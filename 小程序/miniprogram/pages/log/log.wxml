@@ -1,0 +1,19 @@
+<view class="wrap">
+  <view class="sums">
+    <view class="sum" wx:for="{{sums}}" wx:key="id"><view class="av sm" style="background:{{item.c}};color:{{item.i}}">{{item.ch}}</view><text class="sn">{{item.name}}</text><text class="sv num {{item.cls}}">{{item.s}}</text></view>
+  </view>
+  <view class="sec" style="margin-top:12rpx">共 {{total}} 条<text class="s">{{ro?'已结束 · 只读':'点击记录可修改或删除'}}</text></view>
+  <view class="card">
+    <view wx:if="{{!rows.length}}" class="empty">还没有记录</view>
+    <view class="lr" wx:for="{{rows}}" wx:key="i" data-i="{{item.i}}" bindtap="tapRow" hover-class="{{ro?'':'rowp'}}">
+      <view class="rd"><text class="rn num">{{item.round}}</text><text class="rl">局</text></view>
+      <view class="tile" style="background:{{item.c}}29;color:{{item.t}}"><text wx:if="{{item.k==='h9'}}" class="b9" style="width:34rpx;height:34rpx"></text><text wx:else>{{item.ev[0]}}</text></view>
+      <view class="lm">
+        <view class="lt">{{item.name}} · <text style="color:{{item.t}}">{{item.ev}}</text></view>
+        <text class="ls">{{item.time}} · {{item.how}}</text>
+        <text wx:if="{{item.next}}" class="ln">下局顺序 {{item.next}}</text>
+      </view>
+      <view class="ld num"><text wx:for="{{item.ds}}" wx:for-item="d" wx:key="j" class="{{d.cls}}">{{d.txt}}</text></view>
+    </view>
+  </view>
+</view>

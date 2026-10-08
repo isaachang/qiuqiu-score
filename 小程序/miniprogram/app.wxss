@@ -1,0 +1,49 @@
+/* 球球记分 · 全局样式（多巴胺配色，浅色） */
+page{
+  --bg:#F6F4F0;--card:#FFFFFF;--card2:#EEECE7;--tx:#16161A;--tx2:#6B6B73;--tx3:#A9A9B0;--line:rgba(20,20,30,.08);
+  --ink:#16161A;--inkTx:#FFFFFF;--ok:#22C993;--pos:#13B57A;--neg:#F0444D;
+  background:var(--bg);color:var(--tx);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue","Microsoft YaHei",sans-serif;
+  font-size:28rpx;line-height:1.4;
+}
+view,text,button{box-sizing:border-box}
+button{margin:0;padding:0;background:none;border-radius:0;line-height:inherit;font-size:inherit;color:inherit}
+button::after{border:none}
+.num{font-family:"DIN Alternate","SF Pro Rounded",-apple-system,"PingFang SC",sans-serif;font-variant-numeric:tabular-nums}
+.wrap{padding:8rpx 32rpx 80rpx}
+.card{background:var(--card);border-radius:44rpx;box-shadow:0 20rpx 56rpx -28rpx rgba(60,40,20,.28)}
+.sec{display:flex;justify-content:space-between;align-items:center;margin:44rpx 4rpx 20rpx;font-size:34rpx;font-weight:700}
+.sec .s{font-size:26rpx;font-weight:500;color:var(--tx2)}
+.row{display:flex;align-items:center;padding:26rpx 32rpx;position:relative;min-height:112rpx}
+.row+.row::before{content:"";position:absolute;top:0;left:120rpx;right:0;height:1rpx;background:var(--line)}
+.av{width:72rpx;height:72rpx;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:30rpx;flex:none}
+.av.sm{width:52rpx;height:52rpx;font-size:22rpx}
+.tag{display:inline-flex;align-items:center;font-size:22rpx;font-weight:700;padding:4rpx 14rpx;border-radius:99rpx;background:var(--card2);color:var(--tx2);margin-left:10rpx}
+.pos{color:var(--pos)}.neg{color:var(--neg)}
+.btn{height:104rpx;border-radius:52rpx;font-size:32rpx;font-weight:700;display:flex;align-items:center;justify-content:center}
+.btn.pri{background:var(--ink);color:var(--inkTx)}
+.btn.sec2{background:var(--card);color:var(--tx);box-shadow:0 20rpx 56rpx -28rpx rgba(60,40,20,.28)}
+.btn.dis{opacity:.45}
+.press{transform:scale(.96);opacity:.92;transition:transform .2s}
+.cta{position:fixed;left:0;right:0;bottom:0;padding:28rpx 32rpx calc(28rpx + env(safe-area-inset-bottom));background:linear-gradient(to bottom,rgba(246,244,240,0),var(--bg) 30%);display:flex;gap:20rpx;z-index:10}
+.cta .btn{flex:1}
+.empty{text-align:center;color:var(--tx2);font-size:28rpx;padding:100rpx 0}
+.seg{display:flex;padding:6rpx;border-radius:28rpx;background:#E9E7E1;position:relative;height:80rpx}
+.seg .it{flex:1;display:flex;align-items:center;justify-content:center;font-size:28rpx;font-weight:600;color:var(--tx2);border-radius:22rpx;position:relative;z-index:2;transition:color .25s}
+.seg .it.on{color:var(--tx)}
+.seg .thumb{position:absolute;top:6rpx;bottom:6rpx;left:6rpx;border-radius:22rpx;background:var(--card);box-shadow:0 4rpx 16rpx rgba(0,0,0,.08);transition:transform .45s cubic-bezier(.3,1.4,.5,1);z-index:1}
+.tile{width:68rpx;height:68rpx;border-radius:22rpx;display:flex;align-items:center;justify-content:center;flex:none;font-size:30rpx;font-weight:800}
+.b9{width:30rpx;height:30rpx;border-radius:50%;display:inline-block;background:linear-gradient(180deg,#fff 0 26%,#FFC21A 26% 74%,#fff 74%);box-shadow:inset 0 0 0 1rpx rgba(0,0,0,.15);vertical-align:middle}
+/* 底部面板 */
+.sheet-mask{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(10,10,20,.38);z-index:50;opacity:0;transition:opacity .25s;pointer-events:none}
+.sheet-mask.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:16rpx;right:16rpx;bottom:16rpx;border-radius:60rpx;background:var(--card);padding:16rpx 32rpx calc(40rpx + env(safe-area-inset-bottom));z-index:51;transform:translateY(110%);transition:transform .4s cubic-bezier(.2,.9,.25,1.05)}
+.sheet.on{transform:none}
+.sheet .grab{width:72rpx;height:10rpx;border-radius:6rpx;background:var(--tx3);opacity:.5;margin:4rpx auto 20rpx}
+.sheet .st{text-align:center;font-size:34rpx;font-weight:700}
+.sheet .ss{text-align:center;font-size:24rpx;color:var(--tx2);margin:6rpx 0 28rpx}
+/* 统一输入框 */
+.es-in{display:flex;align-items:center;height:108rpx;border-radius:34rpx;background:#F0EEE9;padding:0 32rpx;transition:box-shadow .2s,background .2s}
+.es-in.fo{background:#fff;box-shadow:inset 0 0 0 4rpx #16161A}
+.es-ipt{flex:1;height:108rpx;font-size:34rpx;font-weight:600;color:#16161A}
+.es-ph{color:#A9A9B0;font-weight:500}

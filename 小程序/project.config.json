@@ -1,0 +1,19 @@
+{
+  "description": "球球记分",
+  "miniprogramRoot": "miniprogram/",
+  "compileType": "miniprogram",
+  "appid": "wx2de2fab9928167ef",
+  "projectname": "qiuqiu-jifen",
+  "libVersion": "3.5.8",
+  "setting": {
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "minifyWXSS": true,
+    "minifyWXML": true,
+    "urlCheck": true
+  },
+  "packOptions": { "ignore": [], "include": [] },
+  "editorSetting": { "tabIndent": "insertSpaces", "tabSize": 2 }
+}

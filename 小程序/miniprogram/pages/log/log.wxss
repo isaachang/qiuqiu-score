@@ -1,0 +1,15 @@
+.sums{display:flex;gap:16rpx}
+.sum{flex:1;min-width:0;display:flex;align-items:center;gap:12rpx;padding:20rpx 24rpx;border-radius:36rpx;background:#fff;box-shadow:0 20rpx 56rpx -28rpx rgba(60,40,20,.28)}
+.sn{flex:1;min-width:0;font-size:26rpx;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sv{font-size:38rpx;font-weight:800}
+.lr{display:flex;align-items:center;gap:20rpx;padding:24rpx 28rpx;position:relative}
+.lr+.lr::before{content:"";position:absolute;top:0;left:200rpx;right:0;height:1rpx;background:var(--line)}
+.rowp{background:var(--line)}
+.rd{width:64rpx;display:flex;flex-direction:column;align-items:center;flex:none}
+.rn{font-size:32rpx;font-weight:800;line-height:1}
+.rl{font-size:20rpx;color:var(--tx2)}
+.lm{flex:1;min-width:0;display:flex;flex-direction:column}
+.lt{font-size:30rpx;font-weight:700}
+.ls{font-size:24rpx;color:var(--tx2);margin-top:4rpx}
+.ln{font-size:22rpx;color:var(--tx3);margin-top:4rpx}
+.ld{display:flex;flex-direction:column;align-items:flex-end;font-size:26rpx;font-weight:700;line-height:1.5;white-space:nowrap}

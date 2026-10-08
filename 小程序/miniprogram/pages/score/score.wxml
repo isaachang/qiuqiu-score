@@ -1,0 +1,85 @@
+<import src="/templates/odo.wxml"/>
+<view class="screen">
+  <view class="nav" style="padding-top:{{nav.top}}px;height:{{nav.top+nav.h}}px">
+    <view class="bk" bindtap="back"><image src="/images/back.svg"/></view>
+    <view class="tt" style="top:{{nav.top}}px"><text class="t1">第 {{round}} 局</text><text class="t2">{{clock}}</text></view>
+  </view>
+
+  <view class="body">
+    <view wx:if="{{n===3}}" class="order">
+      <text class="ol">本局顺序</text>
+      <view class="oi {{o.first?'first':''}}" wx:for="{{order}}" wx:for-item="o" wx:key="id">
+        <view class="av sm" style="background:{{o.c}};color:{{o.i}}">{{o.ch}}</view><text>{{o.first?'开球':o.name}}</text>
+      </view>
+    </view>
+
+    <view class="cards {{n===3?'trio':'duo'}}">
+      <view wx:for="{{players}}" wx:key="id" class="pc {{item.fx}}" style="background:{{item.c}};color:{{item.i}};{{item.mv}}"
+            data-i="{{item.idx}}" bindtap="onCard" hover-class="pc-press" hover-stay-time="60">
+        <view class="flash"></view><view class="sheen"></view>
+        <view class="top">
+          <view class="ph">
+            <view class="av" style="background:{{item.i}};color:{{item.c}}">{{item.ch}}</view>
+            <view class="pid">
+              <view class="nm">{{item.name}}<image wx:if="{{item.leader}}" class="crown" src="/images/crown.svg"/><text class="role" style="{{item.brk?'background:'+item.i+';color:'+item.c:''}}">{{item.role}}</text></view>
+              <view wx:if="{{n===3}}" class="hint {{hintIntro?'intro':''}}">轻点卡片 · 普胜 +{{puV}}</view>
+            </view>
+          </view>
+          <view class="ps">
+            <template is="odo" data="{{digits:item.digits,neg:item.neg}}"/>
+            <view wx:if="{{n===2}}" class="hint {{hintIntro?'intro':''}}">轻点卡片 · 普胜 +{{puV}}</view>
+            <view wx:if="{{n===2&&item.leader}}" class="lead">领先 {{item.lead}}</view>
+          </view>
+        </view>
+        <view class="chips">
+          <view class="chip" wx:for="{{chips}}" wx:for-item="c" wx:for-index="ci" wx:key="k" data-i="{{item.idx}}" data-k="{{c.k}}"
+                catchtap="onChip" hover-class="chip-press" hover-stop-propagation="{{true}}">
+            <text class="cl"><text wx:if="{{c.k==='h9'}}" class="b9" style="width:24rpx;height:24rpx"></text>{{c.name}}</text>
+            <text class="cv num" style="color:{{c.t}}">{{c.v}}</text>
+            <text wx:if="{{item.cnt[c.k]>0}}" class="cnt num">{{item.cnt[c.k]}}</text>
+          </view>
+        </view>
+        <view wx:for="{{flies}}" wx:for-item="f" wx:for-index="fi" wx:key="id" wx:if="{{f.pi===item.idx}}" class="fly {{f.cls}}">{{f.text}}</view>
+        <view wx:for="{{parts}}" wx:for-item="pt" wx:for-index="pti" wx:key="id" wx:if="{{pt.pi===item.idx}}" class="pt" style="{{pt.style}}"></view>
+      </view>
+    </view>
+  </view>
+
+  <view class="dock">
+    <view class="db hl" bindtap="onUndo" hover-class="dbp"><image src="/images/undo.svg"/>撤销</view>
+    <view class="db" bindtap="toLog" hover-class="dbp"><image src="/images/list.svg"/>记录</view>
+    <view class="db" bindtap="toLand" hover-class="dbp"><image src="/images/rotate.svg"/>横屏</view>
+    <view class="db end" bindtap="finish" hover-class="dbp"><image src="/images/flag.svg"/>结算</view>
+  </view>
+
+  <view wx:if="{{banner}}" class="banner">
+    <view class="bx">
+      <view class="medal" style="background:{{banner.c}};box-shadow:0 0 0 10rpx {{banner.c}}33,0 18rpx 40rpx -12rpx {{banner.c}}">
+        <image wx:if="{{banner.k==='dj'}}" class="mg" src="/images/crown-w.svg"/>
+        <image wx:elif="{{banner.k==='xj'}}" class="mg" src="/images/spark-w.svg"/>
+        <text wx:else class="m9 num">9</text>
+      </view>
+      <text class="bt" style="color:{{banner.tc}}">{{banner.t}}</text><text class="bs">{{banner.sub}}</text>
+    </view>
+  </view>
+
+  <!-- 结算面板 -->
+  <view class="sheet-mask {{fin.show?'on':''}}" bindtap="closeFin" catchtouchmove="noop"></view>
+  <view class="sheet fin {{fin.show?'on':''}}" catchtap="noop">
+    <view class="grab"></view>
+    <view class="st">结束本场对局</view>
+    <view class="ss" wx:if="{{!fin.empty}}">{{fin.rounds}} 局 · {{fin.logs}} 条记分 · 用时 {{fin.dur}}</view>
+    <view class="ss" wx:else>本局还没有记分，结束后不会留下记录</view>
+    <view wx:if="{{!fin.empty}}" class="fin-rank">
+      <view class="fr" wx:for="{{fin.rank}}" wx:key="id">
+        <text class="fno num">{{item.no}}</text>
+        <view class="av sm" style="background:{{item.c}};color:{{item.i}}">{{item.ch}}</view>
+        <text class="fnm">{{item.name}}</text><image wx:if="{{item.top}}" class="fcr" src="/images/crown.svg"/>
+        <text class="fsc num {{item.cls}}">{{item.txt}}</text>
+      </view>
+    </view>
+    <view wx:if="{{!fin.empty}}" class="btn pri" bindtap="saveFin" hover-class="press">保存战绩，查看战报</view>
+    <view class="fin-x" bindtap="discardFin">{{fin.empty?'直接结束':'不保存，直接结束'}}</view>
+    <view class="fin-c" bindtap="closeFin">继续打</view>
+  </view>
+</view>

@@ -1,0 +1,60 @@
+<view class="wrap" style="padding-bottom:220rpx">
+  <view class="seg">
+    <view class="thumb" style="width:calc(50% - 6rpx);transform:translateX({{mode===2?0:100}}%)"></view>
+    <view class="it {{mode===2?'on':''}}" data-n="2" bindtap="setMode">双人追分</view>
+    <view class="it {{mode===3?'on':''}}" data-n="3" bindtap="setMode">三人追分</view>
+  </view>
+
+  <view class="sec">球员<text class="s">第 1 位先开球</text></view>
+  <view class="card {{rolling?'rolling':''}} {{landed?'landed':''}}">
+    <view class="slot" wx:for="{{slots}}" wx:key="id">
+      <view class="no"><text class="nb num">{{item.no}}</text><text wx:if="{{item.first}}" class="ns">开球</text></view>
+      <view class="av" style="background:{{item.c}};color:{{item.i}}">{{item.ch}}</view>
+      <view class="nm">{{item.name}}<text wx:if="{{item.me}}" class="tag">我</text></view>
+      <view class="x" data-i="{{index}}" bindtap="remove" hover-class="press">×</view>
+    </view>
+    <view wx:if="{{lack>0}}" class="slot add" bindtap="openSheet" hover-class="rowp">
+      <view class="no"><text class="nb num">{{slots.length+1}}</text></view>
+      <view class="av addav">+</view>
+      <view class="nm">添加球员<text class="nsub">还差 {{lack}} 位</text></view>
+      <text class="chev">›</text>
+    </view>
+  </view>
+  <view wx:if="{{mode===3}}" class="dice-btn {{rolling?'roll':''}} {{slots.length<2?'dis':''}}" bindtap="shuffle" hover-class="press">
+    <text class="dic">⚄</text><text>{{rolling?'抽签中…':'随机开球顺序'}}</text>
+  </view>
+
+  <view class="sec">计分规则<text class="s" bindtap="toRules">修改 ›</text></view>
+  <view class="card rsum">
+    <view class="rs" wx:for="{{rules}}" wx:key="k" style="background:{{item.c}}1F">
+      <text wx:if="{{item.k==='h9'}}" class="b9"></text>
+      <text>{{item.name}}</text><text class="rv num" style="color:{{item.t}}">{{item.v}}</text><text wx:if="{{item.pay}}" class="rp">{{item.pay}}</text>
+    </view>
+  </view>
+
+  <view class="sec">选项</view>
+  <view class="card">
+    <view class="row"><text class="ol">屏幕常亮</text><switch checked="{{keep}}" color="#22C993" data-k="keep" bindchange="toggle"/></view>
+    <view class="row"><text class="ol">计分震动反馈</text><switch checked="{{vib}}" color="#22C993" data-k="vib" bindchange="toggle"/></view>
+  </view>
+</view>
+
+<view class="cta"><view class="btn pri {{lack>0?'dis':''}}" bindtap="start" hover-class="press">{{lack>0?'还差 '+lack+' 位球员':'开始对局'}}</view></view>
+
+<view class="sheet-mask {{sheet?'on':''}}" bindtap="closeSheet"></view>
+<view class="sheet {{sheet?'on':''}}" catchtap="noop">
+  <view class="grab"></view>
+  <view class="st">添加球员</view>
+  <view class="ss">从球友中选择，或新建一位 · 还差 {{lack}} 位</view>
+  <view class="pick-grid">
+    <view class="pick" wx:for="{{free}}" wx:key="id" data-id="{{item.id}}" bindtap="pick" hover-class="press">
+      <view class="av" style="background:{{item.c}};color:{{item.i}};width:88rpx;height:88rpx;font-size:34rpx">{{item.ch}}</view><text>{{item.name}}</text>
+    </view>
+  </view>
+  <view wx:if="{{!free.length}}" class="empty" style="padding:24rpx 0 36rpx">还没有其他球友，在下面新建一位</view>
+  <view class="add-row">
+    <view class="es-in {{nf?'fo':''}}" style="flex:1"><input class="es-ipt" placeholder="输入名字，新建球友" placeholder-class="es-ph" maxlength="8" value="{{newName}}" bindinput="onName" bindfocus="onFocus" bindblur="onBlur" confirm-type="done" bindconfirm="addNew" cursor-spacing="140"/></view>
+    <view class="btn pri addb" bindtap="addNew">添加</view>
+  </view>
+  <view class="cancel" bindtap="closeSheet">取消</view>
+</view>

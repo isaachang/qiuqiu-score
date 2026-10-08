@@ -1,0 +1,11 @@
+.tcw{position:relative;width:100%}
+.tcc{width:100%;display:block}
+.tip{position:absolute;top:8rpx;min-width:220rpx;max-width:320rpx;padding:18rpx 22rpx;border-radius:24rpx;background:rgba(22,22,26,.92);color:#fff;box-shadow:0 16rpx 40rpx -12rpx rgba(0,0,0,.45);pointer-events:auto;z-index:5}
+.tip.r{transform:translateX(-100%)}
+.tt{display:block;font-size:24rpx;font-weight:800}
+.tn{display:block;font-size:22rpx;color:rgba(255,255,255,.7);margin:4rpx 0 8rpx}
+.trw{display:flex;align-items:center;gap:12rpx;height:40rpx;font-size:24rpx}
+.tdt{width:14rpx;height:14rpx;border-radius:50%;flex:none}
+.tnm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:rgba(255,255,255,.85)}
+.tv{font-weight:800;margin-left:16rpx}
+.thint{position:absolute;right:16rpx;top:4rpx;font-size:20rpx;color:#A9A9B0;background:rgba(255,255,255,.85);padding:4rpx 12rpx;border-radius:99rpx}

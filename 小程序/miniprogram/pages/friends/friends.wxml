@@ -1,0 +1,13 @@
+<view class="wrap">
+  <view class="sec" style="margin-top:12rpx">球友<text class="s">点击可改名、换颜色或删除</text></view>
+  <view class="card">
+    <view class="row" wx:for="{{list}}" wx:key="id" data-id="{{item.id}}" bindtap="openEdit" hover-class="rowp">
+      <view class="av" style="background:{{item.c}};color:{{item.i}}">{{item.ch}}</view>
+      <text class="fn">{{item.name}}</text><text wx:if="{{item.me}}" class="tag">我</text>
+      <text class="chev">›</text>
+    </view>
+  </view>
+  <view class="btn sec2 addb" bindtap="openNew" hover-class="press">＋ 新建球友</view>
+</view>
+<edit-sheet show="{{es.show}}" title="{{es.title}}" name="{{es.name}}" color="{{es.color}}" show-delete="{{es.del}}" ok-text="{{es.ok}}"
+            bind:save="save" bind:delete="del" bind:close="close"/>

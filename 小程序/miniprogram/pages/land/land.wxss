@@ -1,0 +1,44 @@
+@import "/styles/score.wxss";
+/* 横屏下 rpx 会按更宽的屏幕放大，这里用 px 固定尺寸 */
+.ltop{flex:none;position:relative}
+.lgrp{position:absolute;display:flex;gap:8px}
+.lbtn{padding:0 12px;border-radius:999px;background:#fff;box-shadow:0 6px 16px -8px rgba(0,0,0,.25);font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px}
+.lbtn image{width:16px;height:16px}
+.lt{position:absolute;left:0;right:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.lt .t1{font-size:15px;font-weight:700}
+.lt .t2{font-size:11px;color:var(--tx2);font-variant-numeric:tabular-nums}
+.lcols{flex:1;min-height:0;display:flex;gap:12px;box-sizing:border-box}
+.lc{flex:1;min-width:0;display:flex;padding:12px;border-radius:28px;gap:10px}
+.n2 .lc{flex-direction:row}
+.n3 .lc{flex-direction:column}
+.lmain{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;position:relative;z-index:2;border-radius:20px}
+.tzp{background:rgba(255,255,255,.12)}
+.lc .ph .av{width:32px;height:32px;font-size:14px}
+.lc .nm{font-size:17px;gap:6px}
+.lc .crown{width:16px;height:16px}
+.lc .role{font-size:11px;padding:2px 9px}
+.tz{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.n2 .tz .odo{font-size:100px}
+.n3 .tz .odo{font-size:76px}
+.lc .hint{align-self:center;height:22px;font-size:11px;padding:0 9px;border-radius:11px}
+.lbtns{position:relative;z-index:3;display:grid;gap:8px}
+.n2 .lbtns{width:88px;grid-template-rows:repeat(4,1fr)}
+.n3 .lbtns{grid-template-columns:repeat(4,1fr);gap:6px}
+.lc .chip{border-radius:16px;min-height:52px}
+.lc .chip .cl{font-size:12px}
+.lc .chip .cv{font-size:19px}
+.n3 .chip .cl{font-size:11px}
+.n3 .chip .cv{font-size:17px}
+.lc .chip .cnt{min-width:18px;height:18px;line-height:18px;font-size:11px;padding:0 5px;border-radius:9px;top:-5px;right:-3px}
+.lc .fly{font-size:28px}
+
+/* 横屏庆祝弹窗：和竖屏同比例。
+   竖屏尺寸以屏幕短边（宽 750rpx）为基准；横屏的短边是高度，所以这里把竖屏的 rpx 按「短边 390px ÷ 750rpx」换算成 px，
+   弹窗占短边的比例和竖屏一致（不能直接用 rpx，横屏下 rpx 按长边放大会大一倍多）。 */
+.bx{padding:23px 40px 21px;border-radius:35px;gap:4px}
+.medal{width:77px;height:77px}
+.medal .mg{width:44px;height:44px}
+.medal .m9{width:44px;height:44px;font-size:27px}
+.bx .bt{font-size:44px;letter-spacing:4px}
+.bx .bs{font-size:15px}
+.bx{width:260px;min-height:218px;padding-left:19px;padding-right:19px}

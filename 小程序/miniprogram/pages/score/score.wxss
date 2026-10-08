@@ -1,0 +1,33 @@
+@import "/styles/score.wxss";
+.body{flex:1;min-height:0;display:flex;flex-direction:column;padding:0 16rpx calc(176rpx + env(safe-area-inset-bottom))}
+.order{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12rpx;height:100rpx;padding:0 20rpx;border-radius:40rpx;background:#fff;margin-bottom:20rpx;box-shadow:0 20rpx 56rpx -28rpx rgba(60,40,20,.28)}
+.ol{font-size:24rpx;font-weight:700;color:var(--tx2);white-space:nowrap}
+.oi{display:flex;align-items:center;gap:10rpx;padding:6rpx 20rpx 6rpx 6rpx;border-radius:99rpx;background:var(--card2);font-size:26rpx;font-weight:700;max-width:220rpx;white-space:nowrap;overflow:hidden}
+.oi.first{background:var(--ink);color:var(--inkTx)}
+.cards{flex:1;min-height:0;display:flex;flex-direction:column;gap:24rpx}
+.cards .pc{flex:1;min-height:0;display:flex;flex-direction:column}
+.top{flex:1;min-height:0;display:flex;flex-direction:column}
+.duo .ps{flex:1;gap:12rpx}
+.duo .odo{font-size:240rpx}
+.duo .chip{height:136rpx}
+.trio .pc{padding:24rpx}
+.trio .top{flex-direction:row;align-items:flex-start;justify-content:space-between}
+.trio .ps{align-self:center}
+.trio .odo{font-size:156rpx}
+.trio .chips{gap:12rpx;margin-top:12rpx}
+.trio .chip{height:118rpx;border-radius:30rpx}
+.trio .chip .cl{font-size:22rpx}
+.trio .chip .cv{font-size:34rpx}
+
+/* 结算面板 */
+.fin{z-index:70}
+.sheet-mask{z-index:69}
+.fin-rank{background:#F6F4F0;border-radius:36rpx;padding:8rpx 28rpx;margin-bottom:32rpx}
+.fr{display:flex;align-items:center;gap:20rpx;height:96rpx}
+.fr+.fr{border-top:1rpx solid rgba(20,20,30,.08)}
+.fno{width:36rpx;font-size:32rpx;font-weight:900;color:#A9A9B0}
+.fnm{font-size:30rpx;font-weight:700}
+.fcr{width:32rpx;height:32rpx}
+.fsc{margin-left:auto;font-size:38rpx;font-weight:800}
+.fin-x{text-align:center;color:#F0444D;font-size:30rpx;font-weight:600;padding:32rpx 0 0}
+.fin-c{text-align:center;color:#6B6B73;font-size:30rpx;font-weight:600;padding:28rpx 0 4rpx}

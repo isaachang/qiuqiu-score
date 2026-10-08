@@ -1,0 +1,51 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/stats/stats",
+    "pages/me/me",
+    "pages/setup/setup",
+    "pages/rules/rules",
+    "pages/score/score",
+    "pages/land/land",
+    "pages/log/log",
+    "pages/result/result",
+    "pages/friends/friends",
+    "pages/h2h/h2h"
+  ],
+  "window": {
+    "navigationBarTitleText": "球球记分",
+    "navigationBarBackgroundColor": "#F6F4F0",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#F6F4F0",
+    "backgroundTextStyle": "dark"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents",
+  "tabBar": {
+    "color": "#A9A9B0",
+    "selectedColor": "#16161A",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "追分",
+        "iconPath": "images/tab/home.png",
+        "selectedIconPath": "images/tab/home-on.png"
+      },
+      {
+        "pagePath": "pages/stats/stats",
+        "text": "战绩",
+        "iconPath": "images/tab/stats.png",
+        "selectedIconPath": "images/tab/stats-on.png"
+      },
+      {
+        "pagePath": "pages/me/me",
+        "text": "我的",
+        "iconPath": "images/tab/me.png",
+        "selectedIconPath": "images/tab/me-on.png"
+      }
+    ]
+  }
+}

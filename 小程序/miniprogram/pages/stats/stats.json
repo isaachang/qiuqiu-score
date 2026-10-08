@@ -1,0 +1,1 @@
+{ "navigationBarTitleText": "战绩", "usingComponents": { "swipe-row": "/components/swipe-row/swipe-row", "trend-chart": "/components/trend-chart/trend-chart" } }

@@ -1,0 +1,9 @@
+.mecard{display:flex;align-items:center;gap:28rpx;padding:36rpx;margin-top:12rpx}
+.mm{flex:1;display:flex;flex-direction:column}
+.mn{font-size:40rpx;font-weight:800}
+.ms{font-size:24rpx;color:var(--tx2);margin-top:6rpx}
+.rl{flex:1;font-size:30rpx;font-weight:500}
+.rv{font-size:26rpx;color:var(--tx2);margin-right:12rpx}
+.chev{color:var(--tx3);font-size:40rpx}
+.row+.row::before{left:32rpx}
+.rowp{background:var(--line)}

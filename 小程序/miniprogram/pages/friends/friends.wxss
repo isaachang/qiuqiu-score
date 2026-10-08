@@ -1,0 +1,4 @@
+.fn{flex:1;margin-left:24rpx;font-size:30rpx;font-weight:600}
+.chev{color:var(--tx3);font-size:40rpx;margin-left:12rpx}
+.rowp{background:var(--line)}
+.addb{margin-top:32rpx}

@@ -1,0 +1,42 @@
+.hello{margin:12rpx 4rpx 32rpx;display:flex;flex-direction:column}
+.hs{font-size:26rpx;color:var(--tx2);font-weight:600}
+.hb{font-size:52rpx;font-weight:800;margin-top:4rpx}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:24rpx}
+.mode{height:400rpx;border-radius:56rpx;padding:36rpx;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;color:#fff}
+.mode .blob{position:absolute;border-radius:50%;animation:bob 5s ease-in-out infinite}
+.mode .b2{animation-duration:6s;animation-delay:-2s}
+.mode .b3{animation-duration:5.5s;animation-delay:-3.5s}
+@keyframes bob{50%{transform:translate(8rpx,-16rpx) scale(1.05)}}
+.mode .go{position:absolute;right:28rpx;top:28rpx;width:72rpx;height:72rpx;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:44rpx;font-weight:600}
+.mt{font-size:48rpx;font-weight:800;position:relative}
+.ms{font-size:24rpx;font-weight:600;opacity:.88;margin-top:8rpx;position:relative}
+.live{padding:32rpx;margin-top:24rpx}
+.lh{display:flex;align-items:center;gap:16rpx;min-height:64rpx}
+.dot{width:16rpx;height:16rpx;border-radius:50%;background:#22C993;flex:none;animation:pulse 1.6s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,201,147,.6)}70%{box-shadow:0 0 0 16rpx rgba(34,201,147,0)}100%{box-shadow:0 0 0 0 rgba(34,201,147,0)}}
+.lt{flex:1;min-width:0;font-size:26rpx;font-weight:600;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.go2{height:64rpx;padding:0 24rpx;border-radius:32rpx;background:var(--ink);color:var(--inkTx);font-size:26rpx;font-weight:700;display:flex;align-items:center;flex:none}
+.lg{display:grid;gap:16rpx;margin-top:28rpx}
+.ln{font-size:24rpx;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ls{font-size:44rpx;font-weight:800;line-height:1.15}
+.more{display:flex;gap:20rpx}
+.mm{flex:1;height:172rpx;border-radius:40rpx;padding:24rpx;display:flex;flex-direction:column;justify-content:space-between}
+.mmt{font-size:30rpx;font-weight:700}
+.mtag{align-self:flex-start;font-size:22rpx;font-weight:700;padding:4rpx 14rpx;border-radius:99rpx}
+.stack{display:flex;width:100rpx;flex:none}
+.stack .av{box-shadow:0 0 0 4rpx #fff}
+.stack .av+.av{margin-left:-20rpx}
+.rm{flex:1;min-width:0;margin-left:20rpx;display:flex;flex-direction:column}
+.rn{font-size:30rpx;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rs{font-size:24rpx;color:var(--tx2);margin-top:4rpx}
+.wl{display:flex;flex-direction:column;align-items:flex-end;font-size:32rpx;font-weight:800}
+.wr{font-size:22rpx;color:var(--tx2);font-weight:600}
+.rowp{background:var(--line)}
+
+.sep::before{content:"";position:absolute;top:0;left:120rpx;right:0;height:1rpx;background:var(--line)}
+.clip{overflow:hidden}
+
+/* 进行中卡片：每位球员竖排（头像 / 名字 / 分数），在等宽列里居中 —— 头像位置不受名字和分数长短影响 */
+.lp{display:flex;flex-direction:column;align-items:center;min-width:0;text-align:center}
+.lp .ln{margin-top:12rpx;max-width:100%}
+.lp .ls{margin-top:2rpx}

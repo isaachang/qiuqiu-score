@@ -1,0 +1,7 @@
+<view class="sw-wrap">
+  <view class="sw-del" bindtap="del"><text>删除</text></view>
+  <view class="sw-body {{anim?'sw-anim':''}}" style="transform:translateX({{x}}px)"
+        bindtouchstart="start" bindtouchmove="move" bindtouchend="end" bindtouchcancel="end" bindtap="tapBody">
+    <slot></slot>
+  </view>
+</view>

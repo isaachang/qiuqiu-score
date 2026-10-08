@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cue 追分 · 可交互 Demo</title>
+<link rel="stylesheet" href="app.css">
+<style>
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;background:#ECEAE4;color:#16161A;-webkit-font-smoothing:antialiased;transition:background .35s,color .35s;overflow:hidden}
+body.dark{background:#060608;color:#F4F4F6}
+.shell{display:grid;grid-template-columns:260px 1fr 320px;height:100vh}
+.side{padding:28px 22px;overflow-y:auto;scrollbar-width:none}
+.side::-webkit-scrollbar{display:none}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.brand i{width:34px;height:34px;border-radius:11px;background:conic-gradient(#FF5A5F 0 25%,#FFC53D 0 50%,#1FC98E 0 75%,#3D7BFF 0);display:block}
+.brand b{font-size:19px;font-weight:800}
+.sub{font-size:12px;color:#7A7A82;line-height:1.55;margin-bottom:18px}
+body.dark .sub{color:#8D8D95}
+.grp{font-size:11px;font-weight:700;color:#9A9AA2;letter-spacing:.5px;margin:18px 0 6px}
+.jump{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border-radius:12px;font-size:14px;font-weight:600;text-align:left;transition:background .2s}
+.jump:hover{background:rgba(0,0,0,.05)}
+body.dark .jump:hover{background:rgba(255,255,255,.06)}
+.jump.on{background:#16161A;color:#fff}
+body.dark .jump.on{background:#fff;color:#111}
+.jump span{width:8px;height:8px;border-radius:50%;flex:none}
+.tools{display:flex;gap:8px;margin-top:22px;flex-wrap:wrap}
+.tbtn{height:36px;padding:0 14px;border-radius:18px;font-size:13px;font-weight:700;background:#fff;box-shadow:0 1px 0 rgba(0,0,0,.06),inset 0 0 0 .5px rgba(0,0,0,.08);display:flex;align-items:center;gap:6px}
+body.dark .tbtn{background:#1D1D22;box-shadow:inset 0 0 0 .5px rgba(255,255,255,.1)}
+.tbtn.k{background:#16161A;color:#fff}
+body.dark .tbtn.k{background:#fff;color:#111}
+.stage{display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.scaler{transform-origin:center center;transition:transform .5s cubic-bezier(.3,1.2,.5,1)}
+.panel{padding:28px 24px;overflow-y:auto;scrollbar-width:none}
+.panel::-webkit-scrollbar{display:none}
+.pcard{background:#fff;border-radius:22px;padding:18px;margin-bottom:14px;box-shadow:0 10px 30px -18px rgba(0,0,0,.25)}
+body.dark .pcard{background:#16161B;box-shadow:inset 0 0 0 .5px rgba(255,255,255,.08)}
+.pcard h3{font-size:18px;font-weight:800;margin-bottom:4px}
+.pcard .route{font:600 11px ui-monospace,Menlo,monospace;color:#9A9AA2;margin-bottom:12px}
+.pcard h4{font-size:12px;font-weight:700;color:#9A9AA2;margin:14px 0 8px;letter-spacing:.3px}
+.pcard ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.pcard li{font-size:13px;line-height:1.55;padding-left:16px;position:relative}
+.pcard li::before{content:"";position:absolute;left:2px;top:8px;width:6px;height:6px;border-radius:50%;background:var(--d,#FF5A5F)}
+.pcard li b{font-weight:700}
+.mp li::before{background:#3D7BFF}
+.rulebox{font-size:12.5px;line-height:1.7}
+.rulebox code{font:700 12px ui-rounded,-apple-system;padding:1px 6px;border-radius:6px;background:rgba(0,0,0,.05)}
+body.dark .rulebox code{background:rgba(255,255,255,.08)}
+@media (max-width:1100px){.shell{grid-template-columns:1fr}.side,.panel{display:none}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side">
+    <div class="brand"><i></i><b>Cue 追分</b></div>
+    <div class="sub">可交互 Demo · 微信小程序内测版方向<br>直接在手机里点按操作，左侧可跳到任意页面。</div>
+    <div id="jumps"></div>
+    <div class="tools">
+      <button class="tbtn k" id="themeBtn">深色模式</button>
+      <button class="tbtn" id="resetBtn">重置数据</button>
+      <a class="tbtn" href="flow.html" style="text-decoration:none;color:inherit">页面关系总览图 →</a>
+    </div>
+  </aside>
+  <main class="stage" id="stage">
+    <div class="scaler" id="scaler"><div class="device" id="device"><div class="island"></div><div id="host"></div></div></div>
+  </main>
+  <aside class="panel">
+    <div class="pcard" id="notes"></div>
+    <div class="pcard rulebox">
+      <h3 style="font-size:15px">当前追分规则（默认）</h3>
+      <div style="margin-top:8px">普胜 <code>+4</code> 大金 <code>+10</code> 小金 <code>+7</code> 黄金九 <code>+4</code> 犯规 <code>−1</code><br>
+      </div>
+      <h4 style="font-size:12px;color:#9A9AA2;margin:12px 0 4px">三人顺序</h4>
+      胜者排第一位开下一局，其余人保持原顺序；犯规不改变顺序。<br>
+      <span style="color:#9A9AA2">例：Isaac → Henry → Hugo<br>· Isaac 大金 → 顺序不变<br>· Henry 普胜 → Henry → Isaac → Hugo<br>· Hugo 普胜 → Hugo → Isaac → Henry</span>
+      <h4 style="font-size:12px;color:#9A9AA2;margin:12px 0 4px">三人付分（可在规则里改）</h4>
+      普胜 / 小金：上家付 · 大金 / 黄金九：两家付<br>犯规：扣 1 分给上家<br>
+      <span style="color:#9A9AA2">双人：一律对手付，赢家开球。</span>
+    </div>
+  </aside>
+</div>
+<script src="app.js"></script>
+<script>
+const {App,makeStore}=Cue;
+const NOTES={
+  home:{t:'首页',r:'pages/home',i:['<b>双人追分 / 三人追分</b>两个主按钮放在最前面，一点即进入新对局','有进行中的对局时出现「继续对局」卡片，实时比分 + 计时','「更多玩法」预留中式八球、斯诺克等入口（点按提示即将上线）','底部 Tab：追分 / 战绩 / 我的'],m:['自定义导航栏，避让右上角微信胶囊','自定义 tabBar 组件']},
+  setup:{t:'新对局',r:'pages/setup',i:['顶部切换双人 / 三人','只有一种方式：<b>添加球员</b> —— 从球友里点选，或输入名字新建','按添加顺序排位，第 1 位先开球；点 × 移除','人数不够时按钮显示「还差 N 位球员」，点击直接弹出添加','「修改」进入计分规则'],m:['添加球员用底部弹出面板（自定义组件）','选项开关对应 wx.setKeepScreenOn / wx.vibrateShort']},
+  rules:{t:'计分规则',r:'pages/rules',i:['5 项：普胜、大金、小金、黄金九、犯规，每项可 ± 调整分值','三人模式可设置由谁付分：上家付 / 两家付；犯规可设给上家 / 下家','规则保存在对局里，修改默认规则不影响已开的局'],m:['规则以 JSON 配置存储 → 新玩法只需新增配置']},
+  score:{t:'记分（竖屏）',r:'pages/score',i:['<b>轻点卡片 = 普胜</b>：最常见的情况点一下就行','卡片上有「轻点卡片 · 普胜 +4」小提示（不带气泡），进入页面时轻轻呼吸两次；点击有涟漪反馈','下方 4 个按钮：大金、小金、黄金九、犯规；角标为本场次数','三人模式顶部「本局顺序」实时重排：胜者到第一位开球','不弹提示框：得失分直接从比分上飞出（写明「付」），点错用底栏「撤销」','大金、黄金九全屏庆祝；金球扫光 + 彩纸；犯规卡片震动'],m:['卡片 bindtap = 普胜，按钮用 catchtap 阻止冒泡','卡片位置固定不随顺序移动，避免误触','计分时调用 wx.vibrateShort({type:"light"})']},
+  land:{t:'记分（横屏）',r:'pages/score-landscape',i:['<b>轻点比分 = 普胜</b>','<b>双人</b>：两张卡样式一致 —— 名字在左上、比分居中、大金 / 小金 / 黄金九 / 犯规 竖排在卡片右侧','<b>三人</b>：卡片较窄，4 个按钮在卡片底部横排','左上角「竖屏」返回，「撤销」随时可用'],m:['页面 json 设置 "pageOrientation": "landscape"，仅此页横屏']},
+  log:{t:'对局记录',r:'pages/log',i:['逐条显示：第几局、事件、谁付了几分、时间','三人模式显示每局之后的新顺序','点击任意一条可<b>修改</b>（换人 / 换事件）或<b>删除</b>，比分、顺序自动重算'],m:['记录只存事件，比分由规则引擎重算 → 修改历史不会算错']},
+  result:{t:'结算 · 战报',r:'pages/result',i:['胜者色块 + 皇冠 + 彩纸','排名、本场高光（最长连胜、金球、普胜）','数据对比表；「逐局记录」查看全过程','<b>分享战报</b>生成海报；<b>再来一局</b>沿用球员与规则，按本场最终顺序开局'],m:['海报用 Canvas 2D 绘制 → wx.canvasToTempFilePath → wx.saveImageToPhotosAlbum','分享给好友：onShareAppMessage']},
+  stats:{t:'战绩',r:'pages/stats',i:['按全部 / 双人 / 三人筛选','胜率、对局数、累计净胜分、净胜分走势','得分构成（各事件次数）','交手记录 → 进入与某位球友的对比；历史对局 → 对局详情'],m:['图表用 Canvas 或 ECharts 小程序版（小程序不支持内联 SVG）','内测版数据存在本机；第二版接云开发同步']},
+  h2h:{t:'交手记录',r:'pages/h2h',i:['与某位球友的同场胜负比','同场对局列表，可进入详情'],m:[]},
+  me:{t:'我的',r:'pages/me',i:['浅色 / 深色模式切换','默认计分规则、球友管理','震动、屏幕常亮开关；规则说明'],m:['深色模式：小程序 darkmode 配置 + 主题变量']},
+  friends:{t:'球友管理',r:'pages/friends',i:['球友列表，新建球友（自动分配多巴胺颜色）'],m:['内测版只存本机；第二版可邀请好友扫码加入对局']}
+};
+const JUMPS=[
+  ['开始',[['home','首页','#FF5A5F'],['setup2','新对局 · 双人','#FF5A5F'],['setup3','新对局 · 三人','#3D7BFF'],['rules','计分规则','#FFC53D']]],
+  ['记分',[['score2','双人记分','#FF5A5F'],['score3','三人记分','#3D7BFF'],['land2','横屏记分 · 双人','#1FC98E'],['land3','横屏记分 · 三人','#1FC98E'],['log','对局记录','#9B6BFF']]],
+  ['结算与战绩',[['result','结算战报','#FFC53D'],['stats','战绩','#3D7BFF'],['h2h','交手记录','#FF8A3D'],['me','我的','#9B6BFF']]]
+];
+let app,store=makeStore(),theme='light';
+const host=document.getElementById('host'),device=document.getElementById('device'),scaler=document.getElementById('scaler');
+function fit(){const st=document.getElementById('stage'),land=device.classList.contains('land');
+  const w=land?868:414,h=land?414:868,k=Math.min(1,(st.clientHeight-40)/h,(st.clientWidth-40)/w);scaler.style.transform=`scale(${k})`}
+function boot(){
+  host.innerHTML='';host.className='';device.classList.remove('land');
+  app=new App(host,{store,theme,
+    onOrient:land=>{device.classList.toggle('land',land);device.classList.remove('rot-in','rot-out');void device.offsetWidth;device.classList.add(land?'rot-in':'rot-out');fit()},
+    onPage:name=>{showNotes(name);highlight(name)},
+    onTheme:t=>{theme=t;document.body.classList.toggle('dark',t==='dark');themeBtn.textContent=t==='dark'?'浅色模式':'深色模式'}});
+  fit();
+}
+function showNotes(name){const n=NOTES[name];if(!n)return;
+  document.getElementById('notes').innerHTML=`<h3>${n.t}</h3><div class="route">${n.r}</div><h4>交互</h4><ul>${n.i.map(x=>`<li>${x}</li>`).join('')}</ul>${n.m.length?`<h4>小程序实现</h4><ul class="mp">${n.m.map(x=>`<li>${x}</li>`).join('')}</ul>`:''}`}
+let lastJump='home';
+function highlight(name){const keys=[...document.querySelectorAll('.jump')].map(b=>b.dataset.k);
+  const base=k=>k.replace(/\d$/,'');const pick=base(lastJump)===name?lastJump:keys.find(k=>base(k)===name);
+  document.querySelectorAll('.jump').forEach(b=>b.classList.toggle('on',b.dataset.k===pick))}
+function ensureLive(n){if(!store.live||store.live.mode!==n)store.live=makeStore({live3:n===3}).live}
+function jump(k){
+  lastJump=k;const A=app;
+  if(k==='home')A.tab('home');
+  else if(k==='home3'){ensureLive(3);A.tab('home')}
+  else if(k==='setup2'||k==='setup3'){A.tab('home');Cue.ACTS.new(A,[k.slice(-1)])}
+  else if(k==='rules'){A.tab('home');Cue.ACTS.new(A,['3']);A.open('rules',{target:'draft'})}
+  else if(k==='score2'||k==='score3'){ensureLive(+k.slice(-1));A.reset('score',{},'home')}
+  else if(k==='land2'||k==='land3'){ensureLive(+k.slice(-1));A.reset('score',{},'home');A.open('land')}
+  else if(k==='log'){if(!store.live)ensureLive(2);A.reset('score',{},'home');A.open('log')}
+  else if(k==='result'){A.reset('result',{id:store.history[0].id},'home')}
+  else if(k==='h2h'){A.tab('stats');A.open('h2h',{fid:'u2'})}
+  else A.tab(k);
+  highlight(A.top.name);
+}
+document.getElementById('jumps').innerHTML=JUMPS.map(([g,items])=>`<div class="grp">${g}</div>`+items.map(([k,l,c])=>`<button class="jump" data-k="${k}"><span style="background:${c}"></span>${l}</button>`).join('')).join('');
+document.querySelectorAll('.jump').forEach(b=>b.onclick=()=>jump(b.dataset.k));
+const themeBtn=document.getElementById('themeBtn');
+themeBtn.onclick=()=>app.setTheme(theme==='dark'?'light':'dark');
+document.getElementById('resetBtn').onclick=()=>{store=makeStore();boot();app.toast('已重置数据')};
+window.addEventListener('resize',fit);
+const q=new URLSearchParams(location.search);if(q.get('theme')==='dark'){theme='dark';document.body.classList.add('dark');themeBtn.textContent='浅色模式'}
+boot();
+const h=location.hash.slice(1);if(h)jump(h);
+</script>
+</body>
+</html>

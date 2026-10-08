@@ -1,0 +1,4 @@
+.sw-wrap{position:relative;overflow:hidden}
+.sw-del{position:absolute;top:0;right:0;bottom:0;width:168rpx;background:#F0444D;color:#fff;font-size:30rpx;font-weight:700;display:flex;align-items:center;justify-content:center}
+.sw-body{position:relative;z-index:1;background:#fff}
+.sw-anim{transition:transform .35s cubic-bezier(.3,1.2,.5,1)}

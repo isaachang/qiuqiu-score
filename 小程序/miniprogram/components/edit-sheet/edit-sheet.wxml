@@ -1,0 +1,19 @@
+<view class="sheet-mask {{show?'on':''}}" bindtap="close" catchtouchmove="noop"></view>
+<view class="sheet es {{show?'on':''}}" catchtap="noop">
+  <view class="grab"></view>
+  <view class="st">{{title}}</view>
+  <view class="es-pv">
+    <view class="av es-av" style="background:{{colors[ci].c}};color:{{colors[ci].i}}">{{ch}}</view>
+  </view>
+  <view class="es-in {{focus?'fo':''}}">
+    <input class="es-ipt" value="{{val}}" focus="{{focus}}" maxlength="8" placeholder="输入名字（最多 8 个字）" placeholder-class="es-ph"
+           confirm-type="done" bindinput="onInput" bindconfirm="save" bindfocus="noop" cursor-spacing="140"/>
+    <text class="es-n num">{{val.length}}/8</text>
+  </view>
+  <view wx:if="{{showColor}}" class="es-cl">
+    <view wx:for="{{colors}}" wx:key="c" class="es-dot {{index===ci?'on':''}}" style="background:{{item.c}}" data-i="{{index}}" bindtap="pick"></view>
+  </view>
+  <view class="btn pri es-ok" bindtap="save" hover-class="press">{{okText}}</view>
+  <view wx:if="{{showDelete}}" class="es-del" bindtap="del">删除这位球友</view>
+  <view class="es-cancel" bindtap="close">取消</view>
+</view>

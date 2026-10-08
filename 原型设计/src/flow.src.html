@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cue 追分 · 页面关系总览图</title>
+<link rel="stylesheet" href="app.css">
+<style>
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;background:#ECEAE4;color:#16161A;-webkit-font-smoothing:antialiased;overflow:hidden;transition:background .35s,color .35s}
+body.dark{background:#070709;color:#F4F4F6}
+.top{position:fixed;left:0;right:0;top:0;height:68px;display:flex;align-items:center;gap:16px;padding:0 24px;z-index:50;background:rgba(236,234,228,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:.5px solid rgba(0,0,0,.08)}
+body.dark .top{background:rgba(7,7,9,.8);border-color:rgba(255,255,255,.08)}
+.top .lg{width:30px;height:30px;border-radius:10px;background:conic-gradient(#FF5A5F 0 25%,#FFC53D 0 50%,#1FC98E 0 75%,#3D7BFF 0)}
+.top h1{font-size:18px;font-weight:800}
+.top p{font-size:12px;color:#8A8A92}
+.top .sp{flex:1}
+.legend{display:flex;gap:14px;font-size:12px;font-weight:600;color:#6B6B73}
+body.dark .legend{color:#9D9DA5}
+.legend span{display:flex;align-items:center;gap:6px}
+.tbtn{height:34px;padding:0 13px;border-radius:17px;font-size:13px;font-weight:700;background:#fff;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.1);display:flex;align-items:center;gap:6px;text-decoration:none;color:inherit}
+body.dark .tbtn{background:#1D1D22;box-shadow:inset 0 0 0 .5px rgba(255,255,255,.1)}
+.tbtn.k{background:#16161A;color:#fff}
+body.dark .tbtn.k{background:#fff;color:#111}
+.zoom{display:flex;align-items:center;gap:4px}
+.zoom .tbtn{width:34px;padding:0;justify-content:center}
+.zoom b{font:700 12px ui-rounded;width:44px;text-align:center}
+.vp{position:absolute;inset:68px 0 0 0;overflow:auto;cursor:grab}
+.vp.drag{cursor:grabbing}
+.map{position:relative;transform-origin:0 0;width:2300px;height:2680px}
+.lane{position:absolute;left:30px;right:30px;border-radius:40px;background:rgba(255,255,255,.35);box-shadow:inset 0 0 0 1px rgba(0,0,0,.04)}
+body.dark .lane{background:rgba(255,255,255,.025);box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+.lane b{position:absolute;left:26px;top:20px;font-size:13px;font-weight:800;letter-spacing:1px;color:#9A9AA2}
+.fr{position:absolute;cursor:pointer}
+.fr .cap{display:flex;align-items:baseline;gap:8px;margin:0 4px 10px;white-space:nowrap}
+.fr .cap i{font:800 12px ui-monospace,Menlo,monospace;font-style:normal;color:#fff;background:#16161A;border-radius:7px;padding:2px 6px}
+body.dark .fr .cap i{background:#fff;color:#111}
+.fr .cap b{font-size:15px;font-weight:800}
+.fr .cap small{font-size:11.5px;color:#8A8A92}
+.fr .sc{transform-origin:0 0}
+.fr .host-wrap{pointer-events:none}
+.fr:hover .device{box-shadow:inset 0 0 0 2px #2E2E33,0 0 0 4px #FF5A5F,0 40px 70px -30px rgba(0,0,0,.5)}
+.fr .note{font-size:11.5px;color:#7A7A82;line-height:1.5;margin:10px 4px 0;max-width:230px}
+body.dark .fr .note{color:#8D8D95}
+svg#wires{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.hot{position:absolute;border-radius:12px;border:2.5px solid var(--c);box-shadow:0 0 0 4px color-mix(in srgb,var(--c) 22%,transparent);pointer-events:none}
+.hot i{position:absolute;left:-11px;top:-11px;width:22px;height:22px;border-radius:50%;background:var(--c);color:#fff;font:800 12px/22px ui-rounded,-apple-system;font-style:normal;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.lbl{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;font-size:12px;font-weight:700;padding:5px 10px 5px 5px;border-radius:99px;background:#fff;color:#16161A;box-shadow:0 6px 16px -6px rgba(0,0,0,.25),inset 0 0 0 1.5px var(--c);display:flex;align-items:center;gap:6px;pointer-events:none}
+body.dark .lbl{background:#1A1A1F;color:#F4F4F6}
+.lbl i{width:20px;height:20px;border-radius:50%;background:var(--c);color:#fff;font:800 11px/20px ui-rounded,-apple-system;font-style:normal;text-align:center}
+.lbl em{font-style:normal;font-weight:500;color:#8A8A92;font-size:11px}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="lg"></div>
+  <div><h1>Cue 追分 · 页面关系总览图</h1><p>编号框 = 点击位置，箭头指向点击后到达的页面 · 点任意页面可在可交互 Demo 中打开</p></div>
+  <div class="sp"></div>
+  <div class="legend">
+    <span><svg width="34" height="10"><path d="M2 5h26" stroke="#FF5A5F" stroke-width="2.5"/><path d="M26 1l6 4-6 4z" fill="#FF5A5F"/></svg>页面跳转</span>
+    <span><svg width="34" height="10"><path d="M2 5h26" stroke="#9B6BFF" stroke-width="2.5" stroke-dasharray="5 4"/><path d="M26 1l6 4-6 4z" fill="#9B6BFF"/></svg>弹层 / 面板</span>
+    <span><svg width="34" height="10"><path d="M2 5h26" stroke="#3D7BFF" stroke-width="2.5" stroke-dasharray="1.5 4" stroke-linecap="round"/><path d="M26 1l6 4-6 4z" fill="#3D7BFF"/></svg>Tab 切换</span>
+  </div>
+  <div class="zoom"><button class="tbtn" id="zo">−</button><b id="zv">70%</b><button class="tbtn" id="zi">+</button></div>
+  <button class="tbtn k" id="themeBtn">深色模式</button>
+  <a class="tbtn" href="demo.html">可交互 Demo →</a>
+</div>
+<div class="vp" id="vp"><div class="map" id="map"><svg id="wires" width="2300" height="2680"></svg></div></div>
+<script src="app.js"></script>
+<script>
+const {App,makeStore,DEFAULT_RULES}=Cue;
+const S=.5, PW=414*S, PH=868*S;
+/* 泳道 */
+const LANES=[['开始 · 新对局',40,640],['记分 · 核心',700,1300],['结算',1360,1960],['Tab 页 · 战绩与我的',2020,2620]];
+/* 画板：id, 标题, 说明, x, y, 横屏?, 初始化, demo 跳转 */
+const draft3=s=>{s.draft={mode:3,slots:['u1','u2'],rules:DEFAULT_RULES()};return s};
+const FR=[
+  ['home','首页','双人 / 三人主按钮在最前；继续对局；更多玩法预留',80,100,0,()=>({start:'home'}),'home'],
+  ['setup','新对局','添加球员（第 1 位开球）· 规则摘要 · 选项',560,100,0,()=>({store:draft3(makeStore()),start:'setup'}),'setup3'],
+  ['picker','添加球员','从球友点选，或输入名字新建',1000,100,0,()=>({store:draft3(makeStore()),start:'setup',after:A=>A.run('addP')}),'setup3'],
+  ['rules','计分规则','5 项分值 ±；三人可设上家付 / 两家付',1440,100,0,()=>({store:draft3(makeStore()),start:'rules',params:{target:'draft'}}),'rules'],
+  ['score2','双人记分','轻点卡片 = 普胜 · 4 个事件按钮 · 底栏撤销',80,760,0,()=>({start:'score',after:A=>{A.top.view.score(0,'pu')}}),'score2'],
+  ['score3','三人记分','顶部「本局顺序」：胜者到第一位开球',560,760,0,()=>({store:makeStore({live3:true}),start:'score'}),'score3'],
+  ['land','横屏 · 双人','轻点比分 = 普胜；两张卡同一方向，按钮在右',1000,760,1,()=>({start:'land'}),'land2'],
+  ['land3','横屏 · 三人','卡片较窄，按钮在底部横排',1000,1000,1,()=>({store:makeStore({live3:true}),start:'land'}),'land3'],
+  ['log','对局记录','点任意一条可修改 / 删除，自动重算',1560,760,0,()=>({start:'log'}),'log'],
+  ['finish','结算确认','弹窗确认后生成战报',80,1420,0,()=>({start:'score',after:A=>A.run('finish')}),'score2'],
+  ['result','战报','排名 · 高光 · 数据对比',560,1420,0,s=>({start:'result',params:{id:s.history[0].id}}),'result'],
+  ['poster','分享海报','保存到相册 / 分享给好友',1000,1420,0,s=>({start:'result',params:{id:s.history[0].id},after:A=>A.run('poster:'+s.history[0].id)}),'result'],
+  ['stats','战绩','已下滑到「交手记录 / 历史对局」区域',80,2080,0,()=>({start:'stats',after:A=>{const b=A.top.el.querySelector('.body'),r=b.querySelector('[data-act^=h2h]');b.scrollTop=r.offsetTop-120}}),'stats'],
+  ['h2h','交手记录','与某位球友的同场胜负',560,2080,0,()=>({start:'h2h',params:{fid:'u2'}}),'h2h'],
+  ['detail','对局详情','历史对局复用战报页',1000,2080,0,s=>({start:'result',params:{id:s.history[2].id,detail:1}}),'stats'],
+  ['me','我的','深色模式 · 默认规则 · 球友管理',1440,2080,0,()=>({start:'me'}),'me'],
+  ['friends','球友管理','新建球友自动分配颜色',1960,2080,0,()=>({start:'friends'}),'me']
+];
+/* 连线：编号, 源画板, 源元素, 目标画板, 文案, 类型(push|ovl|tab) */
+const ED0=[
+  [1,'home','[data-act="new:2"]','setup','双人追分','push'],
+  [2,'home','[data-act="new:3"]','setup','三人追分','push'],
+  [3,'home','.live .go2','score2','继续对局','push'],
+  [4,'home','.tabbar [data-act="tab:stats"]','stats','Tab 战绩','tab'],
+  [5,'home','.tabbar [data-act="tab:me"]','me','Tab 我的','tab'],
+  [6,'setup','[data-act="addP"]','picker','添加球员','ovl'],
+  [7,'setup','[data-act="open:rules:draft"]','rules','修改规则','push'],
+  [8,'setup','[data-act="start"]','score3','人齐后开始对局','push'],
+  [10,'score2','[data-act="open:land"]','land','横屏','push'],
+  [11,'score2','[data-act="open:log"]','log','记录','push'],
+  [12,'score2','[data-act="finish"]','finish','结算','ovl'],
+  [13,'score3','[data-act="open:land"]','land3','横屏','push'],
+  [14,'finish','.modal .ok','result','结束对局','push'],
+  [15,'result','[data-act^="poster"]','poster','分享战报','ovl'],
+  [16,'result','[data-act^="again"]','setup','再来一局','push'],
+  [17,'stats','.list [data-act^="h2h"]','h2h','交手记录','push'],
+  [18,'stats','.list [data-act^="match"]','detail','历史对局','push'],
+  [19,'me','[data-act="open:rules:default"]','rules','默认规则','push'],
+  [20,'me','[data-act="open:friends"]','friends','球友管理','push']
+];
+const ED=ED0.map((e,i)=>[i+1,...e.slice(1)]);
+const COL={push:'#FF5A5F',ovl:'#9B6BFF',tab:'#3D7BFF'};
+const map=document.getElementById('map'),wires=document.getElementById('wires'),apps={},frames={};
+let theme='light',zoom=.7;
+LANES.forEach(([t,y1,y2])=>{const d=document.createElement('div');d.className='lane';d.style.top=y1+'px';d.style.height=(y2-y1)+'px';d.innerHTML=`<b>${t}</b>`;map.insertBefore(d,wires)});
+FR.forEach(([id,title,note,x,y,land,init,jump],k)=>{
+  const fr=document.createElement('div');fr.className='fr';fr.style.left=x+'px';fr.style.top=(y+(land?0:0))+'px';
+  const w=land?PH:PW,h=land?PW:PH;
+  fr.innerHTML=`<div class="cap"><i>${String(k+1).padStart(2,'0')}</i><b>${title}</b></div><div class="host-wrap" style="width:${w}px;height:${h}px"><div class="sc" style="transform:scale(${S})"><div class="device ${land?'land':''}"><div class="island"></div><div class="host"></div></div></div></div>${land&&id==='land'?'':`<div class="note">${note}</div>`}`;
+  if(land&&id==='landpop'){fr.querySelector('.cap').insertAdjacentHTML('beforeend',`<small>${note}</small>`)}
+  if(land&&id==='land'){fr.querySelector('.cap').insertAdjacentHTML('beforeend',`<small>${note}</small>`)}
+  fr.onclick=()=>window.open('demo.html'+(theme==='dark'?'?theme=dark':'')+'#'+jump,'_blank');
+  map.appendChild(fr);frames[id]=fr;
+  const store=makeStore();const o=init(store);
+  const A=new App(fr.querySelector('.host'),{store:o.store||store,start:o.start,params:o.params,static:true,theme});
+  apps[id]=A;if(o.after)setTimeout(()=>o.after(A),60);
+});
+function rel(el){const m=map.getBoundingClientRect(),r=el.getBoundingClientRect();return {x:(r.left-m.left)/zoom,y:(r.top-m.top)/zoom,w:r.width/zoom,h:r.height/zoom}}
+function draw(){
+  wires.innerHTML=`<defs>${Object.entries(COL).map(([k,c])=>`<marker id="ar-${k}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="${c}"/></marker>`).join('')}</defs>`;
+  map.querySelectorAll('.hot,.lbl').forEach(e=>e.remove());
+  const used={};
+  ED.forEach(([no,from,sel,to,label,type])=>{
+    const src=apps[from].host.querySelector(sel);if(!src)return;
+    const a=rel(src),tf=rel(frames[to].querySelector('.device')),c=COL[type];
+    const hot=document.createElement('div');hot.className='hot';hot.style.cssText=`--c:${c};left:${a.x-3}px;top:${a.y-3}px;width:${a.w+6}px;height:${a.h+6}px`;hot.innerHTML=`<i>${no}</i>`;map.appendChild(hot);
+    const sx=a.x+a.w/2,sy=a.y+a.h/2;let p1,p2,d1,d2;
+    const right=tf.x>a.x+a.w+20,left=tf.x+tf.w<a.x-20;
+    const k=(used[to]=(used[to]||0)+1);
+    if(right){p1=[a.x+a.w+3,sy];p2=[tf.x-6,Math.min(tf.y+tf.h-30,Math.max(tf.y+30,tf.y+40+k*42))];d1=[1,0];d2=[-1,0]}
+    else if(left&&Math.abs(tf.y-a.y)<300){p1=[a.x-3,sy];p2=[tf.x+tf.w+6,tf.y+60+k*40];d1=[-1,0];d2=[1,0]}
+    else if(tf.y>a.y){p1=[sx,a.y+a.h+3];p2=[tf.x+tf.w/2+(k-1)*40,tf.y-6];d1=[0,1];d2=[0,-1]}
+    else{p1=[sx,a.y-3];p2=[tf.x+tf.w/2+(k-1)*40,tf.y+tf.h+6];d1=[0,-1];d2=[0,1]}
+    const dist=Math.hypot(p2[0]-p1[0],p2[1]-p1[1]),L=Math.max(70,dist*.42);
+    const c1=[p1[0]+d1[0]*L,p1[1]+d1[1]*L],c2=[p2[0]+d2[0]*L,p2[1]+d2[1]*L];
+    const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d',`M${p1} C${c1} ${c2} ${p2}`);path.setAttribute('fill','none');path.setAttribute('stroke',c);path.setAttribute('stroke-width','2.6');
+    if(type==='ovl')path.setAttribute('stroke-dasharray','8 6');if(type==='tab'){path.setAttribute('stroke-dasharray','1.5 6');path.setAttribute('stroke-linecap','round');path.setAttribute('stroke-width','3.2')}
+    path.setAttribute('marker-end',`url(#ar-${type})`);path.setAttribute('opacity','.92');wires.appendChild(path);
+    const t=type==="tab"?.1:dist>560?.24:.5,mt=1-t,mx=mt*mt*mt*p1[0]+3*mt*mt*t*c1[0]+3*mt*t*t*c2[0]+t*t*t*p2[0],my=mt*mt*mt*p1[1]+3*mt*mt*t*c1[1]+3*mt*t*t*c2[1]+t*t*t*p2[1];
+    const lb=document.createElement('div');lb.className='lbl';lb.style.cssText=`--c:${c};left:${mx}px;top:${my}px`;lb.innerHTML=`<i>${no}</i>${label}`;map.appendChild(lb);
+  });
+}
+function setZoom(z){zoom=Math.max(.3,Math.min(1.2,z));map.style.transform=`scale(${zoom})`;map.parentElement.style.setProperty('--z',zoom);
+  document.getElementById('zv').textContent=Math.round(zoom*100)+'%';sizer()}
+function sizer(){let s=document.getElementById('sizer');if(!s){s=document.createElement('div');s.id='sizer';s.style.cssText='position:absolute;left:0;top:0;width:1px;height:1px;pointer-events:none';vp.appendChild(s)}
+  s.style.transform=`translate(${2300*zoom}px,${2680*zoom}px)`}
+const vp=document.getElementById('vp');
+document.getElementById('zi').onclick=()=>setZoom(zoom+.1);document.getElementById('zo').onclick=()=>setZoom(zoom-.1);
+vp.addEventListener('wheel',e=>{if(e.ctrlKey||e.metaKey){e.preventDefault();setZoom(zoom-e.deltaY*.002)}},{passive:false});
+let dr=null;vp.addEventListener('mousedown',e=>{if(e.target.closest('.fr'))return;dr={x:e.clientX,y:e.clientY,l:vp.scrollLeft,t:vp.scrollTop};vp.classList.add('drag')});
+window.addEventListener('mousemove',e=>{if(!dr)return;vp.scrollLeft=dr.l-(e.clientX-dr.x);vp.scrollTop=dr.t-(e.clientY-dr.y)});
+window.addEventListener('mouseup',()=>{dr=null;vp.classList.remove('drag')});
+document.getElementById('themeBtn').onclick=()=>{theme=theme==='dark'?'light':'dark';document.body.classList.toggle('dark',theme==='dark');
+  Object.values(apps).forEach(A=>A.host.classList.toggle('dark',theme==='dark'));document.getElementById('themeBtn').textContent=theme==='dark'?'浅色模式':'深色模式'};
+const fit=()=>setZoom(Math.min(1,(innerWidth-20)/2300));
+const q=new URLSearchParams(location.search);
+if(q.get('theme')==='dark')document.getElementById('themeBtn').click();
+setZoom(q.get('z')?+q.get('z'):Math.max(.5,Math.min(.8,(innerWidth-20)/2300)));
+setTimeout(draw,1100);window.addEventListener('resize',()=>setTimeout(draw,50));
+</script>
+</body>
+</html>

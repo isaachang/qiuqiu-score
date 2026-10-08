@@ -1,0 +1,49 @@
+<view class="wrap">
+  <view class="hello"><text class="hs">{{hello}}</text><text class="hb">今晚来一局？</text></view>
+
+  <view class="modes">
+    <view class="mode" style="background:#FF5A5F" hover-class="press" bindtap="new2">
+      <view class="blob" style="width:240rpx;height:240rpx;background:#FFC53D;right:-60rpx;top:-68rpx"></view>
+      <view class="blob b2" style="width:140rpx;height:140rpx;background:#3D7BFF;right:92rpx;top:76rpx;opacity:.9"></view>
+      <view class="go">+</view>
+      <text class="mt">双人追分</text><text class="ms">1 v 1 · 赢家开球</text>
+    </view>
+    <view class="mode" style="background:#3D7BFF" hover-class="press" bindtap="new3">
+      <view class="blob" style="width:180rpx;height:180rpx;background:#1FC98E;right:-36rpx;top:-40rpx"></view>
+      <view class="blob b2" style="width:128rpx;height:128rpx;background:#FFC53D;right:116rpx;top:40rpx"></view>
+      <view class="blob b3" style="width:100rpx;height:100rpx;background:#FF5A5F;right:40rpx;top:152rpx"></view>
+      <view class="go">+</view>
+      <text class="mt">三人追分</text><text class="ms">胜者开球 · 上家付分</text>
+    </view>
+  </view>
+
+  <view wx:if="{{live}}" class="card live" hover-class="press" bindtap="resume">
+    <view class="lh"><view class="dot"></view><text class="lt">{{live.mode}}追分 · 第 {{live.round}} 局 · {{live.clock}}</text><view class="go2">继续 ›</view></view>
+    <view class="lg c{{live.cols}}" style="grid-template-columns:repeat({{live.cols}},1fr)">
+      <view class="lp" wx:for="{{live.players}}" wx:key="id">
+        <view class="av" style="background:{{item.c}};color:{{item.i}};width:80rpx;height:80rpx;font-size:32rpx">{{item.ch}}</view>
+        <text class="ln">{{item.name}}</text>
+        <text class="ls num {{item.cls}}">{{item.s}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="sec">更多玩法<text class="s">持续上新</text></view>
+  <view class="more">
+    <view class="mm" style="background:#FFF3D6" bindtap="soon"><text class="mmt">中式八球</text><text class="mtag" style="background:#FFE3A1;color:#9A6A00">即将上线</text></view>
+    <view class="mm" style="background:#DDF6EC" bindtap="soon"><text class="mmt">斯诺克</text><text class="mtag" style="background:#BDEDD9;color:#0E7A55">即将上线</text></view>
+    <view class="mm" style="background:#EEE7FF" bindtap="soon"><text class="mmt">九球抢局</text><text class="mtag" style="background:#DCCEFF;color:#5B3BC4">即将上线</text></view>
+  </view>
+
+  <view class="sec">最近对局<text class="s" bindtap="toStats">左滑可删除 · 全部 ›</text></view>
+  <view class="card clip">
+    <view wx:if="{{!recent.length}}" class="empty">还没有对局，开一局吧</view>
+    <swipe-row wx:for="{{recent}}" wx:key="id" data-id="{{item.id}}" bind:tapbody="openMatch" bind:delete="askDelete">
+      <view class="row {{index>0?'sep':''}}">
+      <view class="stack"><view class="av sm" wx:for="{{item.avs}}" wx:for-item="a" wx:key="id" style="background:{{a.c}};color:{{a.i}}">{{a.ch}}</view></view>
+      <view class="rm"><text class="rn">{{item.names}}</text><text class="rs">{{item.mode}} · {{item.rounds}} 局 · {{item.when}}</text></view>
+      <view class="wl"><text class="num {{item.cls}}">{{item.s}}</text><text class="wr">{{item.res}}</text></view>
+      </view>
+    </swipe-row>
+  </view>
+</view>

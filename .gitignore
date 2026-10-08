@@ -1,0 +1,14 @@
+# 上传密钥：只在本机使用，绝不提交
+密钥/
+*.key
+*.pem
+
+# 本地版本快照（已由 git tag 代替）
+版本存档/
+
+# 依赖 / 生成物
+node_modules/
+小程序/preview-qrcode.png
+小程序/project.private.config.json
+小程序/65a2d2baf26bef874cfb2d765d6cbe11/
+.DS_Store

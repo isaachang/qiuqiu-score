@@ -1,0 +1,13 @@
+.es-pv{display:flex;justify-content:center;margin:12rpx 0 28rpx}
+.es-av{width:136rpx;height:136rpx;font-size:56rpx;transition:background .25s}
+.es-in{display:flex;align-items:center;height:108rpx;border-radius:34rpx;background:#F0EEE9;padding:0 32rpx;box-shadow:inset 0 0 0 0 transparent;transition:box-shadow .2s,background .2s}
+.es-in.fo{background:#fff;box-shadow:inset 0 0 0 4rpx #16161A}
+.es-ipt{flex:1;height:108rpx;font-size:34rpx;font-weight:600;color:#16161A}
+.es-ph{color:#A9A9B0;font-weight:500}
+.es-n{font-size:24rpx;color:#A9A9B0;margin-left:16rpx}
+.es-cl{display:flex;justify-content:center;gap:28rpx;margin:32rpx 0 8rpx}
+.es-dot{width:60rpx;height:60rpx;border-radius:50%;transition:transform .25s}
+.es-dot.on{transform:scale(1.15);box-shadow:0 0 0 6rpx #fff,0 0 0 10rpx #16161A}
+.es-ok{margin-top:36rpx}
+.es-del{text-align:center;color:#F0444D;font-size:30rpx;font-weight:600;padding:28rpx 0 0}
+.es-cancel{text-align:center;color:#6B6B73;font-size:30rpx;font-weight:600;padding:28rpx 0 0}

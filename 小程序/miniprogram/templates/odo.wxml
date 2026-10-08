@@ -1,0 +1,4 @@
+<!-- 数字滚轮：每一位是一条 0-9 的竖条，用 translateY 滚到目标数字 -->
+<template name="odo">
+  <view class="odo num"><view class="sg {{neg?'on':''}}">−</view><view class="col" wx:for="{{digits}}" wx:for-item="d"><view class="strip" style="transform:translateY(-{{d}}em)"><view class="dg">0</view><view class="dg">1</view><view class="dg">2</view><view class="dg">3</view><view class="dg">4</view><view class="dg">5</view><view class="dg">6</view><view class="dg">7</view><view class="dg">8</view><view class="dg">9</view></view></view></view>
+</template>

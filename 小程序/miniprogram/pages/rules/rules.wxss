@@ -1,0 +1,17 @@
+.rule{padding:28rpx 28rpx 24rpx;position:relative}
+.rule+.rule::before{content:"";position:absolute;top:0;left:120rpx;right:0;height:1rpx;background:var(--line)}
+.rt{display:flex;align-items:center;gap:24rpx}
+.rm{flex:1;min-width:0;display:flex;flex-direction:column}
+.rn{font-size:32rpx;font-weight:600}
+.rd{font-size:24rpx;color:var(--tx2);margin-top:2rpx}
+.stp{display:flex;align-items:center;height:68rpx;border-radius:34rpx;background:var(--card2)}
+.sb{width:68rpx;height:68rpx;display:flex;align-items:center;justify-content:center;font-size:36rpx;font-weight:600;color:var(--tx2);border-radius:50%}
+.sbp{background:var(--line)}
+.sv{min-width:64rpx;text-align:center;font-size:32rpx;font-weight:800}
+.rp{display:flex;align-items:center;gap:20rpx;margin:20rpx 0 0 92rpx}
+.rpl{font-size:24rpx;color:var(--tx2);white-space:nowrap}
+.seg.sm{flex:1;height:60rpx;border-radius:20rpx;padding:4rpx}
+.seg.sm .it{font-size:24rpx;border-radius:16rpx}
+.seg.sm .thumb{top:4rpx;bottom:4rpx;left:4rpx;border-radius:16rpx}
+.btns{display:flex;gap:20rpx;margin-top:32rpx}
+.btns .btn{flex:1;font-size:28rpx}

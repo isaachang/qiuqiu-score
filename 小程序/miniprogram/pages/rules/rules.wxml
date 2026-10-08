@@ -1,0 +1,23 @@
+<view class="wrap">
+  <view class="sec" style="margin-top:12rpx">计分规则<text class="s">{{isDefault?'新对局默认使用 · 付分设置用于三人':(mode===2?'双人：一律对手付分':'三人模式')}}</text></view>
+  <view class="card">
+    <view class="rule" wx:for="{{list}}" wx:key="k">
+      <view class="rt">
+        <view class="tile" style="background:{{item.c}}29;color:{{item.t}}"><text wx:if="{{item.k==='h9'}}" class="b9" style="width:36rpx;height:36rpx"></text><text wx:else>{{item.name[0]}}</text></view>
+        <view class="rm"><text class="rn">{{item.name}}</text><text class="rd">{{item.desc}}</text></view>
+        <view class="stp"><view class="sb" data-k="{{item.k}}" data-d="-1" bindtap="step" hover-class="sbp">−</view><text class="sv num" style="color:{{item.t}}">{{item.v}}</text><view class="sb" data-k="{{item.k}}" data-d="1" bindtap="step" hover-class="sbp">+</view></view>
+      </view>
+      <view wx:if="{{mode===3}}" class="rp">
+        <text class="rpl">{{item.payLabel}}</text>
+        <view class="seg sm">
+          <view class="thumb" style="width:calc(50% - 6rpx);transform:translateX({{item.idx*100}}%)"></view>
+          <view class="it {{o.on?'on':''}}" wx:for="{{item.opts}}" wx:for-item="o" wx:key="v" data-k="{{item.k}}" data-v="{{o.v}}" bindtap="pay">{{o.l}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+  <view class="btns">
+    <view class="btn sec2" bindtap="reset" hover-class="press">恢复默认</view>
+    <view wx:if="{{!isDefault}}" class="btn sec2" bindtap="saveDefault" hover-class="press">设为以后的默认</view>
+  </view>
+</view>

@@ -1,0 +1,35 @@
+.slot{display:flex;align-items:center;gap:24rpx;padding:24rpx 28rpx;position:relative}
+.slot+.slot::before{content:"";position:absolute;top:0;left:112rpx;right:0;height:1rpx;background:var(--line)}
+.no{width:60rpx;display:flex;flex-direction:column;align-items:center;flex:none}
+.nb{font-size:36rpx;font-weight:800;line-height:1}
+.ns{font-size:20rpx;color:var(--tx2);font-weight:600;margin-top:4rpx}
+.nm{flex:1;font-size:32rpx;font-weight:600;display:flex;align-items:center;flex-wrap:wrap}
+.nsub{width:100%;font-size:24rpx;color:var(--tx2);font-weight:500;margin-top:2rpx}
+.x{width:68rpx;height:68rpx;border-radius:24rpx;background:var(--card2);color:var(--tx2);display:flex;align-items:center;justify-content:center;font-size:40rpx}
+.addav{background:var(--card2);color:var(--tx2);box-shadow:inset 0 0 0 3rpx var(--line);font-size:40rpx;font-weight:500}
+.chev{color:var(--tx3);font-size:40rpx}
+.rowp{background:var(--line)}
+.rsum{padding:28rpx;display:flex;flex-wrap:wrap;gap:16rpx}
+.rs{display:flex;align-items:center;gap:10rpx;padding:14rpx 20rpx;border-radius:24rpx;font-size:26rpx;font-weight:600}
+.rv{font-size:28rpx;font-weight:800}
+.rp{font-size:22rpx;color:var(--tx2);font-weight:500}
+.ol{flex:1;font-size:30rpx;font-weight:500}
+.pick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20rpx;margin-bottom:28rpx}
+.pick{display:flex;flex-direction:column;align-items:center;gap:12rpx;padding:24rpx 8rpx;border-radius:36rpx;background:var(--card2);font-size:26rpx;font-weight:700}
+.add-row{display:flex;gap:16rpx}
+.addb{height:108rpx;border-radius:34rpx;padding:0 40rpx;font-size:30rpx}
+.cancel{text-align:center;color:var(--tx2);font-size:30rpx;font-weight:600;padding:32rpx 0 0}
+
+.dic{font-size:34rpx;line-height:1;display:inline-block}
+.dice-btn.roll .dic{animation:diceSpin .25s linear infinite}
+@keyframes diceSpin{to{transform:rotate(360deg)}}
+.rolling .slot .nm,.rolling .slot .av{animation:blink .14s ease-in-out infinite alternate}
+@keyframes blink{to{opacity:.35;transform:translateY(-4rpx)}}
+.landed .slot{animation:land .5s cubic-bezier(.3,1.5,.5,1)}
+.landed .slot:first-child .no .ns{color:#FF5A5F;font-weight:800}
+@keyframes land{30%{transform:scale(1.03)}}
+
+.dice-btn{margin-top:20rpx;height:108rpx;border-radius:36rpx;background:#fff;box-shadow:0 20rpx 56rpx -28rpx rgba(60,40,20,.28);display:flex;align-items:center;justify-content:center;gap:16rpx;font-size:32rpx;font-weight:800;color:var(--tx)}
+.dice-btn .dic{font-size:44rpx}
+.dice-btn.dis{opacity:.4}
+.dice-btn.roll{background:#16161A;color:#fff}

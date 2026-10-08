@@ -1,0 +1,43 @@
+<import src="/templates/odo.wxml"/>
+<view class="screen">
+  <view class="ltop" style="height:{{bar.top+bar.h}}px">
+    <view class="lgrp" style="left:{{bar.l}}px;top:{{bar.top}}px">
+      <view class="lbtn" style="height:{{bar.h}}px" bindtap="back" hover-class="press"><image src="/images/rotate-dark.svg"/>竖屏</view>
+      <view class="lbtn" style="height:{{bar.h}}px" bindtap="onUndo" hover-class="press"><image src="/images/undo.svg"/>撤销</view>
+    </view>
+    <view class="lt" style="top:{{bar.top}}px;height:{{bar.h}}px"><text class="t1">第 {{round}} 局</text><text class="t2">{{clock}}</text></view>
+  </view>
+  <view class="lcols {{n===3?'n3':'n2'}}" style="padding:12px {{bar.r}}px 14px {{bar.l}}px">
+    <view wx:for="{{players}}" wx:key="id" class="pc lc {{item.fx}}" style="background:{{item.c}};color:{{item.i}};{{item.mv}}">
+      <view class="flash"></view><view class="sheen"></view>
+      <view class="lmain" data-i="{{item.idx}}" bindtap="onCard" hover-class="tzp" hover-stay-time="60">
+        <view class="ph">
+          <view class="av" style="background:{{item.i}};color:{{item.c}}">{{item.ch}}</view>
+          <view class="nm">{{item.name}}<image wx:if="{{item.leader}}" class="crown" src="/images/crown.svg"/><text class="role" style="{{item.brk?'background:'+item.i+';color:'+item.c:''}}">{{item.role}}</text></view>
+        </view>
+        <view class="tz">
+          <template is="odo" data="{{digits:item.digits,neg:item.neg}}"/>
+          <view class="hint">轻点比分 · 普胜 +{{puV}}</view>
+        </view>
+      </view>
+      <view class="lbtns">
+        <view class="chip" wx:for="{{chips}}" wx:for-item="c" wx:for-index="ci" wx:key="k" data-i="{{item.idx}}" data-k="{{c.k}}" catchtap="onChip" hover-class="chip-press">
+          <text class="cl">{{c.name}}</text><text class="cv num" style="color:{{c.t}}">{{c.v}}</text>
+          <text wx:if="{{item.cnt[c.k]>0}}" class="cnt num">{{item.cnt[c.k]}}</text>
+        </view>
+      </view>
+      <view wx:for="{{flies}}" wx:for-item="f" wx:for-index="fi" wx:key="id" wx:if="{{f.pi===item.idx}}" class="fly {{f.cls}}">{{f.text}}</view>
+        <view wx:for="{{parts}}" wx:for-item="pt" wx:for-index="pti" wx:key="id" wx:if="{{pt.pi===item.idx}}" class="pt" style="{{pt.style}}"></view>
+    </view>
+  </view>
+  <view wx:if="{{banner}}" class="banner">
+    <view class="bx">
+      <view class="medal" style="background:{{banner.c}};box-shadow:0 0 0 10rpx {{banner.c}}33,0 18rpx 40rpx -12rpx {{banner.c}}">
+        <image wx:if="{{banner.k==='dj'}}" class="mg" src="/images/crown-w.svg"/>
+        <image wx:elif="{{banner.k==='xj'}}" class="mg" src="/images/spark-w.svg"/>
+        <text wx:else class="m9 num">9</text>
+      </view>
+      <text class="bt" style="color:{{banner.tc}}">{{banner.t}}</text><text class="bs">{{banner.sub}}</text>
+    </view>
+  </view>
+</view>
