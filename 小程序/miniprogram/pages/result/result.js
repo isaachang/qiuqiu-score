@@ -1,11 +1,14 @@
 const store = require('../../utils/store');
+const { enter, onScroll, countUp } = require('../../utils/page');
 const { buildReport } = require('../../utils/report');
 const { dur, dayLabel, clock } = require('../../utils/util');
 
 Page({
   data: { ok: false },
   onLoad(q) { this.id = q.id; },
+  onPageScroll(e) { onScroll(this, e); },
   onShow() {
+    enter(this);
     const m = store.match(this.id);
     if (!m) { this.setData({ ok: false }); return; }
     const R = buildReport(m, id => store.view(id));
@@ -24,6 +27,7 @@ Page({
       conf: Array.from({ length: 18 }, (_, k) => ({ k, l: (k * 37) % 100, c: ['#FFC53D', '#FFFFFF', '#3D7BFF', '#1FC98E', '#9B6BFF', '#FF8A3D'][k % 6], d: 3 + (k % 5) * 0.7, dl: -((k * 0.43) % 4) })),
       chart: this.chartData(R),
     });
+    if (!this._counted) { this._counted = true; this.data.podium.forEach((p, k) => countUp(this, `podium[${k}].txt`, p.txt, 900)); }
   },
 
   /* 走势图数据：每一笔记分一个点 */

@@ -1,0 +1,7 @@
+<view class="tb">
+  <view class="pill" style="transform:translateX({{selected*100}}%)"></view>
+  <view wx:for="{{list}}" wx:key="path" class="ti {{selected===index?'on':''}}" data-i="{{index}}" bindtap="go">
+    <image class="ic {{bounce===index?'bn':''}}" src="{{selected===index?item.on:item.icon}}"/>
+    <text class="tx">{{item.text}}</text>
+  </view>
+</view>

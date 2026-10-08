@@ -85,3 +85,19 @@ page{height:100%;overflow:hidden}
 /* 庆祝弹窗固定尺寸：大金 / 小金 / 黄金九 完全一致，不随说明文字长短变化 */
 .bx{width:500rpx;min-height:420rpx;box-sizing:border-box;padding-left:36rpx;padding-right:36rpx;justify-content:center}
 .bx .bs{text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+
+/* 底栏从下方弹入 */
+.ent .dockin{animation:dockIn .6s cubic-bezier(.2,1.2,.3,1) .25s backwards}
+@keyframes dockIn{from{transform:translateY(160%)}}
+/* 金球庆祝：背后内容虚化，突出庆祝弹窗 */
+.banner{background:rgba(246,244,240,.18);-webkit-backdrop-filter:blur(10px) saturate(140%);backdrop-filter:blur(10px) saturate(140%);animation:bgIn 1.7s ease forwards}
+@keyframes bgIn{0%{opacity:0}12%{opacity:1}82%{opacity:1}100%{opacity:0}}
+/* 首次使用引导 */
+.coach{position:fixed;top:0;left:0;right:0;bottom:0;z-index:80;background:rgba(10,10,20,.55);animation:fadeIn .3s ease}
+.cf{position:relative;z-index:81;box-shadow:0 0 0 8rpx rgba(255,255,255,.9),0 0 0 9999rpx rgba(10,10,20,0)}
+.dock.cf{z-index:81}
+.cb{position:fixed;left:40rpx;right:40rpx;z-index:82;background:#fff;border-radius:40rpx;padding:32rpx 36rpx;box-shadow:0 30rpx 60rpx -20rpx rgba(0,0,0,.5);animation:popIn .45s cubic-bezier(.3,1.4,.5,1)}
+.cbs{font-size:22rpx;font-weight:800;color:#FF5A5F}
+.cbt{display:block;font-size:36rpx;font-weight:900;margin-top:6rpx}
+.cbd{display:block;font-size:26rpx;color:#6B6B73;margin-top:8rpx;line-height:1.5}
+.cbn{margin-top:24rpx;align-self:flex-end;display:inline-flex;height:72rpx;padding:0 36rpx;border-radius:36rpx;background:#16161A;color:#fff;font-size:26rpx;font-weight:800;align-items:center;float:right}

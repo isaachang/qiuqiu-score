@@ -1,20 +1,22 @@
-<view class="wrap">
-  <view class="card mecard" bindtap="rename" hover-class="rowp">
-    <view class="av" style="background:{{me.c}};color:{{me.i}};width:128rpx;height:128rpx;font-size:52rpx">{{me.ch}}</view>
+<nav-bar title="我的" large scrolled="{{scrolled}}"/>
+<view class="wrap {{ent?'ent':'pre'}}">
+  <view class="large rise" style="--i:0"><view><text class="ls">资料与设置</text><text class="lt">我的</text></view></view>
+  <view class="card mecard rise" style="--i:1" bindtap="rename" hover-class="rowp">
+    <view class="av pop" style="--i:1;background:{{me.c}};color:{{me.i}};width:128rpx;height:128rpx;font-size:52rpx">{{me.ch}}</view>
     <view class="mm"><text class="mn">{{me.name}}</text><text class="ms">点击修改名字和颜色 · 已打 {{matches}} 场</text></view>
     <text class="chev">›</text>
   </view>
-  <view class="sec">设置</view>
-  <view class="card">
+  <view class="sec rise" style="--i:2">设置</view>
+  <view class="card rise" style="--i:3">
     <view class="row" bindtap="toRules" hover-class="rowp"><text class="rl">默认计分规则</text><text class="rv">新对局默认使用</text><text class="chev">›</text></view>
     <view class="row" bindtap="toFriends" hover-class="rowp"><text class="rl">球友管理</text><text class="rv">{{count}} 位</text><text class="chev">›</text></view>
     <view class="row"><text class="rl">记分时屏幕常亮</text><switch checked="{{keep}}" color="#22C993" data-k="keep" bindchange="toggle"/></view>
     <view class="row"><text class="rl">计分震动反馈</text><switch checked="{{vib}}" color="#22C993" data-k="vib" bindchange="toggle"/></view>
   </view>
-  <view class="sec">关于</view>
-  <view class="card">
-    <view class="row"><text class="rl">版本</text><text class="rv">内测版 0.1</text></view>
+  <view class="sec rise" style="--i:4">关于</view>
+  <view class="card rise" style="--i:5">
+    <view class="row"><text class="rl">版本</text><text class="rv">内测版 0.2</text></view>
   </view>
+  <view class="tabpad"></view>
 </view>
-
 <edit-sheet show="{{es.show}}" title="我的资料" name="{{es.name}}" color="{{es.color}}" bind:save="saveMe" bind:close="closeEs"/>

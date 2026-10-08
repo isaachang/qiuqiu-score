@@ -1,12 +1,12 @@
 <import src="/templates/odo.wxml"/>
-<view class="screen">
+<view class="screen {{ent?'ent':'pre'}}">
   <view class="nav" style="padding-top:{{nav.top}}px;height:{{nav.top+nav.h}}px">
     <view class="bk" bindtap="back"><image src="/images/back.svg"/></view>
     <view class="tt" style="top:{{nav.top}}px"><text class="t1">第 {{round}} 局</text><text class="t2">{{clock}}</text></view>
   </view>
 
   <view class="body">
-    <view wx:if="{{n===3}}" class="order">
+    <view wx:if="{{n===3}}" class="order rise" style="--i:0">
       <text class="ol">本局顺序</text>
       <view class="oi {{o.first?'first':''}}" wx:for="{{order}}" wx:for-item="o" wx:key="id">
         <view class="av sm" style="background:{{o.c}};color:{{o.i}}">{{o.ch}}</view><text>{{o.first?'开球':o.name}}</text>
@@ -14,7 +14,7 @@
     </view>
 
     <view class="cards {{n===3?'trio':'duo'}}">
-      <view wx:for="{{players}}" wx:key="id" class="pc {{item.fx}}" style="background:{{item.c}};color:{{item.i}};{{item.mv}}"
+      <view wx:for="{{players}}" wx:key="id" class="pc rise {{item.fx}} {{coach===1&&index===0?'cf':''}}" style="--i:{{index+1}};background:{{item.c}};color:{{item.i}};{{item.mv}}"
             data-i="{{item.idx}}" bindtap="onCard" hover-class="pc-press" hover-stay-time="60">
         <view class="flash"></view><view class="sheen"></view>
         <view class="top">
@@ -31,7 +31,7 @@
             <view wx:if="{{n===2&&item.leader}}" class="lead">领先 {{item.lead}}</view>
           </view>
         </view>
-        <view class="chips">
+        <view class="chips {{coach===2&&index===0?'cf':''}}">
           <view class="chip" wx:for="{{chips}}" wx:for-item="c" wx:for-index="ci" wx:key="k" data-i="{{item.idx}}" data-k="{{c.k}}"
                 catchtap="onChip" hover-class="chip-press" hover-stop-propagation="{{true}}">
             <text class="cl"><text wx:if="{{c.k==='h9'}}" class="b9" style="width:24rpx;height:24rpx"></text>{{c.name}}</text>
@@ -45,7 +45,7 @@
     </view>
   </view>
 
-  <view class="dock">
+  <view class="dock dockin {{coach===3?'cf':''}}">
     <view class="db hl" bindtap="onUndo" hover-class="dbp"><image src="/images/undo.svg"/>撤销</view>
     <view class="db" bindtap="toLog" hover-class="dbp"><image src="/images/list.svg"/>记录</view>
     <view class="db" bindtap="toLand" hover-class="dbp"><image src="/images/rotate.svg"/>横屏</view>
@@ -82,4 +82,14 @@
     <view class="fin-x" bindtap="discardFin">{{fin.empty?'直接结束':'不保存，直接结束'}}</view>
     <view class="fin-c" bindtap="closeFin">继续打</view>
   </view>
+  <!-- 首次使用引导 -->
+  <view wx:if="{{coach}}" class="coach" bindtap="nextCoach" catchtouchmove="noop">
+    <view class="cb {{coach===3?'up':''}}" style="{{coach===3?'bottom:calc(200rpx + env(safe-area-inset-bottom))':'top:'+coachTop+'px'}}">
+      <text class="cbs">{{coach}} / 3</text>
+      <text class="cbt">{{coach===1?'轻点卡片 = 普胜':coach===2?'金球和犯规点这里':'点错了随时撤销'}}</text>
+      <text class="cbd">{{coach===1?'最常见的情况，点一下谁的卡片就记谁 +'+puV:coach===2?'大金、小金、黄金九会有庆祝动画；犯规扣 1 分给上家':'打完点「结算」，可以选择保存或不保存'}}</text>
+      <view class="cbn">{{coach===3?'开始记分':'下一步'}}</view>
+    </view>
+  </view>
 </view>
+<ui-sheet show="{{ui.show}}" icon="{{ui.icon}}" title="{{ui.title}}" desc="{{ui.desc}}" actions="{{ui.actions}}" bind:action="onUi" bind:close="onUiClose"/>

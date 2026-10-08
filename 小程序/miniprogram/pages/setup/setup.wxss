@@ -33,3 +33,25 @@
 .dice-btn .dic{font-size:44rpx}
 .dice-btn.dis{opacity:.4}
 .dice-btn.roll{background:#16161A;color:#fff}
+
+/* 旧局未结算面板 */
+.old{z-index:70}
+.ot{display:flex;align-items:center;gap:14rpx;font-size:36rpx;font-weight:900;justify-content:center}
+.odot{width:16rpx;height:16rpx;border-radius:50%;background:#FF8A3D;box-shadow:0 0 0 8rpx rgba(255,138,61,.2);animation:pulseO 1.4s ease-in-out infinite}
+@keyframes pulseO{50%{box-shadow:0 0 0 14rpx rgba(255,138,61,0)}}
+.ob{display:flex;gap:16rpx;background:#F6F4F0;border-radius:36rpx;padding:24rpx 16rpx;margin-bottom:32rpx}
+.op{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;opacity:0;transform:translateY(20rpx) scale(.9)}
+.op.in{animation:opIn .5s cubic-bezier(.3,1.4,.5,1) forwards;animation-delay:calc(var(--i) * 70ms + 150ms)}
+@keyframes opIn{to{opacity:1;transform:none}}
+.opn{font-size:24rpx;color:var(--tx2);margin-top:10rpx;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ops{font-size:40rpx;font-weight:900}
+.ox{text-align:center;color:#F0444D;font-size:30rpx;font-weight:600;padding:32rpx 0 0}
+.oy{text-align:center;color:#6B6B73;font-size:30rpx;font-weight:600;padding:28rpx 0 4rpx}
+/* 不保存确认：正反两面左右滑动切换（不用 3D 翻转，兼容性更好） */
+.oc{position:relative;overflow:hidden}
+.face{transition:transform .5s cubic-bezier(.3,1.15,.5,1),opacity .35s}
+.oc.flip .front{transform:translateX(-110%);opacity:0}
+.back{position:absolute;top:0;left:0;right:0;transform:translateX(110%);opacity:0;display:flex;flex-direction:column}
+.oc.flip .back{transform:none;opacity:1}
+.wic{width:96rpx;height:96rpx;border-radius:50%;background:#FF5A5F1F;color:#F0444D;font-size:52rpx;font-weight:900;display:flex;align-items:center;justify-content:center;margin:12rpx auto 20rpx}
+.btn.danger{background:#F0444D;color:#fff;margin-top:16rpx}

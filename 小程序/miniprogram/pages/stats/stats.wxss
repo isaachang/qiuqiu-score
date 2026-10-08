@@ -64,3 +64,59 @@
 .fe{width:100%;text-align:center;color:var(--tx2);font-size:26rpx;padding:20rpx 0 8rpx}
 .hn{display:flex;align-items:center;gap:10rpx}
 .rtag{font-size:20rpx;font-weight:800;color:#fff;padding:2rpx 12rpx;border-radius:99rpx}
+
+/* ---- 战绩概览 ---- */
+.wld{margin-top:20rpx;padding:32rpx}
+.wr1{display:flex;align-items:baseline;justify-content:space-between}
+.wrl{font-size:28rpx;font-weight:700;color:var(--tx2)}
+.wrv{font-size:88rpx;font-weight:900;color:#13B57A;line-height:1}
+.wbar{display:flex;gap:6rpx;height:16rpx;margin:24rpx 0 20rpx}
+.wb{height:100%;border-radius:8rpx;animation:fill 1s cubic-bezier(.2,1,.3,1)}
+.wb.w{background:#1FC98E}.wb.l{background:#FF5A5F}.wb.d{background:#D9D6CF}
+.wpills{display:grid;grid-template-columns:repeat(3,1fr);gap:16rpx}
+.wp{height:84rpx;border-radius:28rpx;display:flex;align-items:center;justify-content:center;gap:8rpx;font-size:26rpx;font-weight:700}
+.wp text{font-size:36rpx;font-weight:900}
+.wp.w{background:#1FC98E1F;color:#0E9F5E}.wp.l{background:#FF5A5F1F;color:#E5383B}.wp.d{background:var(--card2);color:var(--tx2)}
+/* ---- 个人数据 12 宫格 ---- */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12rpx;padding:20rpx}
+.gc{border-radius:28rpx;background:var(--bg);padding:22rpx 8rpx;display:flex;flex-direction:column;align-items:center;gap:6rpx}
+.gc.hot{background:linear-gradient(160deg,#FFF3D6,#FFE7B0)}
+.gl{font-size:22rpx;color:var(--tx2);font-weight:600;white-space:nowrap}
+.gv{font-size:38rpx;font-weight:900;line-height:1.1}
+.gc.hot .gv{color:#D98200}
+/* ---- 得分来源 ---- */
+.src{padding:28rpx 32rpx}
+.sbar{display:flex;height:28rpx;border-radius:14rpx;overflow:hidden;gap:4rpx}
+.sb{height:100%;animation:fill 1s cubic-bezier(.2,1,.3,1)}
+.sl{display:flex;justify-content:space-around;margin-top:20rpx}
+.sli{display:flex;align-items:center;gap:10rpx;font-size:24rpx;color:var(--tx2);font-weight:600}
+.sd{width:16rpx;height:16rpx;border-radius:50%}
+.slv{color:var(--tx);font-weight:800}
+/* ---- 成就徽章 ---- */
+.ach{display:grid;grid-template-columns:repeat(4,1fr);gap:8rpx;padding:28rpx 12rpx 20rpx}
+.ac{display:flex;flex-direction:column;align-items:center;text-align:center;padding:8rpx 0 12rpx}
+.aci{width:88rpx;height:88rpx;border-radius:30rpx;background:#E3E0D9;color:#fff;font-size:30rpx;font-weight:900;display:flex;align-items:center;justify-content:center;transform:rotate(-6deg)}
+.ac.ok .aci{animation:popIn .55s cubic-bezier(.3,1.4,.5,1)}
+.act{font-size:22rpx;font-weight:800;margin-top:12rpx;color:var(--tx3)}
+.acd{font-size:19rpx;color:var(--tx3);margin-top:2rpx;padding:0 4rpx;line-height:1.3}
+.ac.ok .act{color:var(--tx)}
+.ac.ok .acd{color:var(--tx2)}
+/* ---- 历史对局卡片 ---- */
+.hist{display:flex;flex-direction:column;gap:20rpx}
+.hc-wrap{border-radius:40rpx;overflow:hidden;box-shadow:0 20rpx 56rpx -28rpx rgba(60,40,20,.28)}
+.hc{padding:26rpx 28rpx;background:#fff;border-left:10rpx solid #D9D6CF}
+.hc.W{border-left-color:#1FC98E}.hc.L{border-left-color:#FF5A5F}
+.hct{display:flex;align-items:center;gap:14rpx}
+.mode-ic{width:52rpx;height:52rpx;border-radius:16rpx;color:#fff;font-size:26rpx;font-weight:900;display:flex;align-items:center;justify-content:center}
+.mode-ic.m2{background:#FF5A5F}.mode-ic.m3{background:#3D7BFF}
+.hcm{font-size:30rpx;font-weight:800}
+.hcd{flex:1;min-width:0;font-size:22rpx;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.res{font-size:22rpx;font-weight:800;padding:6rpx 16rpx;border-radius:99rpx}
+.res.W{background:#1FC98E1F;color:#0E9F5E}.res.L{background:#FF5A5F1F;color:#E5383B}.res.D{background:var(--card2);color:var(--tx2)}
+.chips2{display:flex;gap:12rpx;margin-top:20rpx}
+.pchip{flex:1;min-width:0;position:relative;border-radius:22rpx;padding:14rpx 10rpx;display:flex;flex-direction:column;align-items:center;background:var(--bg)}
+.pchip.pos{background:#1FC98E14}.pchip.neg{background:#FF5A5F12}
+.pn{font-size:22rpx;color:var(--tx2);font-weight:600;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ps{font-size:34rpx;font-weight:900;margin-top:2rpx}
+.pchip.pos .ps{color:#0E9F5E}.pchip.neg .ps{color:#E5383B}
+.metag{position:absolute;left:8rpx;top:8rpx;font-size:18rpx;font-weight:800;color:#fff;background:#16161A;padding:0 8rpx;border-radius:8rpx}

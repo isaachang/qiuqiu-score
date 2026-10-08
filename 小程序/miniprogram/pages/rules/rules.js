@@ -1,10 +1,13 @@
 const store = require('../../utils/store');
+const { enter, onScroll } = require('../../utils/page');
 const { EV, MAIN, DEFAULT_RULES } = require('../../utils/engine');
 
 Page({
   data: { mode: 2, list: [] },
-  onLoad(q) { this.isDefault = q.target === 'default' || !store.get().draft; if (this.isDefault) wx.setNavigationBarTitle({ title: '默认计分规则' }); },
-  onShow() { this.render(); },
+  onLoad(q) { this.isDefault = q.target === 'default' || !store.get().draft; this.setData({ navTitle: this.isDefault ? '默认计分规则' : '计分规则' }); },
+  onPageScroll(e) { onScroll(this, e); },
+  onShow() {
+    enter(this); this.render(); },
   rules() { const s = store.get(); return this.isDefault ? s.defaultRules : s.draft.rules; },
   render() {
     const R = this.rules(), mode = this.isDefault ? 3 : store.get().draft.mode;

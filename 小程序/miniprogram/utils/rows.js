@@ -12,6 +12,9 @@ function matchRow(m) {
     avs: m.players.map(id => store.view(id)),
     s: my === null ? '' : signed(my), cls: my > 0 ? 'pos' : my < 0 ? 'neg' : '',
     res: my === null ? '' : (my === max && my > 0 ? '胜' : my < 0 ? '负' : '平'),
+    resK: my === null ? '' : (my === max && my > 0 ? 'W' : my < 0 ? 'L' : 'D'),
+    chips: m.players.map((id, i) => ({ id, name: store.friend(id).name, me: !!store.friend(id).me, s: signed(D.scores[i]), cls: D.scores[i] > 0 ? 'pos' : D.scores[i] < 0 ? 'neg' : '' })),
+    full: (() => { const d = new Date(m.start); return `${d.getMonth() + 1}月${d.getDate()}日 ${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`; })(),
   };
 }
 

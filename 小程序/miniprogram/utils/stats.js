@@ -17,16 +17,20 @@ function transfer(m, D, a, b) {
 
 /** 某人在一组对局里的个人数据 */
 function personal(ms, id) {
-  let rounds = 0, wins = 0, gold = 0, foul = 0, pu = 0, best = 0, score = 0, top = -Infinity, mWins = 0;
-  const ev = { pu: 0, dj: 0, xj: 0, h9: 0, foul: 0 };
+  let rounds = 0, wins = 0, gold = 0, foul = 0, pu = 0, best = 0, score = 0, top = -Infinity, mWins = 0, mLoss = 0, durSum = 0, clean = 0;
+  const ev = { pu: 0, dj: 0, xj: 0, h9: 0, foul: 0 }, gain = { pu: 0, gold: 0, foul: 0 };
   ms.forEach(m => {
     const D = m._D || (m._D = derive(m)), i = m.players.indexOf(id), st = D.stats[i];
     rounds += D.round - 1; wins += st.win; gold += st.dj + st.xj + st.h9; foul += st.foul; pu += st.pu;
     best = Math.max(best, D.best[i]); score += D.scores[i]; top = Math.max(top, D.scores[i]);
     Object.keys(ev).forEach(k => { ev[k] += st[k]; });
-    if (D.scores[i] === Math.max(...D.scores) && D.scores[i] > 0) mWins++;
+    if (D.scores[i] === Math.max(...D.scores) && D.scores[i] > 0) mWins++; else if (D.scores[i] < 0) mLoss++;
+    durSum += Math.max(0, (m.end || m.start) - m.start);
+    if (st.foul === 0 && D.round - 1 >= 5) clean++;
+    D.steps.forEach(s => { const x = s.d[i]; if (x > 0) gain[s.ev === 'foul' ? 'foul' : EV[s.ev].gold ? 'gold' : 'pu'] += x; });
   });
-  return { n: ms.length, rounds, wins, gold, foul, pu, best, score, top: ms.length ? top : 0, mWins, ev,
+  return { n: ms.length, rounds, wins, gold, foul, pu, best, score, top: ms.length ? top : 0, mWins, mLoss, mDraw: ms.length - mWins - mLoss, ev, gain, clean,
+    durAvg: ms.length ? durSum / ms.length : 0, foulPerMatch: ms.length ? Math.round(foul / ms.length * 10) / 10 : 0,
     roundRate: pct(wins, rounds), goldRate: pct(gold, rounds), foulPer: rounds ? Math.round(foul / rounds * 100) / 100 : 0,
     avg: ms.length ? Math.round(score / ms.length * 10) / 10 : 0 };
 }
@@ -77,14 +81,27 @@ function overview(history, meId, seg, view, days) {
   friends.forEach(f => { f.tag = bank && f.id === bank.id ? 'bank' : nemesis && f.id === nemesis.id ? 'nem' : ''; });
   const mate = friends[0] || null;
 
-  const evMax = Math.max(1, ...Object.values(P.ev));
+  const g = P.gain, gt = g.pu + g.gold + g.foul;
+  const mm = Math.round(P.durAvg / 6e4);
   return {
+    wld: { rate: pct(P.mWins, P.n), w: P.mWins, l: P.mLoss, d: P.mDraw },
+    grid: [
+      { l: '累计得分', v: signed(P.score), cls: P.score > 0 ? 'pos' : P.score < 0 ? 'neg' : '' },
+      { l: '场均得分', v: signed(P.avg), cls: P.avg > 0 ? 'pos' : P.avg < 0 ? 'neg' : '' },
+      { l: '出金率', v: P.goldRate + '%', hot: true },
+      { l: '最高连胜', v: P.best },
+      { l: '普胜', v: P.ev.pu, c: EV.pu.t }, { l: '大金', v: P.ev.dj, c: EV.dj.t }, { l: '小金', v: P.ev.xj, c: EV.xj.t }, { l: '黄金九', v: P.ev.h9, c: EV.h9.t },
+      { l: '犯规', v: P.ev.foul, c: EV.foul.t }, { l: '场均犯规', v: P.foulPerMatch }, { l: '总局数', v: P.rounds }, { l: '场均时长', v: P.n ? (mm >= 60 ? `${mm / 60 | 0}h${mm % 60}m` : `${mm}分`) : '—' },
+    ],
+    sources: gt ? [{ k: 'pu', l: '普胜', v: g.pu, c: EV.pu.c, w: Math.round(g.pu / gt * 100) }, { k: 'gold', l: '金球', v: g.gold, c: EV.dj.c, w: Math.round(g.gold / gt * 100) },
+      { k: 'foul', l: '对手犯规', v: g.foul, c: '#9B6BFF', w: Math.round(g.foul / gt * 100) }].filter(x => x.v) : [],
+    gainTotal: gt,
+
     P, title: titleOf(P), recent: days ? results.slice(-30) : results.slice(-10),
     kpis: [{ l: '对局', v: P.n }, { l: '胜率', v: pct(P.mWins, P.n) + '%' }, { l: '净胜分', v: signed(P.score), cls: P.score > 0 ? 'pos' : P.score < 0 ? 'neg' : '' }, { l: '单场最高', v: P.n ? signed(P.top) : '—' }],
-    bests: [{ l: '最长连胜', v: P.best, u: '连胜' }, { l: '金球', v: P.gold, u: '次' }, { l: '场均', v: signed(P.avg), u: '分' }],
+
     chart: { series: [series], colors: ['#FF5A5F'], names: ['累计净胜'], titles, notes, ticks },
     friends, bank, nemesis, mate,
-    bars: Object.keys(P.ev).map(k => ({ k, name: EV[k].name, c: EV[k].c, v: P.ev[k], w: Math.round(P.ev[k] / evMax * 100) })),
     ms,
   };
 }
@@ -129,4 +146,19 @@ function headToHead(history, meId, fid, view) {
   };
 }
 
-module.exports = { overview, headToHead, transfer, personal };
+/** 成就徽章（按全部战绩计算） */
+function achievements(P) {
+  const A = [
+    { k: 'first', t: '初次登场', d: '完成第 1 场对局', c: '#3D7BFF', ic: '1', ok: P.n >= 1, p: `${Math.min(P.n, 1)}/1` },
+    { k: 'ten', t: '十场老将', d: '完成 10 场对局', c: '#1FC98E', ic: '10', ok: P.n >= 10, p: `${Math.min(P.n, 10)}/10` },
+    { k: 'dj', t: '金手指', d: '打出第一个大金', c: '#FFB020', ic: '金', ok: P.ev.dj >= 1, p: `${Math.min(P.ev.dj, 1)}/1` },
+    { k: 'h9', t: '黄金一杆', d: '打出第一个黄金九', c: '#FFC21A', ic: '9', ok: P.ev.h9 >= 1, p: `${Math.min(P.ev.h9, 1)}/1` },
+    { k: 'streak', t: '五连胜', d: '单场连赢 5 局', c: '#FF5A5F', ic: '连', ok: P.best >= 5, p: `${Math.min(P.best, 5)}/5` },
+    { k: 'fifty', t: '大满贯', d: '单场赢 50 分以上', c: '#9B6BFF', ic: '50', ok: P.top >= 50, p: `${Math.max(0, Math.min(P.top, 50))}/50` },
+    { k: 'clean', t: '零失误', d: '打满 5 局且没有犯规', c: '#22C993', ic: '净', ok: P.clean >= 1, p: `${Math.min(P.clean, 1)}/1` },
+    { k: 'gold10', t: '金球收藏家', d: '累计 10 次金球', c: '#FF8A3D', ic: '藏', ok: P.gold >= 10, p: `${Math.min(P.gold, 10)}/10` },
+  ];
+  return { list: A, got: A.filter(a => a.ok).length };
+}
+
+module.exports = { overview, headToHead, transfer, personal, achievements };

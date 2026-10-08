@@ -1,6 +1,7 @@
-<view class="wrap">
-  <view class="sec" style="margin-top:12rpx">计分规则<text class="s">{{isDefault?'新对局默认使用 · 付分设置用于三人':(mode===2?'双人：一律对手付分':'三人模式')}}</text></view>
-  <view class="card">
+<nav-bar title="{{navTitle}}" back scrolled="{{scrolled}}"/>
+<view class="wrap {{ent?'ent':'pre'}}">
+  <view class="sec rise" style="--i:0;margin-top:12rpx">计分规则<text class="s">{{isDefault?'新对局默认使用 · 付分设置用于三人':(mode===2?'双人：一律对手付分':'三人模式')}}</text></view>
+  <view style="--i:1" class="card rise">
     <view class="rule" wx:for="{{list}}" wx:key="k">
       <view class="rt">
         <view class="tile" style="background:{{item.c}}29;color:{{item.t}}"><text wx:if="{{item.k==='h9'}}" class="b9" style="width:36rpx;height:36rpx"></text><text wx:else>{{item.name[0]}}</text></view>
@@ -16,7 +17,7 @@
       </view>
     </view>
   </view>
-  <view class="btns">
+  <view style="--i:2" class="btns rise">
     <view class="btn sec2" bindtap="reset" hover-class="press">恢复默认</view>
     <view wx:if="{{!isDefault}}" class="btn sec2" bindtap="saveDefault" hover-class="press">设为以后的默认</view>
   </view>

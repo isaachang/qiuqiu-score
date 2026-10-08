@@ -134,9 +134,11 @@ module.exports = Behavior({
       }
     },
 
-    onCard(e) { this.setData({ hintIntro: false }); this.score(+e.currentTarget.dataset.i, 'pu'); },
-    onChip(e) { const { i, k } = e.currentTarget.dataset; this.score(+i, k); },
-    onUndo() { this.undo(); },
+    /** 引导进行中时，点任何地方都只是「下一步」，不会误记分 */
+    guard() { if (this.data.coach) { this.nextCoach && this.nextCoach(); return true; } return false; },
+    onCard(e) { if (this.guard()) return; this.setData({ hintIntro: false }); this.score(+e.currentTarget.dataset.i, 'pu'); },
+    onChip(e) { if (this.guard()) return; const { i, k } = e.currentTarget.dataset; this.score(+i, k); },
+    onUndo() { if (this.guard()) return; this.undo(); },
     noop() {},
   },
 });

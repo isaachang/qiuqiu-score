@@ -1,1 +1,1 @@
-{ "navigationBarTitleText": "对局记录" }
+{"navigationStyle": "custom", "usingComponents": {"nav-bar": "/components/nav-bar/nav-bar", "ui-sheet": "/components/ui-sheet/ui-sheet"}}

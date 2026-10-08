@@ -47,3 +47,42 @@ button::after{border:none}
 .es-in.fo{background:#fff;box-shadow:inset 0 0 0 4rpx #16161A}
 .es-ipt{flex:1;height:108rpx;font-size:34rpx;font-weight:600;color:#16161A}
 .es-ph{color:#A9A9B0;font-weight:500}
+
+/* =========================================================
+   阶段二 · 全局动效系统
+   ---------------------------------------------------------
+   · 入场：给元素加 class="rise" 和 style="--i:序号"，进入页面时按序号依次浮现
+     （外层容器带 .ent 时才播放；Tab 页每次切回来会重新播放）
+   · 按压：所有可点元素用 hover-class="press" / "tap"，统一弹性回弹
+   ========================================================= */
+page{--spring:cubic-bezier(.3,1.35,.5,1);--ease:cubic-bezier(.2,.9,.3,1.04)}
+.ent .rise{animation:rise .62s var(--ease) backwards;animation-delay:calc(var(--i,0) * 55ms)}
+@keyframes rise{from{opacity:0;transform:translateY(44rpx) scale(.985)}to{opacity:1;transform:none}}
+.ent .pop{animation:popIn .55s var(--spring) backwards;animation-delay:calc(var(--i,0) * 55ms + 120ms)}
+@keyframes popIn{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+.ent .fade{animation:fadeIn .5s ease backwards;animation-delay:calc(var(--i,0) * 55ms)}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.press{transform:scale(.96);opacity:.94;transition:transform .25s var(--spring),opacity .2s}
+.tap{background:rgba(20,20,30,.045)}
+.card,.btn,.mode,.chip,.pick,.mm{transition:transform .32s var(--spring),box-shadow .3s}
+
+/* 遮罩：轻微虚化背后内容 */
+.sheet-mask{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.sheet{transition:transform .46s cubic-bezier(.2,.95,.25,1.08)}
+
+/* 自定义导航栏占位 */
+.navpad{width:100%}
+/* 自定义 Tab 留出底部空间 */
+.tabpad{height:calc(200rpx + env(safe-area-inset-bottom))}
+
+/* 大标题 */
+.large{display:flex;align-items:flex-end;justify-content:space-between;margin:8rpx 4rpx 28rpx}
+.large .lt{font-size:64rpx;font-weight:900;letter-spacing:1rpx;line-height:1.1}
+.large .ls{display:block;font-size:26rpx;color:var(--tx2);font-weight:600;margin-bottom:6rpx}
+
+/* 空状态插画：三颗球 */
+.ill{position:relative;width:240rpx;height:150rpx;margin:0 auto 24rpx}
+.ill .ball{position:absolute;border-radius:50%;box-shadow:inset -10rpx -12rpx 0 rgba(0,0,0,.12),0 16rpx 30rpx -12rpx rgba(0,0,0,.35);animation:floaty 3.6s ease-in-out infinite}
+.ill .ball::after{content:"";position:absolute;left:22%;top:18%;width:24%;height:18%;border-radius:50%;background:rgba(255,255,255,.7)}
+@keyframes floaty{50%{transform:translateY(-12rpx)}}
+.pre .rise,.pre .pop,.pre .fade{opacity:0}

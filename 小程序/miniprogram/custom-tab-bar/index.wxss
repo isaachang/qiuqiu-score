@@ -1,0 +1,10 @@
+.tb{position:fixed;left:48rpx;right:48rpx;bottom:calc(20rpx + env(safe-area-inset-bottom));height:124rpx;border-radius:62rpx;padding:10rpx;box-sizing:border-box;display:flex;
+  background:rgba(255,255,255,.88);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
+  box-shadow:0 24rpx 60rpx -24rpx rgba(40,30,20,.35),inset 0 0 0 1rpx rgba(20,20,30,.05);z-index:100}
+.pill{position:absolute;top:10rpx;bottom:10rpx;left:10rpx;width:calc((100% - 20rpx) / 3);border-radius:52rpx;background:#16161A;
+  box-shadow:0 10rpx 24rpx -8rpx rgba(0,0,0,.45);transition:transform .5s cubic-bezier(.3,1.3,.5,1)}
+.ti{flex:1;position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:10rpx;color:#8A8A92;font-size:26rpx;font-weight:700;transition:color .3s}
+.ti.on{color:#fff}
+.ic{width:42rpx;height:42rpx}
+.bn{animation:bn .55s cubic-bezier(.3,1.6,.5,1)}
+@keyframes bn{0%{transform:scale(.6) rotate(-12deg)}60%{transform:scale(1.18)}100%{transform:none}}

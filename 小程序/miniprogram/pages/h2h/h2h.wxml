@@ -1,6 +1,7 @@
-<view wx:if="{{ok}}" class="wrap" style="padding-bottom:220rpx">
+<nav-bar title="{{navTitle}}" back scrolled="{{scrolled}}"/>
+<view wx:if="{{ok}}" class="wrap {{ent?'ent':'pre'}}" style="padding-bottom:220rpx">
   <!-- 对决卡 -->
-  <view class="duel">
+  <view style="--i:0" class="duel rise">
     <view class="half l" style="background:{{A.c}};color:{{A.i}}">
       <view class="av big" style="background:{{A.i}};color:{{A.c}}">{{A.ch}}</view><text class="dn">{{A.name}}</text>
       <text class="dw num">{{X.w}}</text><text class="dl">胜</text>
@@ -11,21 +12,21 @@
     </view>
     <view class="vs">VS</view>
   </view>
-  <view class="verdict">{{X.verdict}}<text wx:if="{{X.d}}" class="vd"> · 平 {{X.d}} 场</text></view>
-  <view class="split"><view class="sp" style="width:{{wSplit}}%;background:{{A.c}}"></view><view class="sp" style="flex:1;background:{{B.c}}"></view></view>
+  <view style="--i:1" class="verdict rise">{{X.verdict}}<text wx:if="{{X.d}}" class="vd"> · 平 {{X.d}} 场</text></view>
+  <view class="split rise"><view class="sp" style="--i:2;width:{{wSplit}}%;background:{{A.c}}"></view><view class="sp" style="flex:1;background:{{B.c}}"></view></view>
 
   <view wx:if="{{X.n}}">
     <!-- 直接交锋 -->
-    <view class="sec">直接交锋<text class="s">你们之间流动的分</text></view>
-    <view class="card flow">
+    <view style="--i:4" class="sec rise">直接交锋<text class="s">你们之间流动的分</text></view>
+    <view style="--i:5" class="card flow rise">
       <view class="fc"><text class="fv num" style="color:{{A.c}}">{{X.gain}}</text><text class="fl">{{A.name}} 从对方手里赢走</text></view>
       <view class="fmid"><text class="fnet num {{X.net>0?'pos':X.net<0?'neg':''}}">{{X.netTxt}}</text><text class="fl">净交锋</text></view>
       <view class="fc"><text class="fv num" style="color:{{B.c}}">{{X.loss}}</text><text class="fl">{{B.name}} 从你手里赢走</text></view>
     </view>
 
     <!-- 近况 -->
-    <view class="sec">最近 {{X.form.length}} 次交手</view>
-    <view class="card form">
+    <view style="--i:6" class="sec rise">最近 {{X.form.length}} 次交手</view>
+    <view style="--i:7" class="card form rise">
       <view wx:for="{{X.form}}" wx:for-index="fi" class="fd {{item}}" style="{{item==='W'?'background:'+A.c+';color:'+A.i:item==='L'?'background:'+B.c+';color:'+B.i:''}}">{{item==='W'?'胜':item==='L'?'负':'平'}}</view>
       <view class="fx">
         <view wx:if="{{X.bigW}}" class="fxi" data-id="{{X.bigW.id}}" bindtap="open">最大胜差 <text class="num pos">{{X.bigW.txt}}</text> · {{X.bigW.when}} ›</view>
@@ -34,8 +35,8 @@
     </view>
 
     <!-- 技术对比 -->
-    <view class="sec">技术对比<text class="s">同场对局中</text></view>
-    <view class="card cmp">
+    <view style="--i:8" class="sec rise">技术对比<text class="s">同场对局中</text></view>
+    <view style="--i:9" class="card cmp rise">
       <view class="cr" wx:for="{{X.cmp}}" wx:key="l">
         <text class="cv num {{item.aw?'win':''}}" style="{{item.aw?'color:'+A.c:''}}">{{item.a}}</text>
         <view class="cb l"><view class="cf" style="width:{{item.wa}}%;background:{{A.c}};opacity:{{item.aw?1:.35}}"></view></view>
@@ -46,13 +47,13 @@
     </view>
 
     <!-- 交手走势 -->
-    <view class="sec">交手走势<text class="s">同场对局的累计得分</text></view>
-    <view class="card" style="padding:20rpx 16rpx">
+    <view style="--i:10" class="sec rise">交手走势<text class="s">同场对局的累计得分</text></view>
+    <view class="card rise" style="--i:10;padding:20rpx 16rpx">
       <trend-chart series="{{chart.series}}" colors="{{chart.colors}}" names="{{chart.names}}" titles="{{chart.titles}}" notes="{{chart.notes}}" ticks="{{chart.ticks}}" height="{{360}}"/>
     </view>
 
-    <view class="sec">同场对局<text class="s">{{X.n}} 场</text></view>
-    <view class="card">
+    <view style="--i:10" class="sec rise">同场对局<text class="s">{{X.n}} 场</text></view>
+    <view style="--i:10" class="card rise">
       <view class="row {{index>0?'sep':''}}" wx:for="{{rows}}" wx:key="id" data-id="{{item.id}}" bindtap="open" hover-class="rowp">
         <view class="stack"><view class="av sm" wx:for="{{item.avs}}" wx:for-item="a" wx:key="id" style="background:{{a.c}};color:{{a.i}}">{{a.ch}}</view></view>
         <view class="rm"><text class="rn">{{item.names}}</text><text class="rs">{{item.mode}} · {{item.rounds}} 局 · {{item.when}}</text></view>
@@ -60,6 +61,6 @@
       </view>
     </view>
   </view>
-  <view wx:else class="empty">你们还没有一起打过球</view>
+  <view style="--i:3" wx:else class="empty rise">你们还没有一起打过球</view>
 </view>
 <view wx:if="{{ok}}" class="cta"><view class="btn pri" bindtap="rematch" hover-class="press">和 {{B.name}} 再来一局</view></view>

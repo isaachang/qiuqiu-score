@@ -1,9 +1,10 @@
-<view class="wrap">
-  <view class="sums">
+<nav-bar title="对局记录" back scrolled="{{scrolled}}"/>
+<view class="wrap {{ent?'ent':'pre'}}">
+  <view style="--i:0" class="sums rise">
     <view class="sum" wx:for="{{sums}}" wx:key="id"><view class="av sm" style="background:{{item.c}};color:{{item.i}}">{{item.ch}}</view><text class="sn">{{item.name}}</text><text class="sv num {{item.cls}}">{{item.s}}</text></view>
   </view>
-  <view class="sec" style="margin-top:12rpx">共 {{total}} 条<text class="s">{{ro?'已结束 · 只读':'点击记录可修改或删除'}}</text></view>
-  <view class="card">
+  <view class="sec rise" style="--i:1;margin-top:12rpx">共 {{total}} 条<text class="s">{{ro?'已结束 · 只读':'点击记录可修改或删除'}}</text></view>
+  <view style="--i:2" class="card rise">
     <view wx:if="{{!rows.length}}" class="empty">还没有记录</view>
     <view class="lr" wx:for="{{rows}}" wx:key="i" data-i="{{item.i}}" bindtap="tapRow" hover-class="{{ro?'':'rowp'}}">
       <view class="rd"><text class="rn num">{{item.round}}</text><text class="rl">局</text></view>
@@ -17,3 +18,4 @@
     </view>
   </view>
 </view>
+<ui-sheet show="{{ui.show}}" icon="{{ui.icon}}" title="{{ui.title}}" desc="{{ui.desc}}" actions="{{ui.actions}}" bind:action="onUi" bind:close="onUiClose"/>

@@ -1,4 +1,5 @@
 const scoring = require('../../behaviors/scoring');
+const { enter } = require('../../utils/page');
 
 // 横屏左右最小留白（px）：避开圆角和刘海，不依赖系统安全区数值（部分机型横屏时返回 0）
 const EDGE = 36;
@@ -7,7 +8,8 @@ Page({
   behaviors: [scoring],
   data: { land: true, bar: { top: 8, h: 32, l: EDGE, r: EDGE, capR: 110 } },
   onShow() {
-    this.initScore();
+    if (!this.initScore()) return;
+    enter(this);
     setTimeout(() => this.measureBar(), 350); // 等横屏旋转完成后再取胶囊位置
   },
   onResize() { this._step = 0; this.measureBar(); },

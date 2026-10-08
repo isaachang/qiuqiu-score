@@ -16,7 +16,14 @@ Component({
     signed: { type: Boolean, value: true },
   },
   data: { tip: null, hint: true },
-  observers: { 'series, colors'() { this.ready && this.draw(-1); } },
+  observers: {
+    'series, colors'(s) {
+      const key = JSON.stringify(s);
+      if (key === this._key) return; // 数据没变（比如从子页面返回）：不重画，避免闪烁
+      this._key = key;
+      if (this.ready && this.ctx) this.animateIn();
+    },
+  },
   lifetimes: {
     ready() { this.ready = true; setTimeout(() => this.init(), 50); },
   },
@@ -27,8 +34,18 @@ Component({
         const dpr = (wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()).pixelRatio || 2;
         this.cv = r.node; this.ctx = r.node.getContext('2d'); this.W = r.width; this.H = r.height; this.left = r.left;
         this.cv.width = r.width * dpr; this.cv.height = r.height * dpr; this.ctx.scale(dpr, dpr);
-        this.draw(-1);
+        this.animateIn();
       });
+    },
+    /** 入场：折线像笔画一样从左画到右 */
+    animateIn() {
+      const t0 = Date.now(), D = 900, raf = f => (this.cv.requestAnimationFrame ? this.cv.requestAnimationFrame(f) : setTimeout(f, 16));
+      const step = () => {
+        const k = Math.min(1, (Date.now() - t0) / D), e = 1 - Math.pow(1 - k, 3);
+        this.draw(-1, e);
+        if (k < 1) raf(step);
+      };
+      step();
     },
     geo() {
       const S = this.data.series, all = S.flat();
@@ -37,7 +54,7 @@ Component({
       const N = Math.max(1, (S[0] || []).length - 1);
       return { mn, mx, L, R, T, B, pw, ph, N, X: i => L + pw * i / N, Y: v => T + ph * (1 - (v - mn) / span) };
     },
-    draw(hi) {
+    draw(hi, prog = 1) {
       const ctx = this.ctx; if (!ctx) return;
       const S = this.data.series, C = this.data.colors, g = this.geo(), W = this.W, H = this.H;
       ctx.clearRect(0, 0, W, H);
@@ -51,17 +68,23 @@ Component({
       ctx.textAlign = 'center'; ctx.textBaseline = 'top';
       (this.data.ticks || []).forEach(t => ctx.fillText(t.t, Math.min(W - g.R - 12, Math.max(g.L + 12, g.X(t.i))), H - g.B + 9));
       // 单线时填充渐变
-      if (this.data.fill && S.length === 1 && S[0].length > 1) {
+      if (this.data.fill && S.length === 1 && S[0].length > 1 && prog >= 1) {
         const s = S[0], grd = ctx.createLinearGradient(0, g.T, 0, H - g.B);
         grd.addColorStop(0, (C[0] || '#FF5A5F') + '55'); grd.addColorStop(1, (C[0] || '#FF5A5F') + '00');
         ctx.fillStyle = grd; ctx.beginPath(); ctx.moveTo(g.X(0), g.Y(0));
         s.forEach((v, i) => ctx.lineTo(g.X(i), g.Y(v))); ctx.lineTo(g.X(s.length - 1), g.Y(0)); ctx.closePath(); ctx.fill();
       }
+      const lim = prog * g.N; // 入场动画：只画到 lim
       S.forEach((s, j) => {
         const c = C[j] || '#16161A';
         ctx.strokeStyle = c; ctx.lineWidth = 2.6; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.globalAlpha = hi >= 0 ? 0.9 : 1;
-        ctx.beginPath(); s.forEach((v, i) => (i ? ctx.lineTo(g.X(i), g.Y(v)) : ctx.moveTo(g.X(i), g.Y(v)))); ctx.stroke(); ctx.globalAlpha = 1;
-        if (hi < 0 && s.length) this.dot(g.X(s.length - 1), g.Y(s[s.length - 1]), c);
+        ctx.beginPath();
+        for (let i = 0; i < s.length; i++) {
+          if (i > lim) { const a = s[i - 1], b = s[i], f = lim - (i - 1); ctx.lineTo(g.X(i - 1 + f), g.Y(a + (b - a) * f)); break; }
+          i ? ctx.lineTo(g.X(i), g.Y(s[i])) : ctx.moveTo(g.X(i), g.Y(s[i]));
+        }
+        ctx.stroke(); ctx.globalAlpha = 1;
+        if (hi < 0 && prog >= 1 && s.length) this.dot(g.X(s.length - 1), g.Y(s[s.length - 1]), c);
       });
       if (hi >= 0) {
         ctx.strokeStyle = 'rgba(20,20,30,.35)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(g.X(hi), g.T - 4); ctx.lineTo(g.X(hi), H - g.B); ctx.stroke();

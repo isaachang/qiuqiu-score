@@ -1,28 +1,39 @@
-.hello{margin:12rpx 4rpx 32rpx;display:flex;flex-direction:column}
-.hs{font-size:26rpx;color:var(--tx2);font-weight:600}
-.hb{font-size:52rpx;font-weight:800;margin-top:4rpx}
+.me{width:84rpx;height:84rpx;font-size:34rpx;box-shadow:0 0 0 6rpx #fff,0 12rpx 28rpx -10rpx rgba(0,0,0,.35)}
 .modes{display:grid;grid-template-columns:1fr 1fr;gap:24rpx}
-.mode{height:400rpx;border-radius:56rpx;padding:36rpx;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;color:#fff}
+.mode{height:420rpx;border-radius:60rpx;padding:36rpx;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;color:#fff;box-shadow:0 30rpx 60rpx -32rpx rgba(0,0,0,.45)}
+.mpress{transform:scale(.95) rotate(-1deg)}
 .mode .blob{position:absolute;border-radius:50%;animation:bob 5s ease-in-out infinite}
-.mode .b2{animation-duration:6s;animation-delay:-2s}
-.mode .b3{animation-duration:5.5s;animation-delay:-3.5s}
 @keyframes bob{50%{transform:translate(8rpx,-16rpx) scale(1.05)}}
-.mode .go{position:absolute;right:28rpx;top:28rpx;width:72rpx;height:72rpx;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:44rpx;font-weight:600}
-.mt{font-size:48rpx;font-weight:800;position:relative}
-.ms{font-size:24rpx;font-weight:600;opacity:.88;margin-top:8rpx;position:relative}
+/* 台球：实色球 + 9 号花球，带高光与阴影 */
+.ball{position:absolute;width:96rpx;height:96rpx;border-radius:50%;animation:roll 6s ease-in-out infinite}
+.b-solid{background:radial-gradient(circle at 34% 28%,rgba(255,255,255,.85) 0 8%,transparent 22%),radial-gradient(circle at 60% 72%,transparent 40%,rgba(0,0,0,.35) 100%),var(--bc);box-shadow:0 16rpx 24rpx -10rpx rgba(0,0,0,.4)}
+.b-nine{width:84rpx;height:84rpx;background:radial-gradient(circle at 34% 28%,rgba(255,255,255,.9) 0 8%,transparent 22%),radial-gradient(circle at 60% 72%,transparent 40%,rgba(0,0,0,.3) 100%),linear-gradient(180deg,#fff 0 26%,#FFC21A 26% 74%,#fff 74%);box-shadow:0 16rpx 24rpx -10rpx rgba(0,0,0,.4);animation-delay:-2s}
+@keyframes roll{50%{transform:translate(-6rpx,-10rpx) rotate(12deg)}}
+.shine{position:absolute;top:0;bottom:0;width:120rpx;left:-160rpx;background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);animation:shine 5s ease-in-out infinite 1s}
+.shine.s2{animation-delay:3.4s}
+@keyframes shine{0%,70%{left:-160rpx}100%{left:110%}}
+.mt{font-size:48rpx;font-weight:900;position:relative;letter-spacing:1rpx}
+.ms{font-size:24rpx;font-weight:600;opacity:.9;margin-top:8rpx;position:relative}
 .live{padding:32rpx;margin-top:24rpx}
 .lh{display:flex;align-items:center;gap:16rpx;min-height:64rpx}
-.dot{width:16rpx;height:16rpx;border-radius:50%;background:#22C993;flex:none;animation:pulse 1.6s infinite}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,201,147,.6)}70%{box-shadow:0 0 0 16rpx rgba(34,201,147,0)}100%{box-shadow:0 0 0 0 rgba(34,201,147,0)}}
-.lt{flex:1;min-width:0;font-size:26rpx;font-weight:600;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.go2{height:64rpx;padding:0 24rpx;border-radius:32rpx;background:var(--ink);color:var(--inkTx);font-size:26rpx;font-weight:700;display:flex;align-items:center;flex:none}
+.dot{position:relative;width:18rpx;height:18rpx;border-radius:50%;background:#22C993;flex:none}
+.ring{position:absolute;left:-10rpx;top:-10rpx;right:-10rpx;bottom:-10rpx;border-radius:50%;border:4rpx solid #22C993;animation:ring 1.6s ease-out infinite}
+@keyframes ring{from{transform:scale(.4);opacity:.8}to{transform:scale(1.4);opacity:0}}
+.lt2{flex:1;min-width:0;font-size:26rpx;font-weight:600;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.go2{height:64rpx;padding:0 26rpx;border-radius:32rpx;background:var(--ink);color:var(--inkTx);font-size:26rpx;font-weight:700;display:flex;align-items:center;flex:none}
 .lg{display:grid;gap:16rpx;margin-top:28rpx}
-.ln{font-size:24rpx;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ls{font-size:44rpx;font-weight:800;line-height:1.15}
+.lp{display:flex;flex-direction:column;align-items:center;min-width:0;text-align:center}
+.ln{margin-top:12rpx;max-width:100%;font-size:24rpx;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ls2{font-size:44rpx;font-weight:800;line-height:1.15;margin-top:2rpx}
 .more{display:flex;gap:20rpx}
-.mm{flex:1;height:172rpx;border-radius:40rpx;padding:24rpx;display:flex;flex-direction:column;justify-content:space-between}
-.mmt{font-size:30rpx;font-weight:700}
-.mtag{align-self:flex-start;font-size:22rpx;font-weight:700;padding:4rpx 14rpx;border-radius:99rpx}
+.mm{flex:1;height:188rpx;border-radius:40rpx;padding:24rpx;display:flex;flex-direction:column;justify-content:space-between}
+.mi{width:56rpx;height:56rpx;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:inset -6rpx -8rpx 0 rgba(0,0,0,.12)}
+.mi text{width:28rpx;height:28rpx;border-radius:50%;background:#fff;font-size:18rpx;font-weight:900;display:flex;align-items:center;justify-content:center}
+.mmt{font-size:30rpx;font-weight:800}
+.mtag{font-size:22rpx;font-weight:700;opacity:.9}
+.emp{padding:48rpx 0 44rpx;display:flex;flex-direction:column;align-items:center}
+.et{font-size:30rpx;font-weight:800}
+.es{font-size:24rpx;color:var(--tx2);margin-top:8rpx}
 .stack{display:flex;width:100rpx;flex:none}
 .stack .av{box-shadow:0 0 0 4rpx #fff}
 .stack .av+.av{margin-left:-20rpx}
@@ -31,12 +42,5 @@
 .rs{font-size:24rpx;color:var(--tx2);margin-top:4rpx}
 .wl{display:flex;flex-direction:column;align-items:flex-end;font-size:32rpx;font-weight:800}
 .wr{font-size:22rpx;color:var(--tx2);font-weight:600}
-.rowp{background:var(--line)}
-
 .sep::before{content:"";position:absolute;top:0;left:120rpx;right:0;height:1rpx;background:var(--line)}
 .clip{overflow:hidden}
-
-/* 进行中卡片：每位球员竖排（头像 / 名字 / 分数），在等宽列里居中 —— 头像位置不受名字和分数长短影响 */
-.lp{display:flex;flex-direction:column;align-items:center;min-width:0;text-align:center}
-.lp .ln{margin-top:12rpx;max-width:100%}
-.lp .ls{margin-top:2rpx}

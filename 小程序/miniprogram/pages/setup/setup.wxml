@@ -1,12 +1,13 @@
-<view class="wrap" style="padding-bottom:220rpx">
-  <view class="seg">
+<nav-bar title="{{navTitle}}" back scrolled="{{scrolled}}"/>
+<view class="wrap {{ent?'ent':'pre'}}" style="padding-bottom:220rpx">
+  <view style="--i:0" class="seg rise">
     <view class="thumb" style="width:calc(50% - 6rpx);transform:translateX({{mode===2?0:100}}%)"></view>
     <view class="it {{mode===2?'on':''}}" data-n="2" bindtap="setMode">双人追分</view>
     <view class="it {{mode===3?'on':''}}" data-n="3" bindtap="setMode">三人追分</view>
   </view>
 
-  <view class="sec">球员<text class="s">第 1 位先开球</text></view>
-  <view class="card {{rolling?'rolling':''}} {{landed?'landed':''}}">
+  <view style="--i:1" class="sec rise">球员<text class="s">第 1 位先开球</text></view>
+  <view style="--i:2" class="card {{rolling?'rolling':''}} {{landed?'landed':''}} rise">
     <view class="slot" wx:for="{{slots}}" wx:key="id">
       <view class="no"><text class="nb num">{{item.no}}</text><text wx:if="{{item.first}}" class="ns">开球</text></view>
       <view class="av" style="background:{{item.c}};color:{{item.i}}">{{item.ch}}</view>
@@ -20,20 +21,20 @@
       <text class="chev">›</text>
     </view>
   </view>
-  <view wx:if="{{mode===3}}" class="dice-btn {{rolling?'roll':''}} {{slots.length<2?'dis':''}}" bindtap="shuffle" hover-class="press">
+  <view style="--i:3" wx:if="{{mode===3}}" class="dice-btn {{rolling?'roll':''}} {{slots.length<2?'dis':''}} rise" bindtap="shuffle" hover-class="press">
     <text class="dic">⚄</text><text>{{rolling?'抽签中…':'随机开球顺序'}}</text>
   </view>
 
-  <view class="sec">计分规则<text class="s" bindtap="toRules">修改 ›</text></view>
-  <view class="card rsum">
+  <view style="--i:4" class="sec rise">计分规则<text class="s" bindtap="toRules">修改 ›</text></view>
+  <view style="--i:5" class="card rsum rise">
     <view class="rs" wx:for="{{rules}}" wx:key="k" style="background:{{item.c}}1F">
       <text wx:if="{{item.k==='h9'}}" class="b9"></text>
       <text>{{item.name}}</text><text class="rv num" style="color:{{item.t}}">{{item.v}}</text><text wx:if="{{item.pay}}" class="rp">{{item.pay}}</text>
     </view>
   </view>
 
-  <view class="sec">选项</view>
-  <view class="card">
+  <view style="--i:6" class="sec rise">选项</view>
+  <view style="--i:7" class="card rise">
     <view class="row"><text class="ol">屏幕常亮</text><switch checked="{{keep}}" color="#22C993" data-k="keep" bindchange="toggle"/></view>
     <view class="row"><text class="ol">计分震动反馈</text><switch checked="{{vib}}" color="#22C993" data-k="vib" bindchange="toggle"/></view>
   </view>
@@ -43,18 +44,47 @@
 
 <view class="sheet-mask {{sheet?'on':''}}" bindtap="closeSheet"></view>
 <view class="sheet {{sheet?'on':''}}" catchtap="noop">
-  <view class="grab"></view>
-  <view class="st">添加球员</view>
-  <view class="ss">从球友中选择，或新建一位 · 还差 {{lack}} 位</view>
-  <view class="pick-grid">
+  <view style="--i:8" class="grab rise"></view>
+  <view style="--i:9" class="st rise">添加球员</view>
+  <view style="--i:10" class="ss rise">从球友中选择，或新建一位 · 还差 {{lack}} 位</view>
+  <view style="--i:10" class="pick-grid rise">
     <view class="pick" wx:for="{{free}}" wx:key="id" data-id="{{item.id}}" bindtap="pick" hover-class="press">
       <view class="av" style="background:{{item.c}};color:{{item.i}};width:88rpx;height:88rpx;font-size:34rpx">{{item.ch}}</view><text>{{item.name}}</text>
     </view>
   </view>
-  <view wx:if="{{!free.length}}" class="empty" style="padding:24rpx 0 36rpx">还没有其他球友，在下面新建一位</view>
-  <view class="add-row">
+  <view wx:if="{{!free.length}}" class="empty rise" style="--i:10;padding:24rpx 0 36rpx">还没有其他球友，在下面新建一位</view>
+  <view style="--i:10" class="add-row rise">
     <view class="es-in {{nf?'fo':''}}" style="flex:1"><input class="es-ipt" placeholder="输入名字，新建球友" placeholder-class="es-ph" maxlength="8" value="{{newName}}" bindinput="onName" bindfocus="onFocus" bindblur="onBlur" confirm-type="done" bindconfirm="addNew" cursor-spacing="140"/></view>
     <view class="btn pri addb" bindtap="addNew">添加</view>
   </view>
-  <view class="cancel" bindtap="closeSheet">取消</view>
+  <view style="--i:10" class="cancel rise" bindtap="closeSheet">取消</view>
+</view>
+
+<!-- 旧局未结算 -->
+<view class="sheet-mask {{old.show?'on':''}}" bindtap="closeOld" catchtouchmove="noop"></view>
+<view class="sheet old {{old.show?'on':''}}" catchtap="noop">
+  <view class="grab"></view>
+  <view class="oc {{old.confirm?'flip':''}}">
+    <view class="face front">
+      <view class="ot"><view class="odot"></view>{{old.empty?'有一局正在进行':'还有一局没结算'}}</view>
+      <view class="ss">{{old.empty?old.mode+'追分 · 还没有记分 · 已开 '+old.dur:old.mode+'追分 · '+old.rounds+' 局 · '+old.logs+' 条记分 · 已打 '+old.dur}}</view>
+      <view class="ob">
+        <view wx:for="{{old.players}}" wx:key="id" class="op {{old.show?'in':''}}" style="--i:{{index}}">
+          <view class="av" style="background:{{item.c}};color:{{item.i}}">{{item.ch}}</view>
+          <text class="opn">{{item.name}}</text><text class="ops num {{item.cls}}">{{item.s}}</text>
+        </view>
+      </view>
+      <view wx:if="{{!old.empty}}" class="btn pri" bindtap="saveOld" hover-class="press">保存旧局战绩，开新局</view>
+      <view wx:else class="btn pri" bindtap="discardOld" hover-class="press">放弃这局，开新局</view>
+      <view wx:if="{{!old.empty}}" class="ox" bindtap="askDiscard">不保存旧局，直接开新局</view>
+      <view class="oy" bindtap="continueOld">回去继续打旧局 ›</view>
+    </view>
+    <view class="face back">
+      <view class="wic">!</view>
+      <view class="ot" style="justify-content:center">确定不保存旧局？</view>
+      <view class="ss">旧局的 {{old.logs}} 条记分会被清除，不计入战绩，无法恢复</view>
+      <view class="btn danger" bindtap="discardOld" hover-class="press">不保存，开新局</view>
+      <view class="oy" bindtap="backFromDiscard">‹ 返回</view>
+    </view>
+  </view>
 </view>

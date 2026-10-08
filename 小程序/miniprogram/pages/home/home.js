@@ -1,20 +1,35 @@
 const store = require('../../utils/store');
+const { ask, uiDone } = require('../../utils/ui');
 const { derive, signed } = require('../../utils/engine');
 const { clock } = require('../../utils/util');
 const { matchRow } = require('../../utils/rows');
+const { enter, onScroll } = require('../../utils/page');
+
+function greet() {
+  const h = new Date().getHours();
+  if (h < 5) return '夜深了，还在练球？';
+  if (h < 11) return '早上好，先热热手';
+  if (h < 14) return '中午好，来一局？';
+  if (h < 18) return '下午好，球桌在等你';
+  return '晚上好，今晚一杆清台';
+}
 
 Page({
-  data: { hello: '', live: null, recent: [] },
+  onUi(e) { uiDone(this, e.detail.k); },
+  onUiClose() { uiDone(this, null); },
+  data: { greet: '', live: null, recent: [], me: {}, scrolled: false, ent: false },
   onShow() {
-    const d = new Date();
-    this.setData({ hello: `${d.getMonth() + 1}月${d.getDate()}日 · 今晚也要一杆清台` });
+    this.setData({ greet: greet() });
     this.load();
+    enter(this, 0);
+    clearInterval(this.timer);
     this.timer = setInterval(() => { const L = store.get().live; if (L) this.setData({ 'live.clock': clock((Date.now() - L.start) / 1000) }); }, 1000);
   },
   onHide() { clearInterval(this.timer); },
   onUnload() { clearInterval(this.timer); },
+  onPageScroll(e) { onScroll(this, e); },
   load() {
-    const s = store.get(), L = s.live;
+    const s = store.get(), L = s.live, me = s.friends.find(f => f.me);
     let live = null;
     if (L) {
       const D = derive(L);
@@ -23,12 +38,12 @@ Page({
         players: L.players.map((id, i) => ({ ...store.view(id), s: signed(D.scores[i]), cls: D.scores[i] > 0 ? 'pos' : D.scores[i] < 0 ? 'neg' : '' })),
       };
     }
-    const recent = s.history.slice(0, 5).map(m => matchRow(m));
-    this.setData({ live, recent });
+    this.setData({ live, recent: s.history.slice(0, 5).map(matchRow), me: store.view(me.id) });
   },
   new2() { this.go(2); },
   new3() { this.go(3); },
   go(mode) {
+    wx.vibrateShort({ type: 'light' });
     const me = store.get().friends.find(f => f.me);
     store.newDraft(mode, me ? [me.id] : []);
     wx.navigateTo({ url: '/pages/setup/setup' });
@@ -36,10 +51,11 @@ Page({
   resume() { wx.navigateTo({ url: '/pages/score/score' }); },
   soon() { wx.showToast({ title: '敬请期待', icon: 'none' }); },
   toStats() { wx.switchTab({ url: '/pages/stats/stats' }); },
+  toMe() { wx.switchTab({ url: '/pages/me/me' }); },
   askDelete(e) {
     const id = e.currentTarget.dataset.id;
-    wx.showModal({ title: '删除这场对局？', content: '删除后战绩统计会同步更新，无法恢复。', confirmText: '删除', confirmColor: '#F0444D',
-      success: r => { if (r.confirm) { store.deleteMatch(id); this.load(); wx.showToast({ title: '已删除', icon: 'success' }); } } });
+    ask(this, { icon: 'warn', title: '删除这场对局？', desc: '删除后战绩统计会同步更新，无法恢复。', actions: [{ k: 'del', t: '删除', type: 'danger' }] })
+      .then(k => { if (k === 'del') { store.deleteMatch(id); this.load(); wx.showToast({ title: '已删除', icon: 'success' }); } });
   },
   openMatch(e) { wx.navigateTo({ url: '/pages/result/result?id=' + e.currentTarget.dataset.id }); },
 });

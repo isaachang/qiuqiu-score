@@ -1,11 +1,17 @@
 const store = require('../../utils/store');
+const { ask, uiDone } = require('../../utils/ui');
+const { enter, onScroll } = require('../../utils/page');
 const { EV, MAIN, PAY, FOULTO, derive, signed } = require('../../utils/engine');
 const { hm } = require('../../utils/util');
 
 Page({
+  onUi(e) { uiDone(this, e.detail.k); },
+  onUiClose() { uiDone(this, null); },
   data: { ro: false, sums: [], rows: [], total: 0 },
   onLoad(q) { this.id = q.id || 'live'; },
-  onShow() { this.render(); },
+  onPageScroll(e) { onScroll(this, e); },
+  onShow() {
+    enter(this); this.render(); },
   m() { return store.match(this.id); },
   render() {
     const m = this.m();
@@ -29,23 +35,25 @@ Page({
   },
   tapRow(e) {
     if (this.data.ro) return;
-    const i = +e.currentTarget.dataset.i;
-    wx.showActionSheet({
-      itemList: ['修改这条记录', '删除这条记录'], itemColor: '#16161A',
-      success: r => { if (r.tapIndex === 0) this.edit(i); else this.del(i); },
-    });
+    const i = +e.currentTarget.dataset.i, row = this.data.rows.find(r => r.i === i);
+    ask(this, { title: `第 ${row.round} 局 · ${row.name} ${row.ev}`, desc: '修改或删除后，比分、顺序和之后的记录会自动重算',
+      actions: [{ k: 'edit', t: '修改这条记录', type: 'plain' }, { k: 'del', t: '删除这条记录', type: 'danger' }] })
+      .then(k => { if (k === 'edit') this.edit(i); else if (k === 'del') this.del(i); });
   },
   del(i) {
-    wx.showModal({ title: '删除这条记录？', content: '删除后比分、顺序和之后的记录会自动重算。', confirmText: '删除', confirmColor: '#F0444D',
-      success: r => { if (!r.confirm) return; this.m().events.splice(i, 1); store.save(); this.render(); wx.showToast({ title: '已删除', icon: 'success' }); } });
+    ask(this, { icon: 'warn', title: '删除这条记录？', desc: '删除后比分、顺序和之后的记录会自动重算。', actions: [{ k: 'del', t: '删除', type: 'danger' }] })
+      .then(k => { if (k !== 'del') return; this.m().events.splice(i, 1); store.save(); this.render(); wx.showToast({ title: '已删除', icon: 'success' }); });
   },
   edit(i) {
     const m = this.m(), names = m.players.map(id => store.friend(id).name);
-    wx.showActionSheet({ itemList: names.map(n => `改为 ${n}`), success: a => {
-      wx.showActionSheet({ itemList: MAIN.map(k => EV[k].name), success: b => {
-        const e = m.events[i]; e.p = a.tapIndex; e.ev = MAIN[b.tapIndex];
-        store.save(); this.render(); wx.showToast({ title: '已修改', icon: 'success' });
-      } });
-    } });
+    ask(this, { title: '这一笔是谁的？', actions: names.map((n, j) => ({ k: 'p' + j, t: n, type: 'plain' })) }).then(a => {
+      if (!a) return;
+      const p = +a.slice(1);
+      ask(this, { title: `${names[p]} 的哪个事件？`, actions: MAIN.map(k => ({ k, t: `${EV[k].name}  ${k === 'foul' ? '−' : '+'}${m.rules[k].v}`, type: k === 'foul' ? 'danger' : 'plain' })) }).then(ev => {
+        if (!ev) return;
+        const e = m.events[i]; e.p = p; e.ev = ev;
+        store.save(); this.render(); wx.showToast({ title: '已修改，已重算', icon: 'success' });
+      });
+    });
   },
 });

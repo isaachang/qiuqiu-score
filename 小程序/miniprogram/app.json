@@ -46,6 +46,7 @@
         "iconPath": "images/tab/me.png",
         "selectedIconPath": "images/tab/me-on.png"
       }
-    ]
+    ],
+    "custom": true
   }
 }

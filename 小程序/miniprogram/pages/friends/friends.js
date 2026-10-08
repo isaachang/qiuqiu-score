@@ -1,7 +1,13 @@
 const store = require('../../utils/store');
+const { ask, uiDone } = require('../../utils/ui');
+const { enter, onScroll } = require('../../utils/page');
 Page({
+  onUi(e) { uiDone(this, e.detail.k); },
+  onUiClose() { uiDone(this, null); },
   data: { list: [], es: { show: false } },
-  onShow() { this.render(); },
+  onPageScroll(e) { onScroll(this, e); },
+  onShow() {
+    enter(this); this.render(); },
   render() { this.setData({ list: store.activeFriends().map(f => store.view(f.id)) }); },
   openNew() { this.editing = null; this.setData({ es: { show: true, title: '新建球友', name: '', color: store.activeFriends().length % 6, del: false, ok: '添加' } }); },
   openEdit(e) {
@@ -19,12 +25,12 @@ Page({
   },
   del() {
     const id = this.editing, f = store.friend(id);
-    wx.showModal({ title: `删除「${f.name}」？`, content: '删除后不会出现在球友列表里，历史战绩中仍保留名字。', confirmText: '删除', confirmColor: '#F0444D',
-      success: r => {
-        if (!r.confirm) return;
+    ask(this, { icon: 'warn', title: `删除「${f.name}」？`, desc: '删除后不会出现在球友列表里，历史战绩中仍保留名字。', actions: [{ k: 'del', t: '删除', type: 'danger' }] })
+      .then(k => {
+        if (k !== 'del') return;
         const err = store.removeFriend(id);
         if (err) { wx.showToast({ title: err, icon: 'none' }); return; }
         this.close(); this.render(); wx.showToast({ title: '已删除', icon: 'success' });
-      } });
+      });
   },
 });

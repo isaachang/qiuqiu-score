@@ -1,7 +1,9 @@
 const store = require('../../utils/store');
+const { enter, onScroll } = require('../../utils/page');
 Page({
-  data: { es: { show: false } },
-  onShow() { this.render(); },
+  data: { es: { show: false }, scrolled: false, ent: false },
+  onShow() { this.render(); enter(this, 2); },
+  onPageScroll(e) { onScroll(this, e); },
   render() {
     const s = store.get(), me = s.friends.find(f => f.me);
     this.setData({ me: store.view(me.id), count: store.activeFriends().length, matches: s.history.length, vib: s.settings.vib, keep: s.settings.keep });

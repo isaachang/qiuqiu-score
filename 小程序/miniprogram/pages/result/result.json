@@ -1,1 +1,1 @@
-{"navigationBarTitleText": "战报", "usingComponents": {"trend-chart": "/components/trend-chart/trend-chart"}}
+{"usingComponents": {"trend-chart": "/components/trend-chart/trend-chart", "nav-bar": "/components/nav-bar/nav-bar"}, "navigationStyle": "custom"}

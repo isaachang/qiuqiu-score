@@ -1,15 +1,20 @@
 const store = require('../../utils/store');
+const { derive, signed } = require('../../utils/engine');
+const { clock } = require('../../utils/util');
+const { enter, onScroll } = require('../../utils/page');
 const { EV, MAIN, PAY, FOULTO } = require('../../utils/engine');
 
 Page({
   data: { mode: 2, slots: [], lack: 0, rules: [], sheet: false, free: [], newName: '', vib: true, keep: true },
+  onPageScroll(e) { onScroll(this, e); },
   onShow() {
+    enter(this);
     if (!store.get().draft) store.newDraft(2, []);
     this.render();
   },
   render() {
     const s = store.get(), d = s.draft;
-    wx.setNavigationBarTitle({ title: d.mode === 2 ? '双人追分' : '三人追分' });
+    this.setData({ navTitle: d.mode === 2 ? '双人追分' : '三人追分' });
     this.setData({
       mode: d.mode,
       slots: d.slots.map((id, i) => ({ ...store.view(id), no: i + 1, first: i === 0 })),
@@ -75,19 +80,20 @@ Page({
   start() {
     if (this.data.lack > 0) { this.openSheet(); return; }
     const s = store.get();
-    const go = () => { store.startLive(); wx.redirectTo({ url: '/pages/score/score' }); };
-    if (s.live && s.live.events.length) {
-      wx.showActionSheet({
-        alertText: '还有一局没结算，先处理一下它',
-        itemList: ['保存旧局战绩，开新局', '不保存旧局，开新局', '回去继续打旧局'],
-        success: r => {
-          if (r.tapIndex === 0) { store.finishLive(); go(); }
-          else if (r.tapIndex === 1) {
-            wx.showModal({ title: '确定不保存旧局？', content: '旧局的记分会被清除，不计入战绩，无法恢复。', confirmText: '不保存', cancelText: '再想想', confirmColor: '#F0444D',
-              success: m => { if (m.confirm) { store.discardLive(); go(); } } });
-          } else wx.redirectTo({ url: '/pages/score/score' });
-        },
-      });
-    } else go();
+    const go = this.go = () => { store.startLive(); wx.redirectTo({ url: '/pages/score/score' }); };
+    if (s.live) this.openOld();
+    else go();
   },
+  /* ---------- 旧局未结算：自定义面板（替代微信自带的选项框） ---------- */
+  openOld() {
+    const L = store.get().live, D = derive(L);
+    const players = L.players.map((id, i) => ({ ...store.view(id), s: signed(D.scores[i]), cls: D.scores[i] > 0 ? 'pos' : D.scores[i] < 0 ? 'neg' : '' }));
+    this.setData({ old: { show: true, confirm: false, empty: !L.events.length, mode: L.mode === 2 ? '双人' : '三人', rounds: D.round - 1, logs: L.events.length, dur: clock((Date.now() - L.start) / 1000), players } });
+  },
+  closeOld() { this.setData({ 'old.show': false }); },
+  saveOld() { wx.vibrateShort({ type: 'light' }); store.finishLive(); this.setData({ 'old.show': false }); this.go(); },
+  askDiscard() { wx.vibrateShort({ type: 'light' }); this.setData({ 'old.confirm': true }); },
+  backFromDiscard() { this.setData({ 'old.confirm': false }); },
+  discardOld() { store.discardLive(); this.setData({ 'old.show': false }); this.go(); },
+  continueOld() { this.setData({ 'old.show': false }); wx.redirectTo({ url: '/pages/score/score' }); },
 });

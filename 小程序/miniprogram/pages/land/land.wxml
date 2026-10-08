@@ -1,5 +1,5 @@
 <import src="/templates/odo.wxml"/>
-<view class="screen">
+<view class="screen {{ent?'ent':'pre'}}">
   <view class="ltop" style="height:{{bar.top+bar.h}}px">
     <view class="lgrp" style="left:{{bar.l}}px;top:{{bar.top}}px">
       <view class="lbtn" style="height:{{bar.h}}px" bindtap="back" hover-class="press"><image src="/images/rotate-dark.svg"/>竖屏</view>
@@ -8,7 +8,7 @@
     <view class="lt" style="top:{{bar.top}}px;height:{{bar.h}}px"><text class="t1">第 {{round}} 局</text><text class="t2">{{clock}}</text></view>
   </view>
   <view class="lcols {{n===3?'n3':'n2'}}" style="padding:12px {{bar.r}}px 14px {{bar.l}}px">
-    <view wx:for="{{players}}" wx:key="id" class="pc lc {{item.fx}}" style="background:{{item.c}};color:{{item.i}};{{item.mv}}">
+    <view wx:for="{{players}}" wx:key="id" class="pc lc rise {{item.fx}}" style="--i:{{index}};background:{{item.c}};color:{{item.i}};{{item.mv}}">
       <view class="flash"></view><view class="sheen"></view>
       <view class="lmain" data-i="{{item.idx}}" bindtap="onCard" hover-class="tzp" hover-stay-time="60">
         <view class="ph">

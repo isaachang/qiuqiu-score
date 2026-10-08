@@ -1,8 +1,9 @@
+<nav-bar title="战报" back scrolled="{{scrolled}}"/>
 <view wx:if="{{!ok}}" class="empty">未找到这场对局</view>
-<view wx:else class="wrap rp" style="padding-bottom:240rpx">
+<view wx:else class="wrap rp {{ent?'ent':'pre'}}" style="padding-bottom:240rpx">
 
   <!-- 1. 冠军领奖台 -->
-  <view class="hero">
+  <view style="--i:0" class="hero rise">
     <view class="confetti"><view wx:for="{{conf}}" wx:key="k" class="cf" style="left:{{item.l}}%;background:{{item.c}};animation-duration:{{item.d}}s;animation-delay:{{item.dl}}s"></view></view>
     <view class="h-top"><text class="h-t">{{title}}</text><text class="h-w">{{when}}</text></view>
     <text class="h-win"><text style="color:{{W.c}}">{{W.name}}</text> 赢下本场</text>
@@ -19,8 +20,8 @@
   </view>
 
   <!-- 2. 本场之最 -->
-  <view wx:if="{{hl.length}}" class="sec">本场之最</view>
-  <view wx:if="{{hl.length}}" class="hls">
+  <view style="--i:1" wx:if="{{hl.length}}" class="sec rise">本场之最</view>
+  <view style="--i:2" wx:if="{{hl.length}}" class="hls rise">
     <view class="hl card" wx:for="{{hl}}" wx:key="t">
       <view class="hic" style="background:{{item.c}}">{{item.ic}}</view>
       <view class="hm"><text class="ht">{{item.t}}</text><text class="hd">{{item.p.name}} · {{item.d}}</text></view>
@@ -28,15 +29,15 @@
   </view>
 
   <!-- 3. 分数走势 -->
-  <view class="sec">分数走势<text class="s">点按或拖动查看每一笔</text></view>
-  <view class="card chart">
+  <view style="--i:3" class="sec rise">分数走势<text class="s">点按或拖动查看每一笔</text></view>
+  <view style="--i:4" class="card chart rise">
     <trend-chart series="{{chart.series}}" colors="{{chart.colors}}" names="{{chart.names}}" titles="{{chart.titles}}" notes="{{chart.notes}}" ticks="{{chart.ticks}}" height="{{400}}"/>
     <view class="lgd"><view class="lg" wx:for="{{legend}}" wx:key="id"><view class="ld" style="background:{{item.c}}"></view>{{item.name}}</view></view>
   </view>
 
   <!-- 4. 得分来源 -->
-  <view class="sec">得分来源<text class="s">赢来的分由什么组成</text></view>
-  <view class="card src">
+  <view style="--i:5" class="sec rise">得分来源<text class="s">赢来的分由什么组成</text></view>
+  <view style="--i:6" class="card src rise">
     <view class="sr" wx:for="{{sources}}" wx:key="id">
       <view class="srh"><view class="av sm" style="background:{{item.c}};color:{{item.i}}">{{item.ch}}</view><text class="srn">{{item.name}}</text><text class="srv num">赢 {{item.tot}} · 付 {{item.lost}}</text></view>
       <view class="srb"><view class="srf" style="width:{{item.w}}%"><view wx:for="{{item.segs}}" wx:for-item="g" wx:key="k" class="seg-c" style="width:{{g.w}}%;background:{{g.c}}"></view></view></view>
@@ -45,8 +46,8 @@
   </view>
 
   <!-- 5. 数据对比 -->
-  <view class="sec">数据对比<text class="s" bindtap="toLog">逐局记录 ›</text></view>
-  <view class="card tbl">
+  <view style="--i:7" class="sec rise">数据对比<text class="s" bindtap="toLog">逐局记录 ›</text></view>
+  <view style="--i:8" class="card tbl rise">
     <view class="tr hd" style="grid-template-columns:1.25fr repeat({{cols}},1fr)"><text></text><view wx:for="{{heads}}" wx:key="id" class="hc"><text class="hname" style="background:{{item.c}};color:{{item.i}}">{{item.name}}</text></view></view>
     <view class="tr" wx:for="{{table}}" wx:key="l" style="grid-template-columns:1.25fr repeat({{cols}},1fr)">
       <text class="tl">{{item.l}}</text>
@@ -55,14 +56,14 @@
   </view>
 
   <!-- 6. 整场统计 -->
-  <view class="sec">整场统计<text class="s">出金率 {{goldRate}}%</text></view>
-  <view class="card grid">
+  <view style="--i:9" class="sec rise">整场统计<text class="s">出金率 {{goldRate}}%</text></view>
+  <view style="--i:10" class="card grid rise">
     <view class="gi" wx:for="{{grid}}" wx:key="l"><text class="gv num">{{item.v}}</text><text class="gl">{{item.l}}</text></view>
   </view>
 
-  <view class="brand"><view class="bball"><text>9</text></view><view><text class="bn">球球记分</text><text class="bs">台球追分记分 · 双人 / 三人</text></view></view>
+  <view style="--i:10" class="brand rise"><view class="bball"><text>9</text></view><view><text class="bn">球球记分</text><text class="bs">台球追分记分 · 双人 / 三人</text></view></view>
 </view>
 <view wx:if="{{ok}}" class="cta">
   <button class="btn sec2" open-type="share">分享给球友</button>
-  <view class="btn pri" bindtap="again" hover-class="press">再来一局</view>
+  <view style="--i:10" class="btn pri rise" bindtap="again" hover-class="press">再来一局</view>
 </view>
