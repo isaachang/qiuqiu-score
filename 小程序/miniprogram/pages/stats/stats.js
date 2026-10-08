@@ -18,7 +18,7 @@ Page({
     const ALL = overview(s.history, me.id, this.data.seg, view, 0);   // 名片：始终是全部战绩
     const O = days ? overview(s.history, me.id, this.data.seg, view, days) : ALL; // 下方内容：跟随时间范围
     this.setData({
-      me: store.view(me.id), card: { title: ALL.title, kpis: ALL.kpis }, O, empty: !ALL.P.n, rangeEmpty: !O.P.n,
+      demo: !!s.demo, me: store.view(me.id), card: { title: ALL.title, kpis: ALL.kpis }, O, empty: !ALL.P.n, rangeEmpty: !O.P.n,
       rangeTxt: days ? `近 ${days} 天 · ${O.P.n} 场` : `最近 ${O.recent.length} 场`,
       recent: O.recent.map((r, k) => ({ k, r })),
       friends: O.friends, bank: O.bank, nemesis: O.nemesis,

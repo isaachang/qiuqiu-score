@@ -1,1 +1,1 @@
-{"usingComponents": {"edit-sheet": "/components/edit-sheet/edit-sheet", "nav-bar": "/components/nav-bar/nav-bar"}, "navigationStyle": "custom"}
+{"usingComponents": {"edit-sheet": "/components/edit-sheet/edit-sheet", "nav-bar": "/components/nav-bar/nav-bar", "ui-sheet": "/components/ui-sheet/ui-sheet"}, "navigationStyle": "custom"}

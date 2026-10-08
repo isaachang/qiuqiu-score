@@ -1,5 +1,6 @@
 // 球球记分 · 本地数据（内测版只存本机：wx.setStorageSync）
 const { DEFAULT_RULES, derive } = require('./engine');
+const demo = require('./demo');
 
 const KEY = 'qq_state_v1';
 const COLORS = [
@@ -25,6 +26,8 @@ function get() {
     try { S = wx.getStorageSync(KEY) || null; } catch (e) { S = null; }
     if (!S) S = fresh();
     migrate(S);
+    // 第一次打开且还没有任何对局：自动载入演示数据，方便内测体验（可在「我的」里清除）
+    if (!S.demoSeen) { S.demoSeen = true; if (!S.history.length) demo.seedDemo(S); try { wx.setStorageSync(KEY, S); } catch (e) {} }
   }
   return S;
 }
@@ -86,9 +89,11 @@ function removeFriend(id) {
   save();
   return '';
 }
+function loadDemo() { const ok = demo.seedDemo(get()); save(); return ok; }
+function clearDemo() { const r = demo.clearDemo(get()); save(); return r; }
 function deleteMatch(id) { const s = get(); s.history = s.history.filter(m => m.id !== id); save(); }
 /** 结束但不保存：直接丢弃进行中的对局 */
 function discardLive() { get().live = null; save(); }
 function match(id) { const s = get(); return id === 'live' ? s.live : s.history.find(m => m.id === id); }
 
-module.exports = { get, save, friend, color, view, addFriend, activeFriends, updateFriend, removeFriend, deleteMatch, newDraft, startLive, finishLive, discardLive, match, COLORS, derive };
+module.exports = { get, save, friend, color, view, addFriend, activeFriends, updateFriend, removeFriend, deleteMatch, loadDemo, clearDemo, newDraft, startLive, finishLive, discardLive, match, COLORS, derive };

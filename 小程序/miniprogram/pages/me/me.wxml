@@ -13,10 +13,18 @@
     <view class="row"><text class="rl">记分时屏幕常亮</text><switch checked="{{keep}}" color="#22C993" data-k="keep" bindchange="toggle"/></view>
     <view class="row"><text class="rl">计分震动反馈</text><switch checked="{{vib}}" color="#22C993" data-k="vib" bindchange="toggle"/></view>
   </view>
+  <view class="sec rise" style="--i:4">演示数据</view>
+  <view class="card rise" style="--i:4">
+    <view class="row" bindtap="toggleDemo" hover-class="rowp">
+      <view class="dm"><text class="rl">{{demo?'清除演示数据':'载入演示数据'}}</text><text class="dsub">{{demo?'当前包含 '+demoN+' 场 Isaac / Henry / Hugo 的演示对局':'生成一套近一个月的演示对局，方便体验战绩和交手'}}</text></view>
+      <text class="dbtn {{demo?'red':''}}">{{demo?'清除':'载入'}}</text>
+    </view>
+  </view>
   <view class="sec rise" style="--i:4">关于</view>
   <view class="card rise" style="--i:5">
-    <view class="row"><text class="rl">版本</text><text class="rv">内测版 0.2</text></view>
+    <view class="row"><text class="rl">版本</text><text class="rv">内测版 0.2.1</text></view>
   </view>
   <view class="tabpad"></view>
 </view>
 <edit-sheet show="{{es.show}}" title="我的资料" name="{{es.name}}" color="{{es.color}}" bind:save="saveMe" bind:close="closeEs"/>
+<ui-sheet show="{{ui.show}}" icon="{{ui.icon}}" title="{{ui.title}}" desc="{{ui.desc}}" actions="{{ui.actions}}" bind:action="onUi" bind:close="onUiClose"/>

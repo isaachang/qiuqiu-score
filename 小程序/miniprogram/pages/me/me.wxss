@@ -7,3 +7,8 @@
 .chev{color:var(--tx3);font-size:40rpx}
 .row+.row::before{left:32rpx}
 .rowp{background:var(--line)}
+
+.dm{flex:1;min-width:0;display:flex;flex-direction:column}
+.dsub{font-size:22rpx;color:var(--tx2);margin-top:4rpx}
+.dbtn{font-size:26rpx;font-weight:800;padding:12rpx 28rpx;border-radius:99rpx;background:#16161A;color:#fff}
+.dbtn.red{background:#F0444D1A;color:#F0444D}

@@ -1,6 +1,6 @@
 <nav-bar title="战绩" large scrolled="{{scrolled}}"/>
 <view class="wrap {{ent?'ent':'pre'}}">
-  <view class="large rise" style="--i:0"><view><text class="ls">你的台球履历</text><text class="lt">战绩</text></view></view>
+  <view class="large rise" style="--i:0"><view><text class="ls">{{demo?'当前包含演示数据 · 可在「我的」里清除':'你的台球履历'}}</text><text class="lt">战绩</text></view></view>
   <view class="seg rise" style="--i:1;margin:0 0 28rpx">
     <view class="thumb" style="width:calc(33.33% - 4rpx);transform:translateX({{segIdx*100}}%)"></view>
     <view class="it {{seg==='all'?'on':''}}" data-s="all" bindtap="setSeg">全部</view>
