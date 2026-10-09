@@ -17,19 +17,21 @@ Component({
     show(v) {
       if (!v) { this.setData({ focus: false }); return; }
       const val = this.data.name || '';
-      this.setData({ val, ci: this.data.color || 0, ch: val.slice(0, 1) || '?' });
-      setTimeout(() => this.setData({ focus: true }), 380);
+      this.setData({ val, ci: this.data.color || 0, ch: val.slice(0, 1) || '?', focus: false }); // 不自动弹键盘，用户点输入框才弹
     },
   },
   methods: {
+    onFocus() { this.setData({ focus: true }); },
+    onBlur() { this.setData({ focus: false }); },
     onInput(e) { const val = e.detail.value; this.setData({ val, ch: val.trim().slice(0, 1) || '?' }); },
     pick(e) { this.setData({ ci: +e.currentTarget.dataset.i }); },
     save() {
+      const now = Date.now(); if (now - (this._t || 0) < 600) return; this._t = now;
       const v = (this.data.val || '').trim();
       if (!v) { wx.showToast({ title: '请输入名字', icon: 'none' }); return; }
       this.triggerEvent('save', { name: v.slice(0, 8), color: this.data.ci });
     },
-    del() { this.triggerEvent('delete'); },
+    del() { this.triggerEvent('delete', { name: this.data.val, color: this.data.ci }); }, // 带上正在编辑的内容，取消删除时可以原样恢复
     close() { this.triggerEvent('close'); },
     noop() {},
   },

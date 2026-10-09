@@ -1,19 +1,27 @@
 // 球球记分 · 记分逻辑（竖屏 / 横屏共用的 Behavior）
 const store = require('../utils/store');
-const { EV, CHIPS, derive, signed } = require('../utils/engine');
+const { EV, CHIPS, derive, signed, played } = require('../utils/engine');
 const { clock } = require('../utils/util');
 const sfx = require('../utils/sfx');
+const idle = require('../utils/idle');
+const limit = require('../utils/limit');
 
 let flySeq = 1;
 
 module.exports = Behavior({
-  data: { risen: false, n: 2, players: [], round: 1, clock: '00:00:00', order: [], flies: [], parts: [], banner: null, chips: [], hintIntro: true },
+  data: { risen: false, n: 2, players: [], round: 1, clock: '00:00:00', ccls: '', order: [], flies: [], parts: [], banner: null, chips: [], hintIntro: true },
 
   methods: {
     initScore() {
+      idle.check();
       const s = store.get();
       this.m = s.live;
-      if (!this.m) { wx.navigateBack({ fail: () => wx.switchTab({ url: '/pages/home/home' }) }); return false; }
+      if (!this.m) {
+        this.stopClock(); wx.setKeepScreenOn({ keepScreenOn: false });
+        // 刚被自动保存：记分页弹「已自动保存」；其它情况直接返回
+        if (this.onNoLive && this.onNoLive()) return false;
+        wx.navigateBack({ fail: () => wx.switchTab({ url: '/pages/home/home' }) }); return false;
+      }
       const m = this.m;
       this.setData({
         lite: !!(getApp().globalData || {}).lite,
@@ -22,7 +30,8 @@ module.exports = Behavior({
         puV: m.rules.pu.v,
       });
       this.refresh(null);
-      if (s.settings.keep) wx.setKeepScreenOn({ keepScreenOn: true });
+      // 屏幕常亮；限时比赛总是常亮 —— 锁屏后小程序会被挂起，到点也没法提醒
+      if (s.settings.keep || m.limit) wx.setKeepScreenOn({ keepScreenOn: true });
       sfx.preload();
       this.startClock();
       setTimeout(() => this.setData({ hintIntro: false }), 2400);
@@ -32,10 +41,42 @@ module.exports = Behavior({
     },
     startClock() {
       this.stopClock();
-      const tick = () => this.m && this.setData({ clock: clock((Date.now() - this.m.start) / 1000) });
+      const tick = () => {
+        const m = this.m; if (!m) return;
+        const now = Date.now();
+        if (now - store.lastAct(m) >= store.IDLE) { this.idleOut(); return; } // 30 分钟没操作 → 自动保存
+        const { txt, ccls, due } = limit.state(m, now);
+        if (due) this.timeUp();
+        if (txt !== this.data.clock || ccls !== this.data.ccls) this.setData({ clock: txt, ccls });
+      };
       tick(); this._clk = setInterval(tick, 1000);
     },
     stopClock() { if (this._clk) clearInterval(this._clk); this._clk = null; },
+
+    /* ---------- 限时比赛：时间到只提醒，不自动结算 ---------- */
+    timeUp() {
+      if (this.busy && this.busy()) return; // 正在看别的面板 / 庆祝：等它关掉再提醒
+      limit.asked(this.m); // 同一个时限只提醒一次
+      this.showTimeUp();
+    },
+    /** 点顶部计时：超时后可以再打开「时间到」 */
+    onClock() { if (this.guard()) return; if (this.m && this.m.limit && this.data.ccls === 'over') this.showTimeUp(); },
+    showTimeUp() { this.setData({ tu: true, tuDesc: limit.desc(this.m) }); },
+    onTuClose() { this.setData({ tu: false }); },
+    onTuAdd(e) {
+      const min = e.detail.m;
+      this.setData({ tu: false });
+      limit.more(this.m, min); this.startClock();
+      wx.showToast({ title: `已加时 ${min} 分钟`, icon: 'none' });
+    },
+    onTuEnd() { this.setData({ tu: false }); this.endFromTimeUp && this.endFromTimeUp(); },
+    /** 长时间没操作：自动保存，然后交给页面提示 */
+    idleOut() {
+      this.stopClock(); sfx.stop();
+      this.setData({ 'fin.show': false, 'ui.show': false, tup: false, banner: null });
+      idle.check();
+      this.initScore();
+    },
 
     /** 由事件重算全部显示数据；step 不为空时播放该次计分的动效 */
     refresh(step) {
@@ -62,6 +103,7 @@ module.exports = Behavior({
       });
       const order = D.order.map((p, k) => ({ ...store.view(m.players[p]), first: k === 0 }));
       this.setData({ players, round: D.round, order }, () => {
+        if (moved) this._lockUntil = Date.now() + 620;
         if (moved) setTimeout(() => {
           const up = {}; players.forEach((p, r) => { if (p.mv) up[`players[${r}].mv`] = 'transform:none;transition:transform .55s cubic-bezier(.3,1.25,.5,1);'; });
           this.setData(up);
@@ -78,6 +120,10 @@ module.exports = Behavior({
     },
 
     score(pi, k) {
+      // 防连点：400ms 内只记一次；三人局卡片换位动画期间（约 0.6s）不接受新的记分，避免点到刚换过来的人
+      const now = Date.now();
+      if (now < (this._lockUntil || 0)) return;
+      this._lockUntil = now + 400;
       const m = this.m;
       m.events.push({ p: pi, ev: k, t: Date.now() });
       store.save();
@@ -89,7 +135,7 @@ module.exports = Behavior({
     undo() {
       const m = this.m, e = m.events.pop();
       if (!e) { wx.showToast({ title: '没有可撤销的记录', icon: 'none' }); return; }
-      store.save();
+      store.touchLive(); store.save();
       const before = derive({ ...m, events: [...m.events, e] }), step = before.steps[before.steps.length - 1];
       if (e.ev === 'dj' || e.ev === 'xj') sfx.stop(); // 撤销金球时音乐也一起停
       if (this.data.banner) this.closeBanner(true);

@@ -1,9 +1,10 @@
 // 全部对局 · 日历视图
 // 周视图（默认）/ 月视图切换，左右滑动翻页；每天一个结果圆环（绿 = 赢的场次占比，红 = 输）；点某天看当天对局
 const store = require('../../utils/store');
+const nav = require('../../utils/nav');
 const { matchRow } = require('../../utils/rows');
 const { derived } = require('../../utils/cache');
-const { signed } = require('../../utils/engine');
+const { signed, outcome } = require('../../utils/engine');
 const { enter, onScroll } = require('../../utils/page');
 const { ask, uiDone } = require('../../utils/ui');
 
@@ -33,10 +34,10 @@ Page({
     const ms = s.history.filter(m => m.status === 'done' && m.players.includes(me.id) && (this.seg === 'all' || m.mode === +this.seg) && m.start >= since);
     const idx = {};
     ms.forEach(m => {
-      const k = keyOf(new Date(m.start)), D = derived(m), my = D.scores[m.players.indexOf(me.id)], max = Math.max(...D.scores);
+      const k = keyOf(new Date(m.start)), D = derived(m), i = m.players.indexOf(me.id), my = D.scores[i], oc = outcome(D.scores, i);
       const g = idx[k] || (idx[k] = { ms: [], w: 0, l: 0, net: 0 });
       g.ms.push(m); g.net += my;
-      if (my === max && my > 0) g.w++; else if (my < 0) g.l++;
+      if (oc === 'W') g.w++; else if (oc === 'L') g.l++;
     });
     this.idx = idx;
     this.latest = Object.keys(idx).map(Number).sort((a, b) => b - a)[0] || 0;
@@ -110,7 +111,7 @@ Page({
     if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) dx < 0 ? this.next() : this.prev();
   },
 
-  open(e) { wx.navigateTo({ url: '/pages/result/result?id=' + e.currentTarget.dataset.id }); },
+  open(e) { nav.to('/pages/result/result?id=' + e.currentTarget.dataset.id); },
   askDelete(e) {
     const id = e.currentTarget.dataset.id;
     ask(this, { icon: 'warn', title: '删除这场对局？', desc: '删除后战绩统计会同步更新，无法恢复。', actions: [{ k: 'del', t: '删除', type: 'danger' }] })

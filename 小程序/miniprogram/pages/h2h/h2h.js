@@ -1,4 +1,5 @@
 const store = require('../../utils/store');
+const nav = require('../../utils/nav');
 const { enter, onScroll } = require('../../utils/page');
 const { headToHead } = require('../../utils/stats');
 const { matchRow } = require('../../utils/rows');
@@ -20,9 +21,9 @@ Page({
       wSplit: X.w + X.l ? Math.round(X.w / (X.w + X.l) * 100) : 50,
     });
   },
-  open(e) { wx.navigateTo({ url: '/pages/result/result?id=' + e.currentTarget.dataset.id }); },
+  open(e) { nav.to('/pages/result/result?id=' + e.currentTarget.dataset.id); },
   rematch() {
     store.newDraft(2, [store.get().friends.find(f => f.me).id, this.fid]);
-    wx.navigateTo({ url: '/pages/setup/setup' });
+    nav.to('/pages/setup/setup');
   },
 });

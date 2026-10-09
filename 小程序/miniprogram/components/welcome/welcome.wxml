@@ -1,0 +1,64 @@
+<!-- 新用户引导：3 页简单介绍 + 起名字；背景虚化 -->
+<view wx:if="{{show}}" class="wm {{lite?'lite':''}} {{out?'out':''}}" catchtouchmove="noop">
+  <view class="wc">
+    <swiper class="ws" current="{{cur}}" bindchange="onSwipe" duration="380" easing-function="easeOutCubic">
+      <!-- 1. 是什么 -->
+      <swiper-item>
+        <view class="pg {{cur===0?'on':''}}">
+          <view class="ill i1">
+            <view class="glow"></view>
+            <image class="logo" src="/images/logo.png" mode="aspectFill"/>
+            <view class="bl b-r"></view><view class="bl b-b"></view><view class="bl b-9"></view>
+          </view>
+          <text class="wt">欢迎来到球球记分</text>
+          <text class="wd">台球追分记分，一台手机记全场\n双人、三人都能打，分数自动算好</text>
+        </view>
+      </swiper-item>
+      <!-- 2. 怎么记分 -->
+      <swiper-item>
+        <view class="pg {{cur===1?'on':''}}">
+          <view class="ill i2">
+            <view class="mc">
+              <view class="mh"><view class="ma">{{mch}}</view><text class="mn">{{nameShow}}</text></view>
+              <text class="ms num">+4</text>
+              <view class="mchips"><text class="mk k1">大金</text><text class="mk k2">小金</text><text class="mk k3">黄金九</text><text class="mk k4">犯规</text></view>
+              <view class="tap"></view>
+            </view>
+            <text class="fl num">+4</text>
+          </view>
+          <text class="wt">轻点卡片，记一局</text>
+          <text class="wd">谁赢了就点谁的卡片，记一次普胜\n金球、犯规点下面的按钮，记错了能撤销</text>
+        </view>
+      </swiper-item>
+      <!-- 3. 战报和战绩 -->
+      <swiper-item>
+        <view class="pg {{cur===2?'on':''}}">
+          <view class="ill i3">
+            <view class="rc">
+              <view class="rh"><text class="rl">胜率</text><text class="rv num">64%</text></view>
+              <view class="bars"><view class="bar" wx:for="{{bars}}" wx:key="*this" style="--h:{{item}}%;--d:{{index*70}}ms"></view></view>
+            </view>
+          </view>
+          <text class="wt">打完自动出战报</text>
+          <text class="wd">结算后生成战报，能分享给球友\n战绩页看胜率、走势和你的「克星」</text>
+        </view>
+      </swiper-item>
+      <!-- 4. 起名字 -->
+      <swiper-item>
+        <view class="pg {{cur===3?'on':''}}">
+          <view class="ill i4"><view class="nav-av" style="background:{{c}};color:{{ci}}">{{ch}}</view></view>
+          <text class="wt">你叫什么？</text>
+          <text class="wd">会显示在记分卡和战报上，之后可以在「我的」里改</text>
+          <view class="win {{fo?'fo':''}}">
+            <input class="wip" value="{{name}}" maxlength="8" placeholder="输入你的名字" placeholder-class="wph" confirm-type="done"
+                   bindinput="onInput" bindfocus="onFocus" bindblur="onBlur" bindconfirm="done" cursor-spacing="150"/>
+          </view>
+        </view>
+      </swiper-item>
+    </swiper>
+
+    <view class="dots"><view wx:for="{{4}}" wx:key="*this" class="dot {{index===cur?'on':''}}"></view></view>
+    <view class="btn pri wb" bindtap="next" hover-class="press">{{cur<3?'下一步':(name?'开始使用':'先用「我」开始')}}</view>
+    <view class="skip {{cur<3?'':'hid'}}" bindtap="skipToName">跳过</view>
+  </view>
+</view>

@@ -1,4 +1,5 @@
 const store = require('../../utils/store');
+const nav = require('../../utils/nav');
 const { ask, uiDone } = require('../../utils/ui');
 const { overview, achievements } = require('../../utils/stats');
 const { matchRow } = require('../../utils/rows');
@@ -31,9 +32,9 @@ Page({
     });
     if (anim) ALL.kpis.forEach((k, i) => countUp(this, `card.kpis[${i}].v`, k.v));
   },
-  toHistory() { wx.navigateTo({ url: `/pages/history/history?seg=${this.data.seg}&days=${this.data.days}` }); },
-  toH2h(e) { wx.navigateTo({ url: '/pages/h2h/h2h?fid=' + e.currentTarget.dataset.id }); },
-  open(e) { wx.navigateTo({ url: '/pages/result/result?id=' + e.currentTarget.dataset.id }); },
+  toHistory() { nav.to(`/pages/history/history?seg=${this.data.seg}&days=${this.data.days}`); },
+  toH2h(e) { nav.to('/pages/h2h/h2h?fid=' + e.currentTarget.dataset.id); },
+  open(e) { nav.to('/pages/result/result?id=' + e.currentTarget.dataset.id); },
   askDelete(e) {
     const id = e.currentTarget.dataset.id;
     ask(this, { icon: 'warn', title: '删除这场对局？', desc: '删除后战绩统计会同步更新，无法恢复。', actions: [{ k: 'del', t: '删除', type: 'danger' }] })

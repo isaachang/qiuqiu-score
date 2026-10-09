@@ -1,5 +1,5 @@
 // 球球记分 · 战报数据（结算报告页用）—— 纯函数，从对局事件算出所有可视化数据
-const { EV, derive, signed } = require('./engine');
+const { EV, derive, signed, isDraw } = require('./engine');
 
 const pct = (a, b) => (b ? Math.round(a / b * 1000) / 10 : 0);
 
@@ -24,9 +24,11 @@ function buildReport(m, view) {
 
   // 2) 排名 / 领奖台
   const rank = P.map((p, i) => ({ ...p, i, s: D.scores[i] })).sort((a, b) => b.s - a.s)
-    .map((r, k) => ({ ...r, no: k + 1, txt: signed(r.s), cls: r.s > 0 ? 'pos' : r.s < 0 ? 'neg' : '' }));
+    .map(r => ({ ...r, no: 1 + D.scores.filter(x => x > r.s).length, txt: signed(r.s), cls: r.s > 0 ? 'pos' : r.s < 0 ? 'neg' : '' })); // 同分同名次
   const podium = n === 3 ? [rank[1], rank[0], rank[2]] : [rank[0], rank[1]];
-  const W = rank[0];
+  // 平局（最高分并列）：没有单独的赢家，也就没有皇冠
+  const draw = isDraw(D.scores), W = draw ? null : rank[0];
+  const headline = !draw ? `${W.name} 赢下本场` : rank[0].s > 0 && n === 3 ? rank.filter(r => r.no === 1).map(r => r.name).join('、') + ' 并列第一' : '本场平局';
 
   // 3) 每人数据
   const per = P.map((p, i) => {
@@ -58,7 +60,7 @@ function buildReport(m, view) {
   const hl = [];
   const bs = argmax(D.best); if (bs.v >= 2 && !bs.tie) hl.push({ t: '连胜王', d: `最长 ${bs.v} 连胜`, p: P[bs.i], c: '#FF5A5F', ic: '连' });
   const gm = argmax(per.map(x => x.gold)); if (gm.v > 0 && !gm.tie) hl.push({ t: '金球王', d: `打出 ${gm.v} 次金球`, p: P[gm.i], c: '#FFB020', ic: '金' });
-  const cb = minS[W.i]; if (cb < 0 && W.s > 0) hl.push({ t: '逆转王', d: `从 ${signed(cb)} 打到 ${W.txt}`, p: P[W.i], c: '#1FC98E', ic: '逆' });
+  const cb = W ? minS[W.i] : 0; if (W && cb < 0 && W.s > 0) hl.push({ t: '逆转王', d: `从 ${signed(cb)} 打到 ${W.txt}`, p: P[W.i], c: '#1FC98E', ic: '逆' });
   const fm = argmax(per.map(x => x.foul)); if (fm.v > 0 && !fm.tie) hl.push({ t: '手滑王', d: `犯规 ${fm.v} 次`, p: P[fm.i], c: '#9B6BFF', ic: '滑' });
   const pk = argmax(maxS); if (pk.v > 0 && !pk.tie && hl.length < 4) hl.push({ t: '巅峰时刻', d: `最高领先到 ${signed(pk.v)}`, p: P[pk.i], c: '#3D7BFF', ic: '峰' });
 
@@ -66,7 +68,7 @@ function buildReport(m, view) {
   const ms = (m.end || Date.now()) - m.start;
   const totals = per.reduce((a, x) => ({ pu: a.pu + x.pu, gold: a.gold + x.gold, foul: a.foul + x.foul }), { pu: 0, gold: 0, foul: 0 });
 
-  return { D, P, W, rank, podium, table, sources, hl: hl.slice(0, 4), series, rounds, ms, totals,
+  return { D, P, W, draw, headline, rank, podium, table, sources, hl: hl.slice(0, 4), series, rounds, ms, totals,
     goldRate: pct(totals.gold, rounds), perRound: rounds ? ms / rounds : 0 };
 }
 

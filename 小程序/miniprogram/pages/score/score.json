@@ -1,1 +1,1 @@
-{"navigationStyle": "custom", "disableScroll": true, "usingComponents": {"ui-sheet": "/components/ui-sheet/ui-sheet"}}
+{"navigationStyle": "custom", "disableScroll": true, "usingComponents": {"ui-sheet": "/components/ui-sheet/ui-sheet", "time-up": "/components/time-up/time-up"}}

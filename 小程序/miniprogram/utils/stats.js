@@ -1,5 +1,5 @@
 // 球球记分 · 战绩统计（纯函数，输入历史对局，输出统计页 / 交手页需要的全部数据）
-const { EV, signed } = require('./engine');
+const { EV, signed, outcome, played } = require('./engine');
 const { derived } = require('./cache');
 
 const pct = (a, b) => (b ? Math.round(a / b * 100) : 0);
@@ -25,8 +25,8 @@ function personal(ms, id) {
     rounds += D.round - 1; wins += st.win; gold += st.dj + st.xj + st.h9; foul += st.foul; pu += st.pu;
     best = Math.max(best, D.best[i]); score += D.scores[i]; top = Math.max(top, D.scores[i]);
     Object.keys(ev).forEach(k => { ev[k] += st[k]; });
-    if (D.scores[i] === Math.max(...D.scores) && D.scores[i] > 0) mWins++; else if (D.scores[i] < 0) mLoss++;
-    durSum += Math.max(0, (m.end || m.start) - m.start);
+    const oc = outcome(D.scores, i); if (oc === 'W') mWins++; else if (oc === 'L') mLoss++;
+    durSum += played(m, m.start);
     if (st.foul === 0 && D.round - 1 >= 5) clean++;
     D.steps.forEach(s => { const x = s.d[i]; if (x > 0) gain[s.ev === 'foul' ? 'foul' : EV[s.ev].gold ? 'gold' : 'pu'] += x; });
   });
@@ -55,11 +55,11 @@ function overview(history, meId, seg, view, days) {
   // 每场结果 + 累计净胜分
   let acc = 0; const series = [0], titles = ['起点'], notes = [''];
   const results = chrono.map(m => {
-    const D = derived(m), i = m.players.indexOf(meId), my = D.scores[i], max = Math.max(...D.scores);
+    const D = derived(m), i = m.players.indexOf(meId), my = D.scores[i];
     acc += my; series.push(acc);
     const opp = m.players.filter(x => x !== meId).map(x => view(x).name).join('、');
     titles.push(`${md(m.start)} · vs ${opp}`); notes.push(`本场 ${signed(my)} · 累计 ${signed(acc)}`);
-    return my === max && my > 0 ? 'W' : my < 0 ? 'L' : 'D';
+    return outcome(D.scores, i);
   });
   const ticks = []; const N = chrono.length, cnt = Math.min(4, N);
   for (let k = 0; k <= cnt; k++) { const i = Math.round(N * k / (cnt || 1)); ticks.push({ i, t: i === 0 ? '起点' : md(chrono[i - 1].start) }); }

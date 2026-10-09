@@ -37,6 +37,13 @@
   <view style="--i:7" class="card rise">
     <view class="row"><text class="ol">屏幕常亮</text><switch checked="{{keep}}" color="#22C993" data-k="keep" bindchange="toggle"/></view>
     <view class="row"><text class="ol">计分震动反馈</text><switch checked="{{vib}}" color="#22C993" data-k="vib" bindchange="toggle"/></view>
+    <view class="row lim"><text class="ol">限时比赛</text><switch checked="{{limOn}}" color="#22C993" bindchange="toggleLimit"/></view>
+    <view class="lims {{limOn?'on':''}}">
+      <view wx:for="{{limOpts}}" wx:key="m" class="lo {{item.m===limit?'sel':''}}" data-m="{{item.m}}" bindtap="pickLimit" hover-class="press">{{item.t}}</view>
+      <view class="lo {{custom?'sel':''}}" bindtap="openCustom" hover-class="press">{{customTxt}}</view>
+    </view>
+    <!-- 【测试】只在开发版显示：5 秒后到点，用来测「时间到」面板 -->
+    <view wx:if="{{limOn&&dev}}" class="ltest {{limit===-1?'sel':''}}" bindtap="pickTest">测试：5 秒后到点{{limit===-1?' ✓':''}}</view>
   </view>
 </view>
 
@@ -45,19 +52,32 @@
 <view class="sheet-mask {{sheet?'on':''}}" bindtap="closeSheet"></view>
 <view class="sheet {{sheet?'on':''}}" catchtap="noop">
   <view style="--i:8" class="grab rise"></view>
-  <view style="--i:9" class="st rise">添加球员</view>
-  <view style="--i:10" class="ss rise">从球友中选择，或新建一位 · 还差 {{lack}} 位</view>
-  <view style="--i:10" class="pick-grid rise">
+  <view style="--i:9" class="add-row rise">
+    <view class="es-in {{nf?'fo':''}}" style="flex:1"><input class="es-ipt" placeholder="输入球员名字" placeholder-class="es-ph" maxlength="8" value="{{newName}}" bindinput="onName" bindfocus="onFocus" bindblur="onBlur" confirm-type="done" bindconfirm="addNew" cursor-spacing="140"/></view>
+    <view class="btn pri addb" bindtap="addNew">添加</view>
+  </view>
+  <view wx:if="{{free.length}}" style="--i:10" class="pick-grid rise">
     <view class="pick" wx:for="{{free}}" wx:key="id" data-id="{{item.id}}" bindtap="pick" hover-class="press">
       <view class="av" style="background:{{item.c}};color:{{item.i}};width:88rpx;height:88rpx;font-size:34rpx">{{item.ch}}</view><text>{{item.name}}</text>
     </view>
   </view>
-  <view wx:if="{{!free.length}}" class="empty rise" style="--i:10;padding:24rpx 0 36rpx">还没有其他球友，在下面新建一位</view>
-  <view style="--i:10" class="add-row rise">
-    <view class="es-in {{nf?'fo':''}}" style="flex:1"><input class="es-ipt" placeholder="输入名字，新建球友" placeholder-class="es-ph" maxlength="8" value="{{newName}}" bindinput="onName" bindfocus="onFocus" bindblur="onBlur" confirm-type="done" bindconfirm="addNew" cursor-spacing="140"/></view>
-    <view class="btn pri addb" bindtap="addNew">添加</view>
-  </view>
   <view style="--i:10" class="cancel rise" bindtap="closeSheet">取消</view>
+</view>
+
+<!-- 自定义限时：滚轮 -->
+<view class="sheet-mask {{cs?'on':''}}" bindtap="closeCustom" catchtouchmove="noop"></view>
+<view class="sheet {{cs?'on':''}}" catchtap="noop" catchtouchmove="noop">
+  <view class="grab"></view>
+  <view class="st">自定义时长</view>
+  <view class="pvw">
+    <picker-view class="pv" value="{{pv}}" indicator-class="pvi" mask-class="pvm" bindchange="onPv" immediate-change>
+      <picker-view-column><view wx:for="{{hours}}" wx:key="*this" class="pvc num">{{item}}</view></picker-view-column>
+      <picker-view-column><view wx:for="{{mins}}" wx:key="*this" class="pvc num">{{item}}</view></picker-view-column>
+    </picker-view>
+    <text class="pvl l1">小时</text><text class="pvl l2">分钟</text>
+  </view>
+  <view class="btn pri {{pvZero?'dis':''}}" bindtap="okCustom" hover-class="press">{{pvZero?'至少 5 分钟':'确定'}}</view>
+  <view class="cancel" bindtap="closeCustom">取消</view>
 </view>
 
 <!-- 旧局未结算 -->

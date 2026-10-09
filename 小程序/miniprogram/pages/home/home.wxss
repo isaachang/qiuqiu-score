@@ -44,3 +44,7 @@
 .wr{font-size:22rpx;color:var(--tx2);font-weight:600}
 .sep::before{content:"";position:absolute;top:0;left:120rpx;right:0;height:1rpx;background:var(--line)}
 .clip{overflow:hidden}
+
+/* 限时比赛：最后 5 分钟 / 超时 变红 */
+.lclk{font-variant-numeric:tabular-nums}
+.lclk.warn,.lclk.over{color:#F0444D;font-weight:700}

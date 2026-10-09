@@ -1,0 +1,28 @@
+<!-- 限时比赛 · 时间到：结束比赛，或加时（5 / 10 / 15 分钟、自定义滚轮）；只提醒，不自动结算 -->
+<view class="sheet-mask {{show?'on':''}}" bindtap="close" catchtouchmove="noop"></view>
+<view class="sheet tu {{show?'on':''}} {{land?'land':''}}" catchtap="noop" catchtouchmove="noop">
+  <view class="grab"></view>
+  <view class="tu-face {{wheel?'off':''}}">
+    <view class="tu-t">时间到</view>
+    <view class="tu-d">{{desc}}</view>
+    <view class="btn pri tu-end" bindtap="end" hover-class="press">结束比赛</view>
+    <view class="tu-sec">加时</view>
+    <view class="tu-row">
+      <view wx:for="{{adds}}" wx:key="*this" class="tu-o" data-m="{{item}}" bindtap="add" hover-class="press">+{{item}} 分钟</view>
+      <view class="tu-o" bindtap="openWheel" hover-class="press">自定义</view>
+    </view>
+    <view class="tu-cancel" bindtap="close">取消</view>
+  </view>
+  <view wx:if="{{wheel}}" class="tu-face tu-wf">
+    <view class="tu-t">加时多久</view>
+    <view class="pvw">
+      <picker-view class="pv" value="{{pv}}" indicator-class="pvi" bindchange="onPv" immediate-change>
+        <picker-view-column><view wx:for="{{hours}}" wx:key="*this" class="pvc num">{{item}}</view></picker-view-column>
+        <picker-view-column><view wx:for="{{mins}}" wx:key="*this" class="pvc num">{{item}}</view></picker-view-column>
+      </picker-view>
+      <text class="pvl l1">小时</text><text class="pvl l2">分钟</text>
+    </view>
+    <view class="btn pri tu-end {{zero?'dis':''}}" bindtap="okWheel" hover-class="press">{{zero?'至少 5 分钟':'确定加时'}}</view>
+    <view class="tu-cancel" bindtap="closeWheel">返回</view>
+  </view>
+</view>

@@ -6,8 +6,8 @@
     <view class="av es-av" style="background:{{colors[ci].c}};color:{{colors[ci].i}}">{{ch}}</view>
   </view>
   <view class="es-in {{focus?'fo':''}}">
-    <input class="es-ipt" value="{{val}}" focus="{{focus}}" maxlength="8" placeholder="输入名字（最多 8 个字）" placeholder-class="es-ph"
-           confirm-type="done" bindinput="onInput" bindconfirm="save" bindfocus="noop" cursor-spacing="140"/>
+    <input class="es-ipt" value="{{val}}" maxlength="8" placeholder="输入名字（最多 8 个字）" placeholder-class="es-ph"
+           confirm-type="done" bindinput="onInput" bindconfirm="save" bindfocus="onFocus" bindblur="onBlur" cursor-spacing="140"/>
     <text class="es-n num">{{val.length}}/8</text>
   </view>
   <view wx:if="{{showColor}}" class="es-cl">

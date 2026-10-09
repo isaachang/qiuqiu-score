@@ -24,7 +24,7 @@
   </view>
 
   <view wx:if="{{live}}" class="card live rise" style="--i:3" hover-class="press" bindtap="resume">
-    <view class="lh"><view class="dot"><view class="ring"></view></view><text class="lt2">{{live.mode}}追分 · 第 {{live.round}} 局 · {{live.clock}}</text><view class="go2">继续 ›</view></view>
+    <view class="lh"><view class="dot"><view class="ring"></view></view><text class="lt2">{{live.mode}}追分 · 第 {{live.round}} 局 · <text class="lclk {{live.ccls}}">{{live.ccls==='cd'||live.ccls==='warn'?'剩 ':''}}{{live.clock}}</text></text><view class="go2">继续 ›</view></view>
     <view class="lg" style="grid-template-columns:repeat({{live.cols}},1fr)">
       <view class="lp" wx:for="{{live.players}}" wx:key="id">
         <view class="av pop" style="--i:{{index+3}};background:{{item.c}};color:{{item.i}};width:80rpx;height:80rpx;font-size:32rpx">{{item.ch}}</view>
@@ -57,4 +57,6 @@
   </view>
   <view class="tabpad"></view>
 </view>
+<welcome show="{{wel}}" bind:close="onWelClose"/>
+<time-up show="{{tu}}" desc="{{tuDesc}}" bind:end="onTuEnd" bind:add="onTuAdd" bind:close="onTuClose"/>
 <ui-sheet show="{{ui.show}}" icon="{{ui.icon}}" title="{{ui.title}}" desc="{{ui.desc}}" actions="{{ui.actions}}" bind:action="onUi" bind:close="onUiClose"/>

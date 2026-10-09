@@ -23,14 +23,18 @@ Page({
     this.close(); this.render();
     wx.showToast({ title: this.editing ? '已保存' : '已添加', icon: 'success' });
   },
-  del() {
-    const id = this.editing, f = store.friend(id);
-    ask(this, { icon: 'warn', title: `删除「${f.name}」？`, desc: '删除后不会出现在球友列表里，历史战绩中仍保留名字。', actions: [{ k: 'del', t: '删除', type: 'danger' }] })
-      .then(k => {
-        if (k !== 'del') return;
-        const err = store.removeFriend(id);
-        if (err) { wx.showToast({ title: err, icon: 'none' }); return; }
-        this.close(); this.render(); wx.showToast({ title: '已删除', icon: 'success' });
-      });
+  del(e) {
+    const id = this.editing, f = store.friend(id), cur = (e && e.detail) || {};
+    const keep = Object.assign({}, this.data.es, cur.name != null ? { name: cur.name, color: cur.color } : {});
+    this.setData({ 'es.show': false }); // 先把编辑面板收起来，避免两个面板叠在一起
+    setTimeout(() => {
+      ask(this, { icon: 'warn', title: `删除「${f.name}」？`, desc: '删除后不会出现在球友列表里，历史战绩中仍保留名字。', actions: [{ k: 'del', t: '删除', type: 'danger' }] })
+        .then(k => {
+          if (k !== 'del') { this.setData({ es: Object.assign(keep, { show: true }) }); return; } // 取消：回到编辑面板
+          const err = store.removeFriend(id);
+          if (err) { wx.showToast({ title: err, icon: 'none' }); return; }
+          this.render(); wx.showToast({ title: '已删除', icon: 'success' });
+        });
+    }, 320);
   },
 });

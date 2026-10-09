@@ -4,12 +4,13 @@
 
   <!-- 1. 冠军领奖台 -->
   <view style="--i:0" class="hero rise">
-    <view class="confetti"><view wx:for="{{conf}}" wx:key="k" class="cf" style="left:{{item.l}}%;background:{{item.c}};animation-duration:{{item.d}}s;animation-delay:{{item.dl}}s"></view></view>
+    <view wx:if="{{!draw}}" class="confetti"><view wx:for="{{conf}}" wx:key="k" class="cf" style="left:{{item.l}}%;background:{{item.c}};animation-duration:{{item.d}}s;animation-delay:{{item.dl}}s"></view></view>
     <view class="h-top"><text class="h-t">{{title}}</text><text class="h-w">{{when}}</text></view>
-    <text class="h-win"><text style="color:{{W.c}}">{{W.name}}</text> 赢下本场</text>
+    <text wx:if="{{W}}" class="h-win"><text style="color:{{W.c}}">{{W.name}}</text> 赢下本场</text>
+    <text wx:else class="h-win">{{headline}}</text>
     <view class="podium">
       <view wx:for="{{podium}}" wx:key="id" class="pod">
-        <image wx:if="{{item.no===1}}" class="pcr" src="/images/crown.svg"/>
+        <image wx:if="{{item.no===1&&!draw}}" class="pcr" src="/images/crown.svg"/>
         <view class="av pav {{item.no===1?'big':''}}" style="background:{{item.c}};color:{{item.i}}">{{item.ch}}</view>
         <text class="pnm">{{item.name}}</text>
         <view class="col" style="height:{{item.h}}rpx;background:{{item.c}};color:{{item.i}}">

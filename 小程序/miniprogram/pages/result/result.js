@@ -1,4 +1,5 @@
 const store = require('../../utils/store');
+const nav = require('../../utils/nav');
 const { enter, onScroll, countUp } = require('../../utils/page');
 const { buildReport } = require('../../utils/report');
 const { dur, dayLabel, clock } = require('../../utils/util');
@@ -15,7 +16,7 @@ Page({
     this.match = m; this.R = R;
     const d = new Date(m.end || Date.now());
     this.setData({
-      ok: true, n: m.players.length, W: R.W, podium: R.podium.map((r, k) => ({ ...r, h: [r.no === 1 ? 236 : r.no === 2 ? 176 : 132][0] })),
+      ok: true, n: m.players.length, W: R.W, draw: R.draw, headline: R.headline, podium: R.podium.map((r, k) => ({ ...r, h: [r.no === 1 ? 236 : r.no === 2 ? 176 : 132][0] })),
       title: `${m.mode === 2 ? '双人' : '三人'}追分 · 战报`,
       when: `${d.getMonth() + 1}月${d.getDate()}日 ${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`,
       table: R.table, heads: R.P, cols: R.P.length, sources: R.sources, hl: R.hl,
@@ -40,16 +41,16 @@ Page({
     for (let k = 0; k <= cnt; k++) { const i = Math.round(N * k / (cnt || 1)); ticks.push({ i, t: i === 0 ? '开局' : `第${steps[i - 1].round}局` }); }
     return { series: R.series, colors: R.P.map(p => p.c), names: R.P.map(p => p.name), titles, notes, ticks };
   },
-  toLog() { wx.navigateTo({ url: '/pages/log/log?id=' + this.id }); },
+  toLog() { nav.to('/pages/log/log?id=' + this.id); },
   again() {
     const m = this.match;
     store.newDraft(m.mode, this.R.D.order.map(i => m.players[i]));
     store.get().draft.rules = JSON.parse(JSON.stringify(m.rules));
-    wx.redirectTo({ url: '/pages/setup/setup' });
+    nav.redirect('/pages/setup/setup');
   },
   home() { wx.switchTab({ url: '/pages/home/home' }); },
   onShareAppMessage() {
     const W = this.data.W;
-    return { title: W ? `${W.name} 赢下本场 ${W.txt} · 球球记分` : '球球记分', path: '/pages/home/home' };
+    return { title: W ? `${W.name} 赢下本场 ${W.txt} · 球球记分` : `${this.data.headline || '球球记分'} · 球球记分`, path: '/pages/home/home' };
   },
 });

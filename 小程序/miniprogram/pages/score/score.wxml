@@ -2,7 +2,7 @@
 <view class="screen {{ent?'ent':'pre'}}">
   <view class="nav" style="padding-top:{{nav.top}}px;height:{{nav.top+nav.h}}px">
     <view class="bk" bindtap="back"><image src="/images/back.svg"/></view>
-    <view class="tt" style="top:{{nav.top}}px"><text class="t1">第 {{round}} 局</text><text class="t2">{{clock}}</text></view>
+    <view class="tt" style="top:{{nav.top}}px"><text class="t1">第 {{round}} 局</text><text class="t2 num {{ccls}}" bindtap="onClock">{{ccls==='cd'||ccls==='warn'?'剩 ':''}}{{clock}}</text></view>
   </view>
 
   <view class="body">
@@ -15,9 +15,10 @@
 
     <view class="cards {{n===3?'trio':'duo'}}">
       <view wx:for="{{players}}" wx:key="id" class="pc {{risen?'':'rise'}} {{item.fx}} {{coach===1&&index===0?'cf':''}}" style="--i:{{index+1}};background:{{item.c}};color:{{item.i}};{{item.mv}}"
-            data-i="{{item.idx}}" bindtap="onCard" hover-class="pc-press" hover-stay-time="60">
+            >
         <view class="flash"></view><view class="sheen"></view>
-        <view class="top">
+        <!-- 只有上半部分（名字 / 比分 / 提示）是「普胜区」；按钮那一排和下方边距都不响应 -->
+        <view class="top" data-i="{{item.idx}}" bindtap="onCard" hover-class="top-press" hover-stay-time="60">
           <view class="ph">
             <view class="av" style="background:{{item.i}};color:{{item.c}}">{{item.ch}}</view>
             <view class="pid">
@@ -31,7 +32,7 @@
             <view wx:if="{{n===2&&item.leader}}" class="lead">领先 {{item.lead}}</view>
           </view>
         </view>
-        <view class="chips {{coach===2&&index===0?'cf':''}}">
+        <view class="chips {{coach===2&&index===0?'cf':''}}" catchtap="noop">
           <view class="chip" wx:for="{{chips}}" wx:for-item="c" wx:for-index="ci" wx:key="k" data-i="{{item.idx}}" data-k="{{c.k}}"
                 catchtap="onChip" hover-class="chip-press" hover-stop-propagation="{{true}}">
             <text class="cl"><text wx:if="{{c.k==='h9'}}" class="b9" style="width:24rpx;height:24rpx"></text>{{c.name}}</text>
@@ -81,7 +82,7 @@
       </view>
     </view>
     <view wx:if="{{!fin.empty}}" class="btn pri" bindtap="saveFin" hover-class="press">保存战绩，查看战报</view>
-    <view class="fin-x" bindtap="discardFin">{{fin.empty?'直接结束':'不保存，直接结束'}}</view>
+    <view class="btn fin-x {{fin.empty?'only':''}}" bindtap="discardFin" hover-class="press">{{fin.empty?'直接结束':'不保存'}}</view>
     <view class="fin-c" bindtap="closeFin">继续打</view>
   </view>
   <!-- 首次使用引导 -->
@@ -89,9 +90,10 @@
     <view class="cb {{coach===3?'up':''}}" style="{{coach===3?'bottom:calc(200rpx + env(safe-area-inset-bottom))':'top:'+coachTop+'px'}}">
       <text class="cbs">{{coach}} / 3</text>
       <text class="cbt">{{coach===1?'轻点卡片 = 普胜':coach===2?'金球和犯规点这里':'点错了随时撤销'}}</text>
-      <text class="cbd">{{coach===1?'最常见的情况，点一下谁的卡片就记谁 +'+puV:coach===2?'大金、小金、黄金九会有庆祝动画；犯规扣 1 分给上家':'打完点「结算」，可以选择保存或不保存'}}</text>
+      <text class="cbd">{{coach===1?'最常见的情况，点一下谁的卡片就记谁 +'+puV:coach===2?'大金、小金、黄金九会有庆祝动画；犯规扣 1 分给'+(n===3?'上家':'对手'):'打完点「结算」，可以选择保存或不保存'}}</text>
       <view class="cbn">{{coach===3?'开始记分':'下一步'}}</view>
     </view>
   </view>
 </view>
+<time-up show="{{tu}}" desc="{{tuDesc}}" bind:end="onTuEnd" bind:add="onTuAdd" bind:close="onTuClose"/>
 <ui-sheet show="{{ui.show}}" icon="{{ui.icon}}" title="{{ui.title}}" desc="{{ui.desc}}" actions="{{ui.actions}}" bind:action="onUi" bind:close="onUiClose"/>

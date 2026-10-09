@@ -1,11 +1,14 @@
 <import src="/templates/odo.wxml"/>
 <view class="screen {{ent?'ent':'pre'}}">
-  <view class="ltop" style="height:{{bar.top+bar.h}}px">
-    <view class="lgrp" style="left:{{bar.l}}px;top:{{bar.top}}px">
-      <view class="lbtn glass {{lite?'lite':''}}" style="height:{{bar.h}}px" bindtap="back" hover-class="press"><image src="/images/rotate-dark.svg"/>竖屏</view>
-      <view class="lbtn glass {{lite?'lite':''}}" style="height:{{bar.h}}px" bindtap="onUndo" hover-class="press"><image src="/images/undo.svg"/>撤销</view>
+  <view class="ltop" style="height:{{bar.H}}px">
+    <!-- 左：竖屏 | 撤销（分段胶囊）；右：结算（紧挨微信胶囊） -->
+    <view class="lseg glass {{lite?'lite':''}}" style="left:{{bar.l}}px;top:{{bar.bt}}px;height:{{bar.bh}}px">
+      <view class="lsb" bindtap="back" hover-class="lsbp"><image src="/images/rotate-dark.svg"/>竖屏</view>
+      <view class="lsd"></view>
+      <view class="lsb hl" bindtap="onUndo" hover-class="lsbp"><image src="/images/undo.svg"/>撤销</view>
     </view>
-    <view class="lt" style="top:{{bar.top}}px;height:{{bar.h}}px"><text class="t1">第 {{round}} 局</text><text class="t2">{{clock}}</text></view>
+    <view class="lend glass {{lite?'lite':''}}" style="right:{{bar.capR}}px;top:{{bar.bt}}px;height:{{bar.bh}}px" bindtap="toFinish" hover-class="lsbp"><image src="/images/flag.svg"/>结算</view>
+    <view class="lt" style="top:{{bar.bt}}px;height:{{bar.bh}}px"><text class="t1">第 {{round}} 局</text><text class="t2 num {{ccls}}" bindtap="onClock">{{ccls==='cd'||ccls==='warn'?'剩 ':''}}{{clock}}</text></view>
   </view>
   <view class="lcols {{n===3?'n3':'n2'}}" style="padding:12px {{bar.r}}px 14px {{bar.l}}px">
     <view wx:for="{{players}}" wx:key="id" class="pc lc {{risen?'':'rise'}} {{item.fx}}" style="--i:{{index}};background:{{item.c}};color:{{item.i}};{{item.mv}}">
@@ -20,7 +23,7 @@
           <view class="hint">轻点比分 · 普胜 +{{puV}}</view>
         </view>
       </view>
-      <view class="lbtns">
+      <view class="lbtns" catchtap="noop">
         <view class="chip" wx:for="{{chips}}" wx:for-item="c" wx:for-index="ci" wx:key="k" data-i="{{item.idx}}" data-k="{{c.k}}" catchtap="onChip" hover-class="chip-press">
           <text class="cl">{{c.name}}</text><text class="cv num" style="color:{{c.t}}">{{c.v}}</text>
           <text wx:if="{{item.cnt[c.k]>0}}" class="cnt num">{{item.cnt[c.k]}}</text>
@@ -42,4 +45,5 @@
       <text class="btap">轻点任意处继续</text>
     </view>
   </view>
+  <time-up show="{{tu}}" desc="{{tuDesc}}" land bind:end="onTuEnd" bind:add="onTuAdd" bind:close="onTuClose"/>
 </view>

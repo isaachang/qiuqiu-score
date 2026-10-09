@@ -14,9 +14,9 @@
 .rv{font-size:28rpx;font-weight:800}
 .rp{font-size:22rpx;color:var(--tx2);font-weight:500}
 .ol{flex:1;font-size:30rpx;font-weight:500}
-.pick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20rpx;margin-bottom:28rpx}
+.pick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20rpx;margin-top:28rpx;max-height:520rpx;overflow-y:auto}
 .pick{display:flex;flex-direction:column;align-items:center;gap:12rpx;padding:24rpx 8rpx;border-radius:36rpx;background:var(--card2);font-size:26rpx;font-weight:700}
-.add-row{display:flex;gap:16rpx}
+.add-row{display:flex;gap:16rpx;margin-top:8rpx}
 .addb{height:108rpx;border-radius:34rpx;padding:0 40rpx;font-size:30rpx}
 .cancel{text-align:center;color:var(--tx2);font-size:30rpx;font-weight:600;padding:32rpx 0 0}
 
@@ -57,3 +57,22 @@
 .btn.danger{background:#F0444D;color:#fff;margin-top:16rpx}
 
 .btn.soft{background:#F0EEE9;color:#16161A;margin-top:16rpx}
+
+/* 限时比赛：打开开关后展开时长选项 */
+.lims{display:flex;gap:10rpx;padding:0 32rpx;max-height:0;overflow:hidden;opacity:0;transition:max-height .4s cubic-bezier(.3,1,.4,1),opacity .3s,padding .4s}
+.lims.on{max-height:120rpx;opacity:1;padding:4rpx 32rpx 28rpx}
+.lo{flex:1;min-width:0;white-space:nowrap;height:68rpx;border-radius:22rpx;background:var(--card2,#F0EEE9);display:flex;align-items:center;justify-content:center;font-size:24rpx;font-weight:700;color:var(--tx2);transition:background .25s,color .25s,transform .3s var(--spring)}
+.lo.sel{background:#16161A;color:#fff}
+
+/* 自定义时长滚轮：选中行是一条浅灰圆角带，「小时 / 分钟」固定在数字右边（同苹果计时器） */
+.pvw{position:relative;margin:20rpx 0 32rpx}
+.pv{height:440rpx;width:100%}
+.pvc{height:88rpx;line-height:88rpx;text-align:center;font-size:44rpx;font-weight:700;padding-right:96rpx;box-sizing:border-box}
+.pvi{height:88rpx;background:rgba(20,20,30,.06);border-radius:24rpx}
+.pvi::before,.pvi::after{display:none}
+.pvl{position:absolute;top:50%;transform:translateY(-50%);font-size:28rpx;font-weight:600;color:var(--tx2);pointer-events:none}
+.pvl.l1{left:calc(25% + 10rpx)}.pvl.l2{left:calc(75% + 10rpx)}
+
+/* 【临时测试】上线前删除 */
+.ltest{margin:0 32rpx 24rpx;padding:14rpx 0;text-align:center;border-radius:20rpx;border:2rpx dashed #F0444D;color:#F0444D;font-size:24rpx;font-weight:700}
+.ltest.sel{background:#F0444D;color:#fff;border-style:solid}

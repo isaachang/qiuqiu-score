@@ -1,1 +1,1 @@
-{ "navigationStyle": "custom", "pageOrientation": "landscape", "disableScroll": true }
+{ "navigationStyle": "custom", "pageOrientation": "landscape", "disableScroll": true, "usingComponents": {"time-up": "/components/time-up/time-up"} }

@@ -95,10 +95,10 @@ Component({
       const ctx = this.ctx; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
       ctx.strokeStyle = c; ctx.lineWidth = 2.6; ctx.stroke();
     },
-    touch(e) {
-      if (!this.ctx) return;
-      const t = e.touches && e.touches[0]; if (!t) return;
-      const x = t.x != null ? t.x : t.clientX - this.left;
+    /** 由 touch.wxs 调用：p.x 为画布内坐标（部分机型没有，用 clientX 换算） */
+    at(p) {
+      if (!this.ctx || !p) return;
+      const x = p.x != null ? p.x : p.cx - (this.left || 0);
       const g = this.geo(), S = this.data.series;
       const i = Math.max(0, Math.min(g.N, Math.round((x - g.L) / g.pw * g.N)));
       if (i === this._i && this.data.tip) return;

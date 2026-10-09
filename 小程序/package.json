@@ -1,11 +1,13 @@
 {
   "name": "qiuqiu-jifen",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "private": true,
   "description": "球球记分 · 台球追分记分微信小程序",
   "scripts": {
     "preview": "node --no-experimental-webstorage scripts/ci.js preview",
-    "upload": "node --no-experimental-webstorage scripts/ci.js upload"
+    "upload": "node --no-experimental-webstorage scripts/ci.js upload",
+    "shots": "node scripts/shots/shots.js && node scripts/shots/compose.js",
+    "smoke": "node scripts/smoke.js \"$PWD/miniprogram\""
   },
   "devDependencies": {
     "miniprogram-ci": "^2.1.31"

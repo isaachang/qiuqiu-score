@@ -1,4 +1,6 @@
 const store = require('../../utils/store');
+const env = require('../../utils/env');
+const nav = require('../../utils/nav');
 const { enter, onScroll, tabBar } = require('../../utils/page');
 const { ask, uiDone } = require('../../utils/ui');
 Page({
@@ -10,7 +12,7 @@ Page({
   render() {
     this._rev = store.rev();
     const s = store.get(), me = s.friends.find(f => f.me);
-    this.setData({ demo: !!s.demo, demoN: s.demo ? s.demo.matches.length : 0, me: store.view(me.id), count: store.activeFriends().length, matches: s.history.length, vib: s.settings.vib, keep: s.settings.keep, sfx: s.settings.sfx !== false });
+    this.setData({ dev: env.isDev(), ver: env.versionText(), demo: !!s.demo, demoN: s.demo ? s.demo.matches.length : 0, me: store.view(me.id), count: store.activeFriends().length, matches: s.history.length, vib: s.settings.vib, keep: s.settings.keep, sfx: s.settings.sfx !== false });
   },
   rename() {
     const me = store.get().friends.find(f => f.me);
@@ -31,7 +33,9 @@ Page({
       store.loadDemo(); this.render(); wx.showToast({ title: '已载入演示数据', icon: 'success' });
     }
   },
-  toRules() { wx.navigateTo({ url: '/pages/rules/rules?target=default' }); },
-  toFriends() { wx.navigateTo({ url: '/pages/friends/friends' }); },
+  toRules() { nav.to('/pages/rules/rules?target=default'); },
+  toFriends() { nav.to('/pages/friends/friends'); },
+  /** 重新看一遍新手教程（在首页弹出） */
+  toGuide() { getApp().globalData.showWelcome = true; wx.switchTab({ url: '/pages/home/home' }); },
   toggle(e) { const k = e.currentTarget.dataset.k, s = store.get(); s.settings[k] = !(s.settings[k] !== false); store.save(); this.setData({ [k]: s.settings[k] }); },
 });

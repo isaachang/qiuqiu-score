@@ -56,9 +56,12 @@ function seedDemo(s) {
 
 function clearDemo(s) {
   if (!s.demo) return false;
-  if (s.live && s.live.players.some(id => s.demo.friends.includes(id))) return '有进行中的对局用到了演示球友，先结算它';
   const mids = new Set(s.demo.matches), fids = new Set(s.demo.friends);
   s.history = s.history.filter(m => !mids.has(m.id));
+  // 自己打的对局（含进行中的）里用过的演示球友：留下来变成普通球友，否则那些对局里会显示「?」
+  const used = new Set();
+  s.history.concat(s.live ? [s.live] : []).forEach(m => m.players.forEach(id => used.add(id)));
+  s.friends.forEach(f => { if (fids.has(f.id) && used.has(f.id)) { delete f.demo; fids.delete(f.id); } });
   s.friends = s.friends.filter(f => !fids.has(f.id));
   const me = s.friends.find(f => f.me);
   if (me && me.name === 'Isaac' && s.demo.meName === '我') me.name = '我';

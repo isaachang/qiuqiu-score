@@ -1,9 +1,10 @@
+<wxs module="tg" src="./touch.wxs"></wxs>
 <view class="tcw" style="height:{{height}}rpx">
-  <canvas type="2d" id="tc" class="tcc" style="height:{{height}}rpx" bindtouchstart="touch" catchtouchmove="touch" bindtouchend="end"></canvas>
+  <canvas type="2d" id="tc" class="tcc" style="height:{{height}}rpx" bindtouchstart="{{tg.start}}" bindtouchmove="{{tg.move}}" bindtouchend="{{tg.end}}" bindtouchcancel="{{tg.end}}"></canvas>
   <view wx:if="{{tip}}" class="tip {{tip.right?'r':''}}" style="left:{{tip.x}}px" catchtap="clear">
     <text class="tt">{{tip.title}}</text>
     <text wx:if="{{tip.note}}" class="tn">{{tip.note}}</text>
     <view class="trw" wx:for="{{tip.rows}}" wx:key="j"><view class="tdt" style="background:{{item.c}}"></view><text class="tnm">{{item.n}}</text><text class="tv num">{{item.v}}</text></view>
   </view>
-  <view wx:if="{{hint}}" class="thint">点按或左右拖动查看每一笔</view>
+  <view wx:if="{{hint}}" class="thint">点按或横向拖动查看每一笔</view>
 </view>

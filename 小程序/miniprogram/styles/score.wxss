@@ -8,7 +8,10 @@ page{height:100%;overflow:hidden}
 .nav .bk image{width:44rpx;height:44rpx}
 .nav .tt{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
 .nav .tt .t1{font-size:34rpx;font-weight:600}
-.nav .tt .t2{font-size:22rpx;color:var(--tx2);font-variant-numeric:tabular-nums}
+.nav .tt .t2{font-size:22rpx;color:var(--tx2);font-variant-numeric:tabular-nums;pointer-events:auto;padding:2rpx 14rpx;border-radius:20rpx;transition:color .3s,background .3s}
+/* 限时比赛：最后 5 分钟变红；超时后显示 +超出时间，淡红底，点它可再打开「时间到」 */
+.t2.warn,.lt .t2.warn{color:#F0444D;font-weight:700}
+.t2.over,.lt .t2.over{color:#F0444D;background:#FF5A5F1A;font-weight:700}
 
 /* 数字滚轮 */
 .odo{display:inline-flex;line-height:1;height:1em;overflow:hidden;font-weight:800;letter-spacing:-.03em}
@@ -115,7 +118,7 @@ page{height:100%;overflow:hidden}
 @keyframes beat{50%{transform:scale(1.1)}}
 .banner.live .bt{animation:glow 1.6s ease-in-out infinite}
 @keyframes glow{50%{text-shadow:0 0 24rpx currentColor}}
-.btap{margin-top:14rpx;font-size:22rpx;color:#A9A9B0;font-weight:600;opacity:0;animation:fadeIn .4s ease 1.2s forwards}
+.btap{margin-top:14rpx;font-size:22rpx;color:#A9A9B0;font-weight:600}  /* 和弹窗一起出现，不再延迟 */
 
 /* 记分底栏：液态玻璃（覆盖原来的纯白底） */
 .dock.glass{border-radius:48rpx;background:linear-gradient(135deg,rgba(255,255,255,.44),rgba(255,255,255,.16));-webkit-backdrop-filter:blur(14px) saturate(200%) brightness(1.06);backdrop-filter:blur(14px) saturate(200%) brightness(1.06);box-shadow:inset 0 2rpx 0 rgba(255,255,255,.95),inset 0 -2rpx 0 rgba(255,255,255,.4),inset 0 0 0 1rpx rgba(255,255,255,.6),0 24rpx 56rpx -22rpx rgba(40,30,20,.36),0 2rpx 8rpx rgba(40,30,20,.06)}

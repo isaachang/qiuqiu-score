@@ -1,0 +1,24 @@
+// 走势图手势：先判断方向 —— 横着拖 = 看每一笔（拦住页面滚动）；竖着划 = 正常滚动页面；轻点 = 看这一笔
+var S = { x: 0, y: 0, d: 0, px: null, cx: 0 };
+function start(e) {
+  var t = e.touches[0];
+  S.x = t.clientX; S.y = t.clientY; S.d = 0; S.px = t.x; S.cx = t.clientX;
+  return true;
+}
+function move(e, ins) {
+  var t = e.touches[0], dx = t.clientX - S.x, dy = t.clientY - S.y;
+  if (!S.d) {
+    if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return true;
+    S.d = Math.abs(dx) > Math.abs(dy) ? 1 : 2;
+  }
+  if (S.d === 2) return true; // 竖向：交给页面滚动
+  ins.callMethod('at', { x: t.x, cx: t.clientX });
+  return false;               // 横向：阻止页面跟着动
+}
+function end(e, ins) {
+  if (!S.d) ins.callMethod('at', { x: S.px, cx: S.cx }); // 没怎么动 = 轻点
+  ins.callMethod('end');
+  S.d = 0;
+  return true;
+}
+module.exports = { start: start, move: move, end: end };

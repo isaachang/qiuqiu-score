@@ -29,5 +29,13 @@
 .fnm{font-size:30rpx;font-weight:700}
 .fcr{width:32rpx;height:32rpx}
 .fsc{margin-left:auto;font-size:38rpx;font-weight:800}
-.fin-x{text-align:center;color:#F0444D;font-size:30rpx;font-weight:600;padding:32rpx 0 0}
+.fin-x{margin-top:16rpx;background:#F0EEE9;color:#E5383B}
+.fin-x.only{margin-top:8rpx;color:var(--tx)}
 .fin-c{text-align:center;color:#6B6B73;font-size:30rpx;font-weight:600;padding:28rpx 0 4rpx}
+
+/* 普胜区：铺满卡片上半部分（含卡片上、左、右的内边距），按下时只有这一块有反馈 */
+.top{position:relative;z-index:2;margin:-28rpx -28rpx 0;padding:28rpx 28rpx 12rpx;border-radius:60rpx 60rpx 28rpx 28rpx;transition:background .2s}
+.trio .top{margin:-24rpx -24rpx 0;padding:24rpx 24rpx 10rpx;border-radius:52rpx 52rpx 24rpx 24rpx}
+.top-press{background:rgba(255,255,255,.14)}
+.top .odo{transition:transform .25s cubic-bezier(.3,1.4,.5,1)}
+.top-press .odo{transform:scale(.96)}
