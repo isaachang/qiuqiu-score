@@ -120,3 +120,5 @@
 .ps{font-size:34rpx;font-weight:900;margin-top:2rpx}
 .pchip.pos .ps{color:#0E9F5E}.pchip.neg .ps{color:#E5383B}
 .metag{position:absolute;left:8rpx;top:8rpx;font-size:18rpx;font-weight:800;color:#fff;background:#16161A;padding:0 8rpx;border-radius:8rpx}
+
+.more-btn{margin-top:20rpx;height:96rpx;border-radius:36rpx;background:#fff;box-shadow:0 20rpx 56rpx -28rpx rgba(60,40,20,.28);display:flex;align-items:center;justify-content:center;font-size:28rpx;font-weight:800;color:var(--tx)}

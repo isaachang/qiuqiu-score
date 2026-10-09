@@ -8,11 +8,16 @@ Page({
   onUi(e) { uiDone(this, e.detail.k); },
   onUiClose() { uiDone(this, null); },
   data: { seg: 'all', segIdx: 0, days: 0, scrolled: false, ent: false },
-  onShow() { const played = enter(this, 1); this.render(played); },
+  onShow() {
+    const played = enter(this, 1);
+    if (!played && this._rev === store.rev()) return; // 数据没变：什么都不做，切换瞬间完成
+    this.render(played);
+  },
   onPageScroll(e) { onScroll(this, e); },
   setDays(e) { this.setData({ days: +e.currentTarget.dataset.d }); this.render(); },
   setSeg(e) { const seg = e.currentTarget.dataset.s; this.setData({ seg, segIdx: { all: 0, 2: 1, 3: 2 }[seg] }); this.render(); },
   render(anim) {
+    this._rev = store.rev();
     const s = store.get(), me = s.friends.find(f => f.me);
     const view = id => store.view(id), days = this.data.days;
     const ALL = overview(s.history, me.id, this.data.seg, view, 0);   // 名片：始终是全部战绩
@@ -22,10 +27,11 @@ Page({
       rangeTxt: days ? `近 ${days} 天 · ${O.P.n} 场` : `最近 ${O.recent.length} 场`,
       recent: O.recent.map((r, k) => ({ k, r })),
       friends: O.friends, bank: O.bank, nemesis: O.nemesis,
-      rows: O.ms.map(matchRow), ach: achievements(ALL.P),
+      rows: O.ms.slice(0, 3).map(matchRow), total: O.ms.length, ach: achievements(ALL.P),
     });
     if (anim) ALL.kpis.forEach((k, i) => countUp(this, `card.kpis[${i}].v`, k.v));
   },
+  toHistory() { wx.navigateTo({ url: `/pages/history/history?seg=${this.data.seg}&days=${this.data.days}` }); },
   toH2h(e) { wx.navigateTo({ url: '/pages/h2h/h2h?fid=' + e.currentTarget.dataset.id }); },
   open(e) { wx.navigateTo({ url: '/pages/result/result?id=' + e.currentTarget.dataset.id }); },
   askDelete(e) {

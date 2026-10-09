@@ -10,7 +10,8 @@
     "pages/log/log",
     "pages/result/result",
     "pages/friends/friends",
-    "pages/h2h/h2h"
+    "pages/h2h/h2h",
+    "pages/history/history"
   ],
   "window": {
     "navigationBarTitleText": "球球记分",
@@ -24,27 +25,27 @@
   "lazyCodeLoading": "requiredComponents",
   "tabBar": {
     "color": "#A9A9B0",
-    "selectedColor": "#16161A",
+    "selectedColor": "#FF5A5F",
     "backgroundColor": "#FFFFFF",
     "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/home/home",
-        "text": "追分",
-        "iconPath": "images/tab/home.png",
-        "selectedIconPath": "images/tab/home-on.png"
+        "text": "开火",
+        "iconPath": "images/tab/g-fire.png",
+        "selectedIconPath": "images/tab/g-fire-on.png"
       },
       {
         "pagePath": "pages/stats/stats",
         "text": "战绩",
-        "iconPath": "images/tab/stats.png",
-        "selectedIconPath": "images/tab/stats-on.png"
+        "iconPath": "images/tab/g-stats.png",
+        "selectedIconPath": "images/tab/g-stats-on.png"
       },
       {
         "pagePath": "pages/me/me",
         "text": "我的",
-        "iconPath": "images/tab/me.png",
-        "selectedIconPath": "images/tab/me-on.png"
+        "iconPath": "images/tab/g-me.png",
+        "selectedIconPath": "images/tab/g-me-on.png"
       }
     ],
     "custom": true

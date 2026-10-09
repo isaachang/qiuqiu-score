@@ -57,3 +57,7 @@
 .bball text{width:30rpx;height:30rpx;border-radius:50%;background:#fff;font-size:20rpx;font-weight:900;display:flex;align-items:center;justify-content:center}
 .bn{display:block;font-size:30rpx;font-weight:800}
 .bs{display:block;font-size:22rpx;color:var(--tx2)}
+
+.brand{gap:16rpx;margin:56rpx 0 8rpx;opacity:1}
+.blogo{width:60rpx;height:60rpx;border-radius:18rpx;box-shadow:0 8rpx 20rpx -10rpx rgba(0,0,0,.35)}
+.brand .bn{font-size:30rpx;font-weight:900;letter-spacing:2rpx}

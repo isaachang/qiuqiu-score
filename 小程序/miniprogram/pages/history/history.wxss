@@ -1,0 +1,65 @@
+/* ---------- 日历 ---------- */
+.cal{padding:28rpx 24rpx 16rpx;overflow:hidden}
+.ch{display:flex;align-items:center;justify-content:space-between;padding:0 8rpx}
+.ctl{display:flex;align-items:center;gap:10rpx;font-size:36rpx;font-weight:900}
+.cmode{font-size:28rpx;color:var(--tx2)}
+.cbtns{display:flex;align-items:center;gap:10rpx}
+.cb{width:60rpx;height:60rpx;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:36rpx;color:var(--tx2)}
+.cbp{background:#16161A;color:#fff}
+.ctoday{height:60rpx;padding:0 22rpx;border-radius:30rpx;background:#FF5A5F1A;color:#FF5A5F;font-size:24rpx;font-weight:800;display:flex;align-items:center}
+.wdr{display:grid;grid-template-columns:repeat(7,1fr);margin:24rpx 0 6rpx}
+.wdl{text-align:center;font-size:22rpx;font-weight:700;color:var(--tx3)}
+.wdl.we{color:#FF8A80}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);row-gap:6rpx}
+.grid.sl{animation:slideL .38s cubic-bezier(.2,.9,.3,1)}
+.grid.sr{animation:slideR .38s cubic-bezier(.2,.9,.3,1)}
+@keyframes slideL{from{opacity:0;transform:translateX(60rpx)}}
+@keyframes slideR{from{opacity:0;transform:translateX(-60rpx)}}
+.dc{display:flex;flex-direction:column;align-items:center;padding:6rpx 0}
+/* 结果圆环：外圈 conic-gradient，内圈白底盖住中间 */
+.ring{width:76rpx;height:76rpx;border-radius:50%;padding:6rpx;box-sizing:border-box;transition:transform .3s cubic-bezier(.3,1.4,.5,1)}
+.ring .inner{width:100%;height:100%;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center}
+.dn{font-size:28rpx;font-weight:700;color:var(--tx2)}
+.ring.has .dn{color:var(--tx);font-weight:900}
+.ring.today .dn{color:#FF5A5F;font-weight:900}
+.ring.tonly{box-shadow:inset 0 0 0 3rpx #FF5A5F}
+.ring.sel{transform:scale(1.08)}
+.ring.sel .inner{background:#16161A}
+.ring.sel .dn{color:#fff}
+.dc.other .ring{opacity:.35}
+.dc.future .dn{color:var(--tx3)}
+.dots{display:flex;gap:6rpx;height:10rpx;margin-top:6rpx}
+.dot{width:8rpx;height:8rpx;border-radius:50%;background:#16161A;opacity:.45}
+.msum{text-align:center;font-size:24rpx;color:var(--tx2);font-weight:700;margin-top:16rpx}
+.handle{display:flex;flex-direction:column;align-items:center;gap:6rpx;padding:16rpx 0 4rpx;font-size:20rpx;color:var(--tx3);font-weight:700}
+.hb{width:64rpx;height:8rpx;border-radius:4rpx;background:#D9D6CF}
+.legend{display:flex;justify-content:center;gap:28rpx;font-size:20rpx;color:var(--tx3);font-weight:600;padding-bottom:6rpx}
+.lg-d{display:inline-block;width:14rpx;height:14rpx;border-radius:50%;margin-right:6rpx;vertical-align:middle}
+.tdy{font-size:20rpx;font-weight:800;color:#fff;background:#FF5A5F;padding:4rpx 12rpx;border-radius:99rpx;margin-left:12rpx;margin-right:auto}
+/* 当天没打球 */
+.dempty{padding:40rpx 32rpx;display:flex;flex-direction:column;align-items:center}
+.det{font-size:28rpx;font-weight:800;color:var(--tx2)}
+.dgo{margin-top:28rpx;height:84rpx;padding:0 36rpx;font-size:26rpx}
+.list{display:flex;flex-direction:column}
+.hc-wrap{margin-bottom:20rpx;animation:rowIn .45s cubic-bezier(.2,1,.3,1) backwards;animation-delay:calc(var(--d) * 45ms)}
+@keyframes rowIn{from{opacity:0;transform:translateY(-16rpx)}}
+/* ---- 历史对局卡片 ---- */
+.hist{display:flex;flex-direction:column;gap:20rpx}
+.hc-wrap{border-radius:40rpx;overflow:hidden;box-shadow:0 20rpx 56rpx -28rpx rgba(60,40,20,.28)}
+.hc{padding:26rpx 28rpx;background:#fff;border-left:10rpx solid #D9D6CF}
+.hc.W{border-left-color:#1FC98E}.hc.L{border-left-color:#FF5A5F}
+.hct{display:flex;align-items:center;gap:14rpx}
+.mode-ic{width:52rpx;height:52rpx;border-radius:16rpx;color:#fff;font-size:26rpx;font-weight:900;display:flex;align-items:center;justify-content:center}
+.mode-ic.m2{background:#FF5A5F}.mode-ic.m3{background:#3D7BFF}
+.hcm{font-size:30rpx;font-weight:800}
+.hcd{flex:1;min-width:0;font-size:22rpx;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.res{font-size:22rpx;font-weight:800;padding:6rpx 16rpx;border-radius:99rpx}
+.res.W{background:#1FC98E1F;color:#0E9F5E}.res.L{background:#FF5A5F1F;color:#E5383B}.res.D{background:var(--card2);color:var(--tx2)}
+.chips2{display:flex;gap:12rpx;margin-top:20rpx}
+.pchip{flex:1;min-width:0;position:relative;border-radius:22rpx;padding:14rpx 10rpx;display:flex;flex-direction:column;align-items:center;background:var(--bg)}
+.pchip.pos{background:#1FC98E14}.pchip.neg{background:#FF5A5F12}
+.pn{font-size:22rpx;color:var(--tx2);font-weight:600;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ps{font-size:34rpx;font-weight:900;margin-top:2rpx}
+.pchip.pos .ps{color:#0E9F5E}.pchip.neg .ps{color:#E5383B}
+.metag{position:absolute;left:8rpx;top:8rpx;font-size:18rpx;font-weight:800;color:#fff;background:#16161A;padding:0 8rpx;border-radius:8rpx}
+

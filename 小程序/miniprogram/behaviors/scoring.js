@@ -2,11 +2,12 @@
 const store = require('../utils/store');
 const { EV, CHIPS, derive, signed } = require('../utils/engine');
 const { clock } = require('../utils/util');
+const sfx = require('../utils/sfx');
 
 let flySeq = 1;
 
 module.exports = Behavior({
-  data: { n: 2, players: [], round: 1, clock: '00:00:00', order: [], flies: [], parts: [], banner: null, chips: [], hintIntro: true },
+  data: { risen: false, n: 2, players: [], round: 1, clock: '00:00:00', order: [], flies: [], parts: [], banner: null, chips: [], hintIntro: true },
 
   methods: {
     initScore() {
@@ -15,14 +16,18 @@ module.exports = Behavior({
       if (!this.m) { wx.navigateBack({ fail: () => wx.switchTab({ url: '/pages/home/home' }) }); return false; }
       const m = this.m;
       this.setData({
+        lite: !!(getApp().globalData || {}).lite,
         n: m.players.length,
         chips: CHIPS.map(k => ({ k, name: EV[k].name, v: (k === 'foul' ? '−' : '+') + m.rules[k].v, c: EV[k].c, t: EV[k].t })),
         puV: m.rules.pu.v,
       });
       this.refresh(null);
       if (s.settings.keep) wx.setKeepScreenOn({ keepScreenOn: true });
+      sfx.preload();
       this.startClock();
       setTimeout(() => this.setData({ hintIntro: false }), 2400);
+      // 入场动画播完后从卡片上拿掉：否则犯规震动结束时，入场动画会被重新触发（卡片闪白、从下往上再浮现一次）
+      if (!this.data.risen) setTimeout(() => this.setData({ risen: true }), 1400);
       return true;
     },
     startClock() {
@@ -77,7 +82,7 @@ module.exports = Behavior({
       m.events.push({ p: pi, ev: k, t: Date.now() });
       store.save();
       const D = derive(m), step = D.steps[D.steps.length - 1];
-      if (store.get().settings.vib) wx.vibrateShort({ type: EV[k].gold ? 'heavy' : 'light' });
+      if (store.get().settings.vib) wx.vibrateShort({ type: EV[k].gold ? 'heavy' : k === 'foul' ? 'medium' : 'light' });
       this.refresh(step);
     },
 
@@ -86,6 +91,8 @@ module.exports = Behavior({
       if (!e) { wx.showToast({ title: '没有可撤销的记录', icon: 'none' }); return; }
       store.save();
       const before = derive({ ...m, events: [...m.events, e] }), step = before.steps[before.steps.length - 1];
+      if (e.ev === 'dj' || e.ev === 'xj') sfx.stop(); // 撤销金球时音乐也一起停
+      if (this.data.banner) this.closeBanner(true);
       this.refresh(null);
       step.d.forEach((x, j) => { if (x) this.fly(j, '↺ ' + signed(-x), 'dim'); });
     },
@@ -110,6 +117,7 @@ module.exports = Behavior({
     },
     /** 重新触发卡片上的 CSS 动画：先清空 class，再加回去 */
     cardFx(pi, cls) {
+      if (!this.data.risen) this.setData({ risen: true }); // 入场还没播完就触发了动效：直接结束入场，避免之后重播
       const key = `players[${this.pos ? this.pos[pi] : pi}].fx`;
       this.setData({ [key]: '' });
       setTimeout(() => this.setData({ [key]: cls }), 30);
@@ -124,15 +132,33 @@ module.exports = Behavior({
         const tag = s.ev === 'foul' ? (x < 0 ? ' 犯规' : '') : (x < 0 && s.payers.length === 1 ? ' 付' : '');
         this.fly(j, signed(x) + tag, x > 0 ? 'up' : 'down');
       });
-      this.cardFx(s.p, ['hit', E.gold ? 'gold' : '', s.ev === 'foul' ? 'shake' : ''].join(' ').trim());
+      // 犯规：只震动，不闪白；胜局：闪一下（金球再加扫光）
+      this.cardFx(s.p, s.ev === 'foul' ? 'shake' : ['hit', E.gold ? 'gold' : ''].join(' ').trim());
       if (E.gold) this.burst(s.p, E.c, s.ev === 'dj' ? 30 : 20);
-      if (E.gold) { // 大金 / 小金 / 黄金九：同一套奖章样式的庆祝
-        const who = s.payers.length > 1 ? '两家各付 ' + v : names[s.payers[0]] + ' 付 ' + v;
-        this.setData({ banner: { k: s.ev, t: E.name, c: E.c, tc: E.t, sub: `${names[s.p]} ${signed(s.d[s.p])} · ${who}` } });
-        clearTimeout(this._bn);
-        this._bn = setTimeout(() => this.setData({ banner: null }), 1700);
+      if (E.gold || s.ev === 'foul') { // 大金 / 小金 / 黄金九 / 犯规：同一套奖章样式的弹窗
+        const who = s.ev === 'foul' ? `${names[s.to]} +${v}` : s.payers.length > 1 ? '两家各付 ' + v : names[s.payers[0]] + ' 付 ' + v;
+        this.clearBannerTimers();
+        // 大金、小金有音乐：庆祝一直显示到音乐结束；点屏幕任意处 = 音乐和庆祝一起关掉
+        const music = (s.ev === 'dj' || s.ev === 'xj') && sfx.playGold(() => this.closeBanner(false));
+        this.setData({ banner: { k: s.ev, t: E.name, c: E.c, tc: E.t, live: !!music, out: false, sub: s.ev === 'foul' ? `${names[s.p]} −${v} · ${who}` : `${names[s.p]} ${signed(s.d[s.p])} · ${who}` } });
+        if (music) {
+          this._bn = setTimeout(() => this.closeBanner(false), 8000); // 兜底：万一收不到音乐结束事件
+          this._bb = [1600, 3200, 4800].map(t => setTimeout(() => this.data.banner && this.burst(s.p, E.c, 16), t)); // 音乐期间再撒几次彩纸
+        } else {
+          this._bn = setTimeout(() => this.closeBanner(false), 1700); // 黄金九 / 犯规 / 关了音效：短暂显示后自动消失
+        }
       }
     },
+    clearBannerTimers() { clearTimeout(this._bn); (this._bb || []).forEach(clearTimeout); this._bb = []; },
+    /** 收起庆祝；byTap 为真表示用户点掉的，同时停止音乐 */
+    closeBanner(byTap) {
+      if (!this.data.banner || this.data.banner.out) return;
+      this.clearBannerTimers();
+      if (byTap) sfx.stop();
+      this.setData({ 'banner.out': true });
+      setTimeout(() => this.setData({ banner: null }), 320);
+    },
+    onBannerTap() { this.closeBanner(true); },
 
     /** 引导进行中时，点任何地方都只是「下一步」，不会误记分 */
     guard() { if (this.data.coach) { this.nextCoach && this.nextCoach(); return true; } return false; },

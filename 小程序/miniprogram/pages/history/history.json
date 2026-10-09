@@ -1,0 +1,1 @@
+{ "navigationStyle": "custom", "usingComponents": { "nav-bar": "/components/nav-bar/nav-bar", "swipe-row": "/components/swipe-row/swipe-row", "ui-sheet": "/components/ui-sheet/ui-sheet" } }

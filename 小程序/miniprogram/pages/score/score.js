@@ -1,4 +1,5 @@
 const scoring = require('../../behaviors/scoring');
+const sfx = require('../../utils/sfx');
 const { enter } = require('../../utils/page');
 const store = require('../../utils/store');
 const { ask, uiDone } = require('../../utils/ui');
@@ -31,7 +32,7 @@ Page({
     } else this.setData({ coach: 3 });
   },
   onHide() { this.stopClock(); },
-  onUnload() { this.stopClock(); wx.setKeepScreenOn({ keepScreenOn: false }); },
+  onUnload() { sfx.stop(); this.stopClock(); wx.setKeepScreenOn({ keepScreenOn: false }); },
   back() { if (this.guard()) return; wx.navigateBack({ fail: () => wx.switchTab({ url: '/pages/home/home' }) }); },
   toLog() { if (this.guard()) return; wx.navigateTo({ url: '/pages/log/log' }); },
   toLand() { if (this.guard()) return; wx.navigateTo({ url: '/pages/land/land' }); },

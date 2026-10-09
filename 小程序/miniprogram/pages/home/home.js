@@ -19,8 +19,8 @@ Page({
   onUiClose() { uiDone(this, null); },
   data: { greet: '', live: null, recent: [], me: {}, scrolled: false, ent: false },
   onShow() {
-    this.setData({ greet: greet() });
-    this.load();
+    if (this.data.greet !== greet()) this.setData({ greet: greet() });
+    if (this._rev !== store.rev()) this.load(); // 数据没变就不重算
     enter(this, 0);
     clearInterval(this.timer);
     this.timer = setInterval(() => { const L = store.get().live; if (L) this.setData({ 'live.clock': clock((Date.now() - L.start) / 1000) }); }, 1000);
@@ -29,6 +29,7 @@ Page({
   onUnload() { clearInterval(this.timer); },
   onPageScroll(e) { onScroll(this, e); },
   load() {
+    this._rev = store.rev();
     const s = store.get(), L = s.live, me = s.friends.find(f => f.me);
     let live = null;
     if (L) {

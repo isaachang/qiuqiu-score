@@ -1,5 +1,6 @@
 .nb{position:fixed;left:0;right:0;top:0;z-index:40;box-sizing:border-box;transition:background .3s,box-shadow .3s}
-.nb.solid{background:rgba(246,244,240,.82);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);box-shadow:0 1rpx 0 rgba(20,20,30,.08)}
+.nb.solid{background:linear-gradient(180deg,rgba(255,255,255,.5),rgba(250,248,244,.28));-webkit-backdrop-filter:blur(14px) saturate(200%) brightness(1.06);backdrop-filter:blur(14px) saturate(200%) brightness(1.06);box-shadow:inset 0 -1rpx 0 rgba(255,255,255,.9),0 1rpx 0 rgba(20,20,30,.06),0 12rpx 30rpx -18rpx rgba(40,30,20,.25)}
+.nb.solid.lite{background:rgba(246,244,240,.97);-webkit-backdrop-filter:none;backdrop-filter:none}
 .nb-bk{position:relative;z-index:2;width:96rpx;display:flex;align-items:center;justify-content:center;margin-left:8rpx;border-radius:50%}
 .nb-bk image{width:44rpx;height:44rpx}
 .nb-bkp{background:rgba(20,20,30,.06)}

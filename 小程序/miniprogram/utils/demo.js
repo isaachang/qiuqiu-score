@@ -46,7 +46,7 @@ function seedDemo(s) {
     const d = new Date(now - daysAgo * 864e5); d.setHours(hour, Math.floor(r() * 50), 0, 0);
     const start = Math.min(d.getTime(), now - 3 * 3600e3);
     const { events, end } = genEvents(r, mode, rounds, pl.map(k => SKILL[k]), start);
-    const m = { id: 'demo_m' + i, demo: true, mode, players: pl.map(k => ids[k]), order0: pl.map((_, j) => j), rules: DEFAULT_RULES(), events, start, end, status: 'done' };
+    const m = { id: 'demo_m' + i, demo: true, game: 'chase', mode, players: pl.map(k => ids[k]), order0: pl.map((_, j) => j), rules: DEFAULT_RULES(), events, start, end, status: 'done' };
     derive(m); // 校验一下
     s.history.push(m); s.demo.matches.push(m.id);
   });

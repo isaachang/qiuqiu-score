@@ -67,24 +67,29 @@
   <view class="oc {{old.confirm?'flip':''}}">
     <view class="face front">
       <view class="ot"><view class="odot"></view>{{old.empty?'有一局正在进行':'还有一局没结算'}}</view>
-      <view class="ss">{{old.empty?old.mode+'追分 · 还没有记分 · 已开 '+old.dur:old.mode+'追分 · '+old.rounds+' 局 · '+old.logs+' 条记分 · 已打 '+old.dur}}</view>
+      <view class="ss">{{old.mode}} · {{old.empty?'还没记分':old.rounds+' 局'}} · 已打 {{old.dur}}</view>
       <view class="ob">
         <view wx:for="{{old.players}}" wx:key="id" class="op {{old.show?'in':''}}" style="--i:{{index}}">
           <view class="av" style="background:{{item.c}};color:{{item.i}}">{{item.ch}}</view>
           <text class="opn">{{item.name}}</text><text class="ops num {{item.cls}}">{{item.s}}</text>
         </view>
       </view>
-      <view wx:if="{{!old.empty}}" class="btn pri" bindtap="saveOld" hover-class="press">保存旧局战绩，开新局</view>
-      <view wx:else class="btn pri" bindtap="discardOld" hover-class="press">放弃这局，开新局</view>
-      <view wx:if="{{!old.empty}}" class="ox" bindtap="askDiscard">不保存旧局，直接开新局</view>
-      <view class="oy" bindtap="continueOld">回去继续打旧局 ›</view>
+      <block wx:if="{{!old.empty}}">
+        <view class="btn pri" bindtap="saveOld" hover-class="press">保存并开新局</view>
+        <view class="btn soft" bindtap="continueOld" hover-class="press">继续旧局</view>
+        <view class="ox" bindtap="askDiscard">不保存，开新局</view>
+      </block>
+      <block wx:else>
+        <view class="btn pri" bindtap="discardOld" hover-class="press">开新局</view>
+        <view class="btn soft" bindtap="continueOld" hover-class="press">继续旧局</view>
+      </block>
     </view>
     <view class="face back">
       <view class="wic">!</view>
-      <view class="ot" style="justify-content:center">确定不保存旧局？</view>
-      <view class="ss">旧局的 {{old.logs}} 条记分会被清除，不计入战绩，无法恢复</view>
-      <view class="btn danger" bindtap="discardOld" hover-class="press">不保存，开新局</view>
-      <view class="oy" bindtap="backFromDiscard">‹ 返回</view>
+      <view class="ot" style="justify-content:center">确定不保存？</view>
+      <view class="ss">{{old.logs}} 条记分将被清除</view>
+      <view class="btn danger" bindtap="discardOld" hover-class="press">确定，开新局</view>
+      <view class="oy" bindtap="backFromDiscard">返回</view>
     </view>
   </view>
 </view>

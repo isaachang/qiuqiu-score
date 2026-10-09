@@ -1,10 +1,11 @@
 // 列表行数据（首页「最近对局」、战绩「历史对局」共用）
 const store = require('./store');
-const { derive, signed } = require('./engine');
+const { signed } = require('./engine');
+const { derived } = require('./cache');
 const { dayLabel } = require('./util');
 
 function matchRow(m) {
-  const D = derive(m), me = m.players.findIndex(id => store.friend(id).me);
+  const D = derived(m), me = m.players.findIndex(id => store.friend(id).me);
   const my = me >= 0 ? D.scores[me] : null, max = Math.max(...D.scores);
   return {
     id: m.id, mode: m.mode === 2 ? '双人' : '三人', rounds: D.round - 1, when: dayLabel(m.start),

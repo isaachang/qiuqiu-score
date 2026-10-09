@@ -45,7 +45,7 @@
 @keyframes opIn{to{opacity:1;transform:none}}
 .opn{font-size:24rpx;color:var(--tx2);margin-top:10rpx;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ops{font-size:40rpx;font-weight:900}
-.ox{text-align:center;color:#F0444D;font-size:30rpx;font-weight:600;padding:32rpx 0 0}
+.ox{text-align:center;color:#F0444D;font-size:30rpx;font-weight:600;padding:32rpx 0 4rpx}
 .oy{text-align:center;color:#6B6B73;font-size:30rpx;font-weight:600;padding:28rpx 0 4rpx}
 /* 不保存确认：正反两面左右滑动切换（不用 3D 翻转，兼容性更好） */
 .oc{position:relative;overflow:hidden}
@@ -55,3 +55,5 @@
 .oc.flip .back{transform:none;opacity:1}
 .wic{width:96rpx;height:96rpx;border-radius:50%;background:#FF5A5F1F;color:#F0444D;font-size:52rpx;font-weight:900;display:flex;align-items:center;justify-content:center;margin:12rpx auto 20rpx}
 .btn.danger{background:#F0444D;color:#fff;margin-top:16rpx}
+
+.btn.soft{background:#F0EEE9;color:#16161A;margin-top:16rpx}

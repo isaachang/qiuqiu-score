@@ -61,7 +61,7 @@
     <view class="gi" wx:for="{{grid}}" wx:key="l"><text class="gv num">{{item.v}}</text><text class="gl">{{item.l}}</text></view>
   </view>
 
-  <view style="--i:10" class="brand rise"><view class="bball"><text>9</text></view><view><text class="bn">球球记分</text><text class="bs">台球追分记分 · 双人 / 三人</text></view></view>
+  <view style="--i:10" class="brand rise"><image class="blogo" src="/images/logo.png"/><text class="bn">球球记分</text></view>
 </view>
 <view wx:if="{{ok}}" class="cta">
   <button class="btn sec2" open-type="share">分享给球友</button>

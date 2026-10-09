@@ -1,5 +1,6 @@
 // 球球记分 · 战绩统计（纯函数，输入历史对局，输出统计页 / 交手页需要的全部数据）
-const { EV, derive, signed } = require('./engine');
+const { EV, signed } = require('./engine');
+const { derived } = require('./cache');
 
 const pct = (a, b) => (b ? Math.round(a / b * 100) : 0);
 const md = t => { const d = new Date(t); return `${d.getMonth() + 1}/${d.getDate()}`; };
@@ -20,7 +21,7 @@ function personal(ms, id) {
   let rounds = 0, wins = 0, gold = 0, foul = 0, pu = 0, best = 0, score = 0, top = -Infinity, mWins = 0, mLoss = 0, durSum = 0, clean = 0;
   const ev = { pu: 0, dj: 0, xj: 0, h9: 0, foul: 0 }, gain = { pu: 0, gold: 0, foul: 0 };
   ms.forEach(m => {
-    const D = m._D || (m._D = derive(m)), i = m.players.indexOf(id), st = D.stats[i];
+    const D = derived(m), i = m.players.indexOf(id), st = D.stats[i];
     rounds += D.round - 1; wins += st.win; gold += st.dj + st.xj + st.h9; foul += st.foul; pu += st.pu;
     best = Math.max(best, D.best[i]); score += D.scores[i]; top = Math.max(top, D.scores[i]);
     Object.keys(ev).forEach(k => { ev[k] += st[k]; });
@@ -54,7 +55,7 @@ function overview(history, meId, seg, view, days) {
   // 每场结果 + 累计净胜分
   let acc = 0; const series = [0], titles = ['起点'], notes = [''];
   const results = chrono.map(m => {
-    const D = m._D, i = m.players.indexOf(meId), my = D.scores[i], max = Math.max(...D.scores);
+    const D = derived(m), i = m.players.indexOf(meId), my = D.scores[i], max = Math.max(...D.scores);
     acc += my; series.push(acc);
     const opp = m.players.filter(x => x !== meId).map(x => view(x).name).join('、');
     titles.push(`${md(m.start)} · vs ${opp}`); notes.push(`本场 ${signed(my)} · 累计 ${signed(acc)}`);
@@ -66,7 +67,7 @@ function overview(history, meId, seg, view, days) {
   // 球友关系
   const rel = {};
   ms.forEach(m => {
-    const D = m._D, i = m.players.indexOf(meId);
+    const D = derived(m), i = m.players.indexOf(meId);
     m.players.forEach((id, j) => {
       if (id === meId) return;
       const r = rel[id] || (rel[id] = { id, n: 0, w: 0, l: 0, net: 0 });
@@ -114,7 +115,7 @@ function headToHead(history, meId, fid, view) {
   const sA = [0], sB = [0], titles = ['起点'], notes = [''];
   const form = [];
   chrono.forEach(m => {
-    const D = m._D || (m._D = derive(m)), a = m.players.indexOf(meId), b = m.players.indexOf(fid);
+    const D = derived(m), a = m.players.indexOf(meId), b = m.players.indexOf(fid);
     const diff = D.scores[a] - D.scores[b], t = transfer(m, D, a, b);
     if (diff > 0) w++; else if (diff < 0) l++; else d++;
     form.push(diff > 0 ? 'W' : diff < 0 ? 'L' : 'D');

@@ -117,6 +117,7 @@
           </swipe-row>
         </view>
       </view>
+      <view wx:if="{{total>3}}" class="more-btn rise" style="--i:10" bindtap="toHistory" hover-class="press">查看全部 ›</view>
     </view>
   </view>
   <view class="tabpad"></view>

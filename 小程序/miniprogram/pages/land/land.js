@@ -1,4 +1,5 @@
 const scoring = require('../../behaviors/scoring');
+const sfx = require('../../utils/sfx');
 const { enter } = require('../../utils/page');
 
 // 横屏左右最小留白（px）：避开圆角和刘海，不依赖系统安全区数值（部分机型横屏时返回 0）
@@ -24,6 +25,6 @@ Page({
     this._step = 0; setTimeout(() => this.measure(), 80);
   },
   onHide() { this.stopClock(); },
-  onUnload() { this.stopClock(); },
+  onUnload() { sfx.stop(); this.stopClock(); },
   back() { wx.navigateBack(); },
 });

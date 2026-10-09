@@ -86,3 +86,10 @@ page{--spring:cubic-bezier(.3,1.35,.5,1);--ease:cubic-bezier(.2,.9,.3,1.04)}
 .ill .ball::after{content:"";position:absolute;left:22%;top:18%;width:24%;height:18%;border-radius:50%;background:rgba(255,255,255,.7)}
 @keyframes floaty{50%{transform:translateY(-12rpx)}}
 .pre .rise,.pre .pop,.pre .fade{opacity:0}
+
+/* =========================================================
+   液态玻璃（只用在悬浮的操作层：Tab、导航栏、记分底栏、横屏按钮；内容卡片保持平面）
+   低端安卓机加 .lite 降级为半透明纯色
+   ========================================================= */
+.glass{background:linear-gradient(135deg,rgba(255,255,255,.44),rgba(255,255,255,.16));-webkit-backdrop-filter:blur(14px) saturate(200%) brightness(1.06);backdrop-filter:blur(14px) saturate(200%) brightness(1.06);box-shadow:inset 0 2rpx 0 rgba(255,255,255,.95),inset 0 -2rpx 0 rgba(255,255,255,.4),inset 0 0 0 1rpx rgba(255,255,255,.6),0 24rpx 56rpx -22rpx rgba(40,30,20,.36),0 2rpx 8rpx rgba(40,30,20,.06)}
+.glass.lite{background:rgba(255,255,255,.96);-webkit-backdrop-filter:none;backdrop-filter:none}

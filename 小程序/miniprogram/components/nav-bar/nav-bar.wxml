@@ -1,4 +1,4 @@
-<view class="nb {{scrolled?'solid':''}}" style="height:{{top+h}}px;padding-top:{{top}}px">
+<view class="nb {{scrolled?'solid':''}} {{lite?'lite':''}}" style="height:{{top+h}}px;padding-top:{{top}}px">
   <view wx:if="{{back}}" class="nb-bk" style="height:{{h}}px" bindtap="goBack" hover-class="nb-bkp"><image src="/images/back.svg"/></view>
   <view class="nb-t {{(scrolled||!large)?'on':''}}" style="top:{{top}}px;height:{{h}}px">{{title}}</view>
 </view>

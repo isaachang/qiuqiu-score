@@ -1,21 +1,23 @@
 const store = require('../../utils/store');
-const { enter, onScroll } = require('../../utils/page');
+const { enter, onScroll, tabBar } = require('../../utils/page');
 const { ask, uiDone } = require('../../utils/ui');
 Page({
   onUi(e) { uiDone(this, e.detail.k); },
   onUiClose() { uiDone(this, null); },
   data: { es: { show: false }, scrolled: false, ent: false },
-  onShow() { this.render(); enter(this, 2); },
+  onShow() { if (this._rev !== store.rev()) this.render(); enter(this, 2); },
   onPageScroll(e) { onScroll(this, e); },
   render() {
+    this._rev = store.rev();
     const s = store.get(), me = s.friends.find(f => f.me);
-    this.setData({ demo: !!s.demo, demoN: s.demo ? s.demo.matches.length : 0, me: store.view(me.id), count: store.activeFriends().length, matches: s.history.length, vib: s.settings.vib, keep: s.settings.keep });
+    this.setData({ demo: !!s.demo, demoN: s.demo ? s.demo.matches.length : 0, me: store.view(me.id), count: store.activeFriends().length, matches: s.history.length, vib: s.settings.vib, keep: s.settings.keep, sfx: s.settings.sfx !== false });
   },
   rename() {
     const me = store.get().friends.find(f => f.me);
+    tabBar(this, false);
     this.setData({ es: { show: true, name: me.name === '我' ? '' : me.name, color: me.color } });
   },
-  closeEs() { this.setData({ 'es.show': false }); },
+  closeEs() { this.setData({ 'es.show': false }); tabBar(this, true); },
   saveMe(e) {
     const me = store.get().friends.find(f => f.me);
     store.updateFriend(me.id, { name: e.detail.name, color: e.detail.color });
@@ -31,5 +33,5 @@ Page({
   },
   toRules() { wx.navigateTo({ url: '/pages/rules/rules?target=default' }); },
   toFriends() { wx.navigateTo({ url: '/pages/friends/friends' }); },
-  toggle(e) { const k = e.currentTarget.dataset.k, s = store.get(); s.settings[k] = !s.settings[k]; store.save(); this.setData({ [k]: s.settings[k] }); },
+  toggle(e) { const k = e.currentTarget.dataset.k, s = store.get(); s.settings[k] = !(s.settings[k] !== false); store.save(); this.setData({ [k]: s.settings[k] }); },
 });

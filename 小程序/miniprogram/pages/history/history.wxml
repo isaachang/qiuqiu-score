@@ -1,0 +1,58 @@
+<nav-bar title="全部对局" back scrolled="{{scrolled}}"/>
+<view class="wrap {{ent?'ent':'pre'}}">
+  <view class="large rise" style="--i:0"><view><text class="ls">{{filterTxt?filterTxt+' · ':''}}共 {{total}} 场</text><text class="lt">全部对局</text></view></view>
+
+  <!-- 日历 -->
+  <view class="cal card rise" style="--i:1" bindtouchstart="ts" bindtouchend="te">
+    <view class="ch">
+      <view class="ctl" bindtap="toggleMode" hover-class="press">{{title}}<text class="cmode">{{mode==='week'?'⌄':'⌃'}}</text></view>
+      <view class="cbtns">
+        <view class="cb" bindtap="prev" hover-class="cbp">‹</view>
+        <view class="ctoday" bindtap="goToday" hover-class="press">今天</view>
+        <view class="cb" bindtap="next" hover-class="cbp">›</view>
+      </view>
+    </view>
+    <view class="wdr"><text wx:for="{{wd}}" wx:key="*this" class="wdl {{index===0||index===6?'we':''}}">{{item}}</text></view>
+    <view class="grid {{mode}} {{slide}}">
+      <view wx:for="{{cells}}" wx:key="k" class="dc {{item.other?'other':''}} {{item.future?'future':''}}" data-k="{{item.k}}" bindtap="tapDay">
+        <view class="ring {{item.has?'has':''}} {{item.sel?'sel':''}} {{item.today?'today':''}} {{item.tonly?'tonly':''}}" style="{{item.ring}}">
+          <view class="inner"><text class="dn num">{{item.n}}</text></view>
+        </view>
+        <view class="dots"><view wx:if="{{item.cnt>0}}" class="dot"></view><view wx:if="{{item.cnt>1}}" class="dot"></view><view wx:if="{{item.cnt>2}}" class="dot"></view></view>
+      </view>
+    </view>
+    <view wx:if="{{mode==='month'}}" class="msum">{{title}} · {{monthSum.n}} 场 · 胜 {{monthSum.w}} · <text class="num {{monthSum.cls}}">{{monthSum.net}}</text></view>
+    <view class="handle" bindtap="toggleMode"><view class="hb"></view><text>{{mode==='week'?'展开月历':'收起'}}</text></view>
+    <view class="legend"><text><text class="lg-d" style="background:#1FC98E"></text>赢</text><text><text class="lg-d" style="background:#FF5A5F"></text>输</text><text><text class="lg-d" style="background:#C9C5BD"></text>平</text></view>
+  </view>
+
+  <!-- 选中这天 -->
+  <view class="sec rise" style="--i:2">{{day.t}}<text wx:if="{{day.isToday}}" class="tdy">今天</text>
+    <text wx:if="{{day.n}}" class="s">{{day.n}} 场 · 胜 {{day.w}} · <text class="num {{day.cls}}">{{day.net}}</text></text>
+  </view>
+  <view wx:if="{{!rows.length}}" class="card dempty rise" style="--i:3">
+    <view class="ill"><view class="ball" style="width:80rpx;height:80rpx;left:40rpx;top:50rpx;background:#FF5A5F"></view><view class="ball" style="width:96rpx;height:96rpx;left:90rpx;top:20rpx;background:#FFC53D;animation-delay:-1.2s"></view><view class="ball" style="width:72rpx;height:72rpx;left:150rpx;top:60rpx;background:#3D7BFF;animation-delay:-2.4s"></view></view>
+    <text class="det">这天没有打球</text>
+    <view wx:if="{{latestTxt}}" class="btn sec2 dgo" bindtap="goLatest" hover-class="press">看最近一次 · {{latestTxt}}</view>
+  </view>
+  <view class="list">
+    <view class="hc-wrap" wx:for="{{rows}}" wx:key="id" style="--d:{{index<8?index:8}}">
+      <swipe-row data-id="{{item.id}}" bind:tapbody="open" bind:delete="askDelete">
+        <view class="hc {{item.resK}}">
+          <view class="hct">
+            <view class="mode-ic m{{item.mode==='双人'?2:3}}">{{item.mode==='双人'?'2':'3'}}</view>
+            <text class="hcm">{{item.mode}}追分</text><text class="hcd">{{item.full}} · {{item.rounds}} 局</text>
+            <text class="res {{item.resK}}">{{item.resK==='W'?'胜利':item.resK==='L'?'失败':'平局'}}</text>
+          </view>
+          <view class="chips2">
+            <view wx:for="{{item.chips}}" wx:for-item="p" wx:key="id" class="pchip {{p.cls}}">
+              <text wx:if="{{p.me}}" class="metag">我</text><text class="pn">{{p.name}}</text><text class="ps num">{{p.s}}</text>
+            </view>
+          </view>
+        </view>
+      </swipe-row>
+    </view>
+  </view>
+  <view style="height:80rpx"></view>
+</view>
+<ui-sheet show="{{ui.show}}" icon="{{ui.icon}}" title="{{ui.title}}" desc="{{ui.desc}}" actions="{{ui.actions}}" bind:action="onUi" bind:close="onUiClose"/>

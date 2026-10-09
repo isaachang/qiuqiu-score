@@ -14,7 +14,7 @@
     </view>
 
     <view class="cards {{n===3?'trio':'duo'}}">
-      <view wx:for="{{players}}" wx:key="id" class="pc rise {{item.fx}} {{coach===1&&index===0?'cf':''}}" style="--i:{{index+1}};background:{{item.c}};color:{{item.i}};{{item.mv}}"
+      <view wx:for="{{players}}" wx:key="id" class="pc {{risen?'':'rise'}} {{item.fx}} {{coach===1&&index===0?'cf':''}}" style="--i:{{index+1}};background:{{item.c}};color:{{item.i}};{{item.mv}}"
             data-i="{{item.idx}}" bindtap="onCard" hover-class="pc-press" hover-stay-time="60">
         <view class="flash"></view><view class="sheen"></view>
         <view class="top">
@@ -45,21 +45,23 @@
     </view>
   </view>
 
-  <view class="dock dockin {{coach===3?'cf':''}}">
+  <view class="dock dockin glass {{lite?'lite':''}} {{coach===3?'cf':''}}">
     <view class="db hl" bindtap="onUndo" hover-class="dbp"><image src="/images/undo.svg"/>撤销</view>
     <view class="db" bindtap="toLog" hover-class="dbp"><image src="/images/list.svg"/>记录</view>
     <view class="db" bindtap="toLand" hover-class="dbp"><image src="/images/rotate.svg"/>横屏</view>
     <view class="db end" bindtap="finish" hover-class="dbp"><image src="/images/flag.svg"/>结算</view>
   </view>
 
-  <view wx:if="{{banner}}" class="banner">
+  <view wx:if="{{banner}}" class="banner {{banner.out?'out':''}} {{banner.live?'live':''}}" catchtap="onBannerTap" catchtouchmove="noop">
     <view class="bx">
       <view class="medal" style="background:{{banner.c}};box-shadow:0 0 0 10rpx {{banner.c}}33,0 18rpx 40rpx -12rpx {{banner.c}}">
         <image wx:if="{{banner.k==='dj'}}" class="mg" src="/images/crown-w.svg"/>
         <image wx:elif="{{banner.k==='xj'}}" class="mg" src="/images/spark-w.svg"/>
+        <text wx:elif="{{banner.k==='foul'}}" class="mx">!</text>
         <text wx:else class="m9 num">9</text>
       </view>
       <text class="bt" style="color:{{banner.tc}}">{{banner.t}}</text><text class="bs">{{banner.sub}}</text>
+      <text class="btap">轻点任意处继续</text>
     </view>
   </view>
 

@@ -7,11 +7,11 @@ Component({
     large: { type: Boolean, value: false },   // 页面里自己放大标题，导航栏只在滚动后显示小标题
     scrolled: { type: Boolean, value: false },
   },
-  data: { top: 20, h: 44 },
+  data: { top: 20, h: 44, lite: false },
   lifetimes: {
     attached() {
       const n = (getApp().globalData && getApp().globalData.nav) || require('../../utils/util').navMetrics();
-      this.setData({ top: n.top, h: n.h });
+      this.setData({ top: n.top, h: n.h, lite: !!(getApp().globalData || {}).lite });
     },
   },
   methods: {

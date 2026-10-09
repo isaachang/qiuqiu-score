@@ -14,7 +14,7 @@ function fresh() {
     history: [],
     live: null,
     draft: null,
-    settings: { vib: true, keep: true },
+    settings: { vib: true, keep: true, sfx: true },
     defaultRules: DEFAULT_RULES(),
     seq: 1,
   };
@@ -33,13 +33,22 @@ function get() {
 }
 /** 数据迁移：v2 —— 犯规恢复为 −1（旧版规则页「+」按钮方向容易误触成 −2） */
 function migrate(s) {
-  if ((s.ver || 1) >= 2) return;
-  const fix = r => { if (r && r.foul && r.foul.v !== 1) r.foul.v = 1; };
-  fix(s.defaultRules); s.draft && fix(s.draft.rules); s.live && fix(s.live.rules);
-  s.ver = 2;
+  const v = s.ver || 1;
+  if (v >= 3) return;
+  if (v < 2) { // v2：犯规恢复为 −1
+    const fix = r => { if (r && r.foul && r.foul.v !== 1) r.foul.v = 1; };
+    fix(s.defaultRules); s.draft && fix(s.draft.rules); s.live && fix(s.live.rules);
+  }
+  // v3：① 删掉旧版误写进存储的计算结果（_D），给存储瘦身；② 每场对局补上「玩法」字段（为八球、斯诺克和云端同步做准备）
+  const fix3 = m => { if (!m) return; delete m._D; if (!m.game) m.game = 'chase'; };
+  (s.history || []).forEach(fix3); fix3(s.live); if (s.draft && !s.draft.game) s.draft.game = 'chase';
+  s.ver = 3;
   try { wx.setStorageSync(KEY, s); } catch (e) {}
 }
-function save() { try { wx.setStorageSync(KEY, get()); } catch (e) { console.error('保存失败', e); } }
+let REV = 1;
+/** 数据版本号：每次保存都会变。页面显示时比较它，数据没变就不用重新计算 */
+function rev() { return REV; }
+function save() { REV++; try { wx.setStorageSync(KEY, get()); } catch (e) { console.error('保存失败', e); } }
 
 function friend(id) { return get().friends.find(f => f.id === id) || { id, name: '?', color: 0 }; }
 function color(id) { return COLORS[friend(id).color % COLORS.length]; }
@@ -55,13 +64,13 @@ function view(id) { const f = friend(id), c = color(id); return { id, name: f.na
 
 function newDraft(mode, slots) {
   const s = get();
-  s.draft = { mode, slots: slots || [], rules: JSON.parse(JSON.stringify(s.defaultRules)) };
+  s.draft = { game: 'chase', mode, slots: slots || [], rules: JSON.parse(JSON.stringify(s.defaultRules)) };
   return s.draft;
 }
 function startLive() {
   const s = get(), d = s.draft;
   if (s.live && !s.live.events.length) s.live = null;
-  s.live = { id: 'live', mode: d.mode, players: [...d.slots], order0: d.slots.map((_, i) => i), rules: JSON.parse(JSON.stringify(d.rules)), events: [], start: Date.now(), status: 'live' };
+  s.live = { id: 'live', game: d.game || 'chase', mode: d.mode, players: [...d.slots], order0: d.slots.map((_, i) => i), rules: JSON.parse(JSON.stringify(d.rules)), events: [], start: Date.now(), status: 'live' };
   save();
   return s.live;
 }
@@ -96,4 +105,4 @@ function deleteMatch(id) { const s = get(); s.history = s.history.filter(m => m.
 function discardLive() { get().live = null; save(); }
 function match(id) { const s = get(); return id === 'live' ? s.live : s.history.find(m => m.id === id); }
 
-module.exports = { get, save, friend, color, view, addFriend, activeFriends, updateFriend, removeFriend, deleteMatch, loadDemo, clearDemo, newDraft, startLive, finishLive, discardLive, match, COLORS, derive };
+module.exports = { get, save, rev, friend, color, view, addFriend, activeFriends, updateFriend, removeFriend, deleteMatch, loadDemo, clearDemo, newDraft, startLive, finishLive, discardLive, match, COLORS, derive };
