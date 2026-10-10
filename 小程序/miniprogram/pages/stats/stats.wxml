@@ -1,125 +1,128 @@
 <nav-bar title="战绩" large scrolled="{{scrolled}}"/>
 <view class="wrap {{ent?'ent':'pre'}}">
   <view class="large rise" style="--i:0"><view><text class="ls">{{demo?'当前包含演示数据 · 可在「我的」里清除':'你的台球履历'}}</text><text class="lt">战绩</text></view></view>
-  <view class="seg rise" style="--i:1;margin:0 0 28rpx">
-    <view class="thumb" style="width:calc(33.33% - 4rpx);transform:translateX({{segIdx*100}}%)"></view>
-    <view class="it {{seg==='all'?'on':''}}" data-s="all" bindtap="setSeg">全部</view>
-    <view class="it {{seg==='2'?'on':''}}" data-s="2" bindtap="setSeg">双人</view>
-    <view class="it {{seg==='3'?'on':''}}" data-s="3" bindtap="setSeg">三人</view>
-  </view>
-
-  <!-- 1. 名片（全部战绩） -->
-  <view class="idc rise" style="--i:2;background:{{me.c}};color:{{me.i}}">
-    <view class="blob b1"></view><view class="blob b2"></view>
-    <view class="idt">
-      <view class="av" style="background:{{me.i}};color:{{me.c}};width:96rpx;height:96rpx;font-size:40rpx">{{me.ch}}</view>
-      <view class="idm"><text class="idn">{{me.name}}</text><text class="idd">{{card.title.d}}</text></view>
-      <view class="badge pop" style="--i:3;color:{{me.c}}">{{card.title.t}}</view>
+  <!-- 玩法：横向滑动的胶囊，以后加玩法往后排 -->
+  <scroll-view scroll-x class="gsx rise" style="--i:1" enhanced show-scrollbar="{{false}}">
+    <view class="gchips">
+      <view wx:for="{{games}}" wx:key="k" class="gch {{game===item.k?'on':''}}" data-g="{{item.k}}" bindtap="setGame" hover-class="gchp">
+        <view class="gd" style="background:{{item.dot}}"></view><text class="gn">{{item.n}}</text><text class="gcnt num">{{item.cnt}}</text>
+      </view>
     </view>
-    <view class="kpis"><view class="kp" wx:for="{{card.kpis}}" wx:key="l"><text class="kv num">{{item.v}}</text><text class="kl">{{item.l}}</text></view></view>
+  </scroll-view>
+  <!-- 筛选：人数 + 时间放在同一行，下面所有内容都跟着变（成就除外，成就是累计的） -->
+  <view wx:if="{{!empty}}" class="flt rise" style="--i:1">
+    <view wx:if="{{game==='chase'}}" class="rg fg">
+      <view class="rgi {{seg==='all'?'on':''}}" data-s="all" bindtap="setSeg">全部</view>
+      <view class="rgi {{seg==='2'?'on':''}}" data-s="2" bindtap="setSeg">双人</view>
+      <view class="rgi {{seg==='3'?'on':''}}" data-s="3" bindtap="setSeg">三人</view>
+    </view>
+    <view class="rg fg">
+      <view class="rgi {{days===7?'on':''}}" data-d="7" bindtap="setDays">近7天</view>
+      <view class="rgi {{days===30?'on':''}}" data-d="30" bindtap="setDays">近30天</view>
+      <view class="rgi {{days===0?'on':''}}" data-d="0" bindtap="setDays">全部时间</view>
+    </view>
   </view>
 
   <view wx:if="{{empty}}" class="card empty-card rise" style="--i:4">
     <view class="ill"><view class="ball" style="width:96rpx;height:96rpx;left:20rpx;top:40rpx;background:#FF5A5F"></view><view class="ball" style="width:110rpx;height:110rpx;left:70rpx;top:10rpx;background:#FFC53D;animation-delay:-1.2s"></view><view class="ball" style="width:88rpx;height:88rpx;left:140rpx;top:50rpx;background:#3D7BFF;animation-delay:-2.4s"></view></view>
-    <text class="ee">还没有战绩</text><text class="es">打完并保存一场对局，这里就会出现你的球风称号、个人数据和球友关系</text>
-    <view class="btn pri go-btn" bindtap="start" hover-class="press">去开一局</view>
+    <text class="ee">{{game==='snk'?'还没有斯诺克战绩':'还没有战绩'}}</text><text class="es">{{game==='snk'?'打完并保存一场斯诺克，这里就会出现你的单杆、局胜率和球友关系':'打完并保存一场对局，这里就会出现你的球风称号、个人数据和球友关系'}}</text>
+    <view class="btn pri go-btn" bindtap="start" hover-class="press">{{game==='snk'?'开一局斯诺克':'去开一局'}}</view>
   </view>
 
-  <view wx:else>
-    <!-- 2. 最近场次 + 时间范围（下面所有内容跟着切换） -->
-    <view class="sec rise" style="--i:4">最近场次
-      <view class="rg">
-        <view class="rgi {{days===7?'on':''}}" data-d="7" bindtap="setDays">近7天</view>
-        <view class="rgi {{days===30?'on':''}}" data-d="30" bindtap="setDays">近30天</view>
-        <view class="rgi {{days===0?'on':''}}" data-d="0" bindtap="setDays">全部</view>
+  <block wx:else>
+    <!-- 1. 名片：我是谁 + 打得怎么样（胜率大数字、胜平负、最近几场、关键数据） -->
+    <view class="idc rise" style="--i:2;background:{{me.c}};color:{{me.i}}">
+      <view class="blob b1"></view><view class="blob b2"></view>
+      <view class="idt">
+        <view class="av" style="background:{{me.i}};color:{{me.c}};width:96rpx;height:96rpx;font-size:40rpx">{{me.ch}}</view>
+        <view class="idm"><text class="idn">{{me.name}}</text><text class="idd">{{card.title.d}}</text></view>
+        <view class="badge pop" style="--i:3;color:{{me.c}}">{{card.title.t}}</view>
       </view>
-    </view>
-    <view class="card form rise" style="--i:5">
-      <view class="ft">{{rangeTxt}}<text class="fts">左旧右新</text></view>
-      <view wx:if="{{rangeEmpty}}" class="fe">这段时间还没有打球</view>
-      <view wx:for="{{recent}}" wx:key="k" class="fd {{item.r}}">{{item.r==='W'?'胜':item.r==='L'?'负':'平'}}</view>
-    </view>
-
-    <view wx:if="{{!rangeEmpty}}">
-      <!-- 3. 战绩概览 -->
-      <view class="card wld rise" style="--i:6">
-        <view class="wr1"><text class="wrl">胜率</text><text class="wrv num">{{O.wld.rate}}%</text></view>
-        <view class="wbar"><view class="wb w" style="flex:{{O.wld.w||0.001}}"></view><view class="wb l" style="flex:{{O.wld.l||0.001}}"></view><view class="wb d" style="flex:{{O.wld.d||0.001}}"></view></view>
-        <view class="wpills">
-          <view class="wp w"><text class="num">{{O.wld.w}}</text>胜</view>
-          <view class="wp l"><text class="num">{{O.wld.l}}</text>负</view>
-          <view class="wp d"><text class="num">{{O.wld.d}}</text>平</view>
+      <block wx:if="{{!rangeEmpty}}">
+        <view class="hwr">
+          <view class="hwl"><text class="hwk">{{scopeTxt}}胜率</text><text class="hwv num">{{O.wld.rate}}<text class="hwp">%</text></text></view>
+          <view class="hwd">
+            <view class="hwn"><text class="num">{{O.wld.w}}</text>胜<text class="hdot">·</text><text class="num">{{O.wld.d}}</text>平<text class="hdot">·</text><text class="num">{{O.wld.l}}</text>负</view>
+            <view class="hbar"><view class="hb w" style="flex:{{O.wld.w||0.001}}"></view><view class="hb d" style="flex:{{O.wld.d||0.001}}"></view><view class="hb l" style="flex:{{O.wld.l||0.001}}"></view></view>
+          </view>
         </view>
-      </view>
-
-      <!-- 4. 净胜分走势 -->
-      <view class="sec rise" style="--i:7">净胜分走势<text class="s">每场之后的累计</text></view>
-      <view class="card rise" style="--i:8;padding:20rpx 16rpx">
-        <trend-chart series="{{O.chart.series}}" colors="{{O.chart.colors}}" names="{{O.chart.names}}" titles="{{O.chart.titles}}" notes="{{O.chart.notes}}" ticks="{{O.chart.ticks}}" fill="{{true}}" height="{{340}}"/>
-      </view>
-
-      <!-- 5. 个人数据 -->
-      <view class="sec rise" style="--i:9">个人数据<text class="s">共 {{O.P.n}} 场</text></view>
-      <view class="card grid rise" style="--i:10">
-        <view wx:for="{{O.grid}}" wx:key="l" class="gc {{item.hot?'hot':''}}">
-          <text class="gl">{{item.l}}</text>
-          <text class="gv num {{item.cls||''}}" style="{{item.c?'color:'+item.c:''}}">{{item.v}}</text>
-        </view>
-      </view>
-
-      <!-- 6. 得分来源 -->
-      <view wx:if="{{O.sources.length}}" class="sec rise" style="--i:10">得分来源<text class="s">赢来的 {{O.gainTotal}} 分</text></view>
-      <view wx:if="{{O.sources.length}}" class="card src rise" style="--i:10">
-        <view class="sbar"><view wx:for="{{O.sources}}" wx:key="k" class="sb" style="flex:{{item.v}};background:{{item.c}}"></view></view>
-        <view class="sl"><view wx:for="{{O.sources}}" wx:key="k" class="sli"><view class="sd" style="background:{{item.c}}"></view><text>{{item.l}}</text><text class="num slv">{{item.w}}%</text></view></view>
-      </view>
+        <view class="hfh"><text>最近 {{form.length}} 场</text><text class="hfs">左旧右新</text></view>
+        <view class="hform"><view wx:for="{{form}}" wx:key="k" class="hfd {{item.r}}" style="{{item.r==='W'?'color:'+me.c:''}}">{{item.r==='W'?'胜':item.r==='L'?'负':'平'}}</view></view>
+        <view class="kpis k3"><view class="kp" wx:for="{{card.kpis}}" wx:key="l"><text class="kv num">{{item.v}}</text><text class="kl">{{item.l}}</text></view></view>
+      </block>
+      <view wx:else class="hemp">{{scopeTxt}}还没有打球<text class="hems">换个筛选条件看看</text></view>
     </view>
 
-    <!-- 7. 成就（全部战绩） -->
-    <view class="sec rise" style="--i:10">成就<text class="s">已解锁 {{ach.got}} / {{ach.list.length}}</text></view>
-    <view class="card ach rise" style="--i:10">
-      <view wx:for="{{ach.list}}" wx:key="k" class="ac {{item.ok?'ok':''}}">
-        <view class="aci" style="{{item.ok?'background:'+item.c+';box-shadow:0 10rpx 24rpx -10rpx '+item.c:''}}">{{item.ic}}</view>
-        <text class="act">{{item.t}}</text>
-        <text class="acd">{{item.ok?item.d:item.p}}</text>
-      </view>
-    </view>
-
-    <view wx:if="{{!rangeEmpty}}">
-      <!-- 8. 球友关系 -->
-      <view class="sec rise" style="--i:10">球友关系<text class="s">{{friends.length}} 位 · 点击看交手</text></view>
-      <view class="card rise" style="--i:10">
-        <view class="row {{index>0?'sep':''}}" wx:for="{{friends}}" wx:key="id" data-id="{{item.id}}" bindtap="toH2h" hover-class="rowp">
-          <view class="av" style="background:{{item.c}};color:{{item.i}}">{{item.ch}}</view>
-          <view class="hm"><view class="hn">vs {{item.name}}<text wx:if="{{item.tag==='bank'}}" class="rtag" style="background:#1FC98E">提款机</text><text wx:if="{{item.tag==='nem'}}" class="rtag" style="background:#F0444D">克星</text></view><text class="hs">同场 {{item.n}} 次 · 交锋 {{item.netTxt}}</text></view>
-          <view class="wlb"><text class="num"><text style="color:#13B57A">{{item.w}}</text> : <text style="color:#F0444D">{{item.l}}</text></text><view class="mini"><view style="width:{{item.rate}}%"></view></view></view>
-          <text class="chev">›</text>
-        </view>
-      </view>
-
-      <!-- 9. 历史对局 -->
-      <view class="sec rise" style="--i:10">历史对局<text class="s">左滑可删除</text></view>
-      <view class="hist rise" style="--i:10">
-        <view class="hc-wrap" wx:for="{{rows}}" wx:key="id">
-          <swipe-row data-id="{{item.id}}" bind:tapbody="open" bind:delete="askDelete">
-            <view class="hc {{item.resK}}">
-              <view class="hct">
-                <view class="mode-ic m{{item.mode==='双人'?2:3}}">{{item.mode==='双人'?'2':'3'}}</view>
-                <text class="hcm">{{item.mode}}追分</text><text class="hcd">{{item.full}} · {{item.rounds}} 局</text>
-                <text class="res {{item.resK}}">{{item.resK==='W'?'胜利':item.resK==='L'?'失败':'平局'}}</text>
-              </view>
-              <view class="chips2">
-                <view wx:for="{{item.chips}}" wx:for-item="p" wx:key="id" class="pchip {{p.cls}}">
-                  <text wx:if="{{p.me}}" class="metag">我</text><text class="pn">{{p.name}}</text><text class="ps num">{{p.s}}</text>
-                </view>
-              </view>
+    <block wx:if="{{!rangeEmpty}}">
+      <!-- 2. 球友：最有话题的部分，往前放；默认显示 3 位 -->
+      <view class="sec rise" style="--i:4">球友<text class="s">{{friends.length}} 位 · 点击看交手</text></view>
+      <view class="vcs rise" style="--i:5">
+        <view wx:for="{{friendsShown}}" wx:key="id" class="vc {{item.tag}}" data-id="{{item.id}}" bindtap="toH2h" hover-class="vcp">
+          <view wx:if="{{item.tag==='bank'||item.tag==='nem'}}" class="sash {{item.tag}}"><text>{{item.tag==='bank'?'提款机':'克星'}}</text></view>
+          <view class="vct">
+            <view class="vtg"><text wx:if="{{!item.tag}}" class="vrel {{item.relCls}}">{{item.rel}}</text></view>
+            <text class="vrib num">共 {{item.n}} 场</text>
+            <text class="vdate">{{item.last}}</text>
+          </view>
+          <view class="vcm">
+            <view class="vp"><view class="av vav" style="background:{{item.me.c}};color:{{item.me.i}}">{{item.me.ch}}</view><text class="vpn">{{item.me.name}}</text></view>
+            <view class="vmid">
+              <view class="vsc num"><text class="{{item.lead===0?'hi':''}}" style="{{item.lead===0?'color:'+item.me.c:''}}">{{item.a}}</text><text class="vvs">VS</text><text class="{{item.lead===1?'hi':''}}" style="{{item.lead===1?'color:'+item.op.c:''}}">{{item.b}}</text></view>
+              <text class="vlab">{{item.pctMode?'胜率':'胜场'}}</text>
             </view>
-          </swipe-row>
+            <view class="vp"><view class="av vav" style="background:{{item.op.c}};color:{{item.op.i}}">{{item.op.ch}}</view><text class="vpn">{{item.op.name}}</text></view>
+          </view>
+          <view class="vbar">
+            <view class="vb" style="width:{{item.ww}}%;background:{{item.me.c}}"></view>
+            <view wx:if="{{item.d}}" class="vb dr" style="width:{{item.wd}}%"></view>
+            <view class="vb" style="flex:1;background:{{item.op.c}}"></view>
+            <text class="vbl l num">{{item.w}} 胜</text><text wx:if="{{item.d}}" class="vbl m num">{{item.d}} 平</text><text class="vbl r num">{{item.l}} 胜</text>
+          </view>
+          <text wx:if="{{game==='snk'}}" class="vnet num {{item.net>0?'pos':item.net<0?'neg':''}}">{{item.netLabel}} {{item.netTxt}}</text>
         </view>
       </view>
-      <view wx:if="{{total>3}}" class="more-btn rise" style="--i:10" bindtap="toHistory" hover-class="press">查看全部 ›</view>
-    </view>
-  </view>
+      <view wx:if="{{friends.length>3}}" class="more-btn rise" style="--i:5" bindtap="toggleFriends" hover-class="press">{{fAll?'收起':'展开其余 '+(friends.length-3)+' 位球友'}}</view>
+
+      <!-- 3. 我的数据：按「效率 / 进球 / 得分来源」分组，一张卡片看完 -->
+      <view class="sec rise" style="--i:6">我的数据<text class="s">{{O.foot}}</text></view>
+      <view class="card dat rise" style="--i:7">
+        <view wx:for="{{O.groups}}" wx:for-item="g" wx:key="t" class="dgp">
+          <view class="dgh"><text class="dgt">{{g.t}}</text><text wx:if="{{g.s}}" class="dgs">{{g.s}}</text></view>
+          <view wx:if="{{g.items}}" class="dgr" style="grid-template-columns:repeat({{g.items.length}},1fr)">
+            <view wx:for="{{g.items}}" wx:key="l" class="gc {{item.hot?'hot':''}}">
+              <text class="gl">{{item.l}}</text>
+              <text class="gv num {{item.cls||''}}" style="{{item.c?'color:'+item.c:''}}">{{item.v}}</text>
+            </view>
+          </view>
+          <block wx:if="{{g.bar}}">
+            <view class="sbar"><view wx:for="{{g.bar}}" wx:key="k" class="sb" style="flex:{{item.v}};background:{{item.c}}"></view></view>
+            <view class="sl"><view wx:for="{{g.bar}}" wx:key="k" class="sli"><view class="sd" style="background:{{item.c}}"></view><text>{{item.l}}</text><text class="num slv">{{item.w}}%</text></view></view>
+          </block>
+        </view>
+      </view>
+
+      <!-- 4. 历史对局：和首页同一种对局卡片 -->
+      <view class="sec rise" style="--i:8">历史对局<text class="s">左滑可删除</text></view>
+      <view class="mcs rise" style="--i:8">
+        <swipe-row wx:for="{{rows}}" wx:key="id" round data-id="{{item.id}}" bind:tapbody="open" bind:delete="askDelete"><match-card c="{{item.card}}"/></swipe-row>
+      </view>
+      <view wx:if="{{total>3}}" class="more-btn rise" style="--i:8" bindtap="toHistory" hover-class="press">查看全部 {{total}} 场对局 ›</view>
+    </block>
+
+    <!-- 5. 成就（追分，累计）：放最后，横向滑动；已解锁的排前面 -->
+    <block wx:if="{{game==='chase'}}">
+      <view class="sec rise" style="--i:9">成就<text class="s">累计解锁 {{ach.got}} / {{ach.list.length}}</text></view>
+      <scroll-view scroll-x class="achx rise" style="--i:9" enhanced show-scrollbar="{{false}}">
+        <view class="achs">
+          <view wx:for="{{ach.list}}" wx:key="k" class="ac {{item.ok?'ok':''}}">
+            <view class="aci" style="{{item.ok?'background:'+item.c+';box-shadow:0 10rpx 24rpx -10rpx '+item.c:''}}">{{item.ic}}</view>
+            <text class="act">{{item.t}}</text>
+            <text class="acd">{{item.ok?item.d:item.p}}</text>
+          </view>
+        </view>
+      </scroll-view>
+    </block>
+  </block>
   <view class="tabpad"></view>
 </view>
 <ui-sheet show="{{ui.show}}" icon="{{ui.icon}}" title="{{ui.title}}" desc="{{ui.desc}}" actions="{{ui.actions}}" bind:action="onUi" bind:close="onUiClose"/>

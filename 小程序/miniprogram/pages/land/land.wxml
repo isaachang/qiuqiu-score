@@ -5,6 +5,8 @@
     <view class="lseg glass {{lite?'lite':''}}" style="left:{{bar.l}}px;top:{{bar.bt}}px;height:{{bar.bh}}px">
       <view class="lsb" bindtap="back" hover-class="lsbp"><image src="/images/rotate-dark.svg"/>竖屏</view>
       <view class="lsd"></view>
+      <view class="lsb" bindtap="onPause" hover-class="lsbp"><image src="/images/pause.svg"/>暂停</view>
+      <view class="lsd"></view>
       <view class="lsb hl" bindtap="onUndo" hover-class="lsbp"><image src="/images/undo.svg"/>撤销</view>
     </view>
     <view class="lend glass {{lite?'lite':''}}" style="right:{{bar.capR}}px;top:{{bar.bt}}px;height:{{bar.bh}}px" bindtap="toFinish" hover-class="lsbp"><image src="/images/flag.svg"/>结算</view>
@@ -15,8 +17,7 @@
       <view class="flash"></view><view class="sheen"></view>
       <view class="lmain" data-i="{{item.idx}}" bindtap="onCard" hover-class="tzp" hover-stay-time="60">
         <view class="ph">
-          <view class="av" style="background:{{item.i}};color:{{item.c}}">{{item.ch}}</view>
-          <view class="nm">{{item.name}}<image wx:if="{{item.leader}}" class="crown" src="/images/crown.svg"/><text class="role" style="{{item.brk?'background:'+item.i+';color:'+item.c:''}}">{{item.role}}</text></view>
+          <view class="nm"><text class="nmp" style="background:{{item.i}};color:{{item.c}}">{{item.name}}</text><image wx:if="{{item.leader}}" class="crown" src="/images/crown.svg"/><text class="role" style="{{item.brk?'background:'+item.i+';color:'+item.c:''}}">{{item.role}}</text></view>
         </view>
         <view class="tz">
           <template is="odo" data="{{digits:item.digits,neg:item.neg}}"/>
@@ -43,6 +44,16 @@
       </view>
       <text class="bt" style="color:{{banner.tc}}">{{banner.t}}</text><text class="bs">{{banner.sub}}</text>
       <text class="btap">轻点任意处继续</text>
+    </view>
+  </view>
+  <!-- 暂停 -->
+  <view wx:if="{{paused}}" class="pzov" catchtouchmove="noop" catchtap="noop">
+    <view class="pzbx">
+      <view class="pzic"><view class="pzb"></view><view class="pzb"></view></view>
+      <text class="pzt">已暂停</text>
+      <text class="pzc num">{{clock}}</text>
+      <text class="pzs">计时和限时倒计时已停</text>
+      <view class="btn pri pzbtn" bindtap="onUnpause" hover-class="press">继续</view>
     </view>
   </view>
   <time-up show="{{tu}}" desc="{{tuDesc}}" land bind:end="onTuEnd" bind:add="onTuAdd" bind:close="onTuClose"/>

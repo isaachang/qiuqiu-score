@@ -20,9 +20,9 @@
         <!-- 只有上半部分（名字 / 比分 / 提示）是「普胜区」；按钮那一排和下方边距都不响应 -->
         <view class="top" data-i="{{item.idx}}" bindtap="onCard" hover-class="top-press" hover-stay-time="60">
           <view class="ph">
-            <view class="av" style="background:{{item.i}};color:{{item.c}}">{{item.ch}}</view>
             <view class="pid">
-              <view class="nm">{{item.name}}<image wx:if="{{item.leader}}" class="crown" src="/images/crown.svg"/><text class="role" style="{{item.brk?'background:'+item.i+';color:'+item.c:''}}">{{item.role}}</text></view>
+              <!-- 名字牌：白底 + 球员颜色的大字，手机放远也能看清是谁 -->
+              <view class="nm"><text class="nmp" style="background:{{item.i}};color:{{item.c}}">{{item.name}}</text><image wx:if="{{item.leader}}" class="crown" src="/images/crown.svg"/><text class="role" style="{{item.brk?'background:'+item.i+';color:'+item.c:''}}">{{item.role}}</text></view>
               <view wx:if="{{n===3}}" class="hint {{hintIntro?'intro':''}}">轻点卡片 · 普胜 +{{puV}}</view>
             </view>
           </view>
@@ -35,7 +35,7 @@
         <view class="chips {{coach===2&&index===0?'cf':''}}" catchtap="noop">
           <view class="chip" wx:for="{{chips}}" wx:for-item="c" wx:for-index="ci" wx:key="k" data-i="{{item.idx}}" data-k="{{c.k}}"
                 catchtap="onChip" hover-class="chip-press" hover-stop-propagation="{{true}}">
-            <text class="cl"><text wx:if="{{c.k==='h9'}}" class="b9" style="width:24rpx;height:24rpx"></text>{{c.name}}</text>
+            <text class="cl">{{c.name}}</text>
             <text class="cv num" style="color:{{c.t}}">{{c.v}}</text>
             <text wx:if="{{item.cnt[c.k]>0}}" class="cnt num">{{item.cnt[c.k]}}</text>
           </view>
@@ -49,6 +49,7 @@
   <view class="dock dockin glass {{lite?'lite':''}} {{coach===3?'cf':''}}">
     <view class="db hl" bindtap="onUndo" hover-class="dbp"><image src="/images/undo.svg"/>撤销</view>
     <view class="db" bindtap="toLog" hover-class="dbp"><image src="/images/list.svg"/>记录</view>
+    <view class="db" bindtap="onPause" hover-class="dbp"><image src="/images/pause.svg"/>暂停</view>
     <view class="db" bindtap="toLand" hover-class="dbp"><image src="/images/rotate.svg"/>横屏</view>
     <view class="db end" bindtap="finish" hover-class="dbp"><image src="/images/flag.svg"/>结算</view>
   </view>
@@ -66,6 +67,16 @@
     </view>
   </view>
 
+  <!-- 暂停 -->
+  <view wx:if="{{paused}}" class="pzov" catchtouchmove="noop" catchtap="noop">
+    <view class="pzbx">
+      <view class="pzic"><view class="pzb"></view><view class="pzb"></view></view>
+      <text class="pzt">已暂停</text>
+      <text class="pzc num">{{clock}}</text>
+      <text class="pzs">计时和限时倒计时已停</text>
+      <view class="btn pri pzbtn" bindtap="onUnpause" hover-class="press">继续</view>
+    </view>
+  </view>
   <!-- 结算面板 -->
   <view class="sheet-mask {{fin.show?'on':''}}" bindtap="closeFin" catchtouchmove="noop"></view>
   <view class="sheet fin {{fin.show?'on':''}}" catchtap="noop">

@@ -11,7 +11,10 @@
     "pages/result/result",
     "pages/friends/friends",
     "pages/h2h/h2h",
-    "pages/history/history"
+    "pages/history/history",
+    "pages/snk-setup/snk-setup",
+    "pages/snk-score/snk-score",
+    "pages/snk-result/snk-result"
   ],
   "window": {
     "navigationBarTitleText": "球球记分",

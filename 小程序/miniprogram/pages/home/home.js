@@ -6,6 +6,8 @@ const idle = require('../../utils/idle');
 const limit = require('../../utils/limit');
 const { clock } = require('../../utils/util');
 const { matchRow } = require('../../utils/rows');
+const SN = require('../../utils/snooker');
+const { isSnk, known, liveUrl, resultUrl } = require('../../utils/game');
 const { enter, onScroll, tabBar } = require('../../utils/page');
 
 function greet() {
@@ -52,7 +54,7 @@ Page({
   /* 时间到面板（首页） */
   tuDone() { this.setData({ tu: false }); tabBar(this, true); },
   onTuClose() { this.tuDone(); },
-  onTuEnd() { this.tuDone(); if (store.get().live) { getApp().globalData.openFin = true; nav.to('/pages/score/score'); } },
+  onTuEnd() { this.tuDone(); const L = store.get().live; if (L) { getApp().globalData.openFin = true; nav.to(liveUrl(L)); } },
   onTuAdd(e) {
     this.tuDone();
     const M = store.get().live; if (!M) return;
@@ -66,14 +68,22 @@ Page({
     this._rev = store.rev();
     const s = store.get(), L = s.live, me = s.friends.find(f => f.me);
     let live = null;
-    if (L) {
+    if (L && !known(L)) live = null; // 不认识的玩法：不显示继续卡片
+    else if (L && isSnk(L)) {
+      // 斯诺克：显示第几局、局分，下面是本局比分
+      const S = SN.derive(L), F = S.F;
+      live = {
+        title: `斯诺克 · 第 ${F.no} 局 · 局分 ${S.fw[0]}:${S.fw[1]} · `, clock: limit.state(L).txt, ccls: '', cols: 2,
+        players: L.players.map((id, i) => ({ ...store.view(id), s: String(F.sc[i]), cls: F.act === i && !F.over ? 'pos' : '' })),
+      };
+    } else if (L) {
       const D = derive(L);
       live = {
-        mode: L.mode === 2 ? '双人' : '三人', round: D.round, clock: limit.state(L).txt, ccls: limit.state(L).ccls, cols: L.players.length,
+        title: `${L.mode === 2 ? '双人' : '三人'}追分 · 第 ${D.round} 局 · ${L.pauseAt ? '已暂停 ' : ''}`, clock: limit.state(L).txt, ccls: L.pauseAt ? '' : limit.state(L).ccls, cols: L.players.length,
         players: L.players.map((id, i) => ({ ...store.view(id), s: signed(D.scores[i]), cls: D.scores[i] > 0 ? 'pos' : D.scores[i] < 0 ? 'neg' : '' })),
       };
     }
-    this.setData({ live, recent: s.history.slice(0, 5).map(matchRow), me: store.view(me.id) });
+    this.setData({ live, recent: s.history.filter(known).slice(0, 3).map(m => matchRow(m)), me: store.view(me.id) }); // 最近 3 场，每场一张大卡片
   },
   new2() { this.go(2); },
   new3() { this.go(3); },
@@ -83,14 +93,17 @@ Page({
     store.newDraft(mode, me ? [me.id] : []);
     nav.to('/pages/setup/setup');
   },
-  resume() { nav.to('/pages/score/score'); },
+  resume() { nav.to(liveUrl(store.get().live)); },
+  /** 斯诺克新对局 */
+  newSnk() { wx.vibrateShort({ type: 'light' }); store.snkDraft(); nav.to('/pages/snk-setup/snk-setup'); },
   soon() { wx.showToast({ title: '敬请期待', icon: 'none' }); },
   toStats() { wx.switchTab({ url: '/pages/stats/stats' }); },
+  toAll() { nav.to('/pages/history/history?seg=all&days=0'); },
   toMe() { wx.switchTab({ url: '/pages/me/me' }); },
   askDelete(e) {
     const id = e.currentTarget.dataset.id;
     ask(this, { icon: 'warn', title: '删除这场对局？', desc: '删除后战绩统计会同步更新，无法恢复。', actions: [{ k: 'del', t: '删除', type: 'danger' }] })
       .then(k => { if (k === 'del') { store.deleteMatch(id); this.load(); wx.showToast({ title: '已删除', icon: 'success' }); } });
   },
-  openMatch(e) { nav.to('/pages/result/result?id=' + e.currentTarget.dataset.id); },
+  openMatch(e) { const m = store.match(e.currentTarget.dataset.id); if (m) nav.to(resultUrl(m)); },
 });

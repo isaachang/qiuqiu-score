@@ -1,13 +1,13 @@
-// 左滑出现「删除」的列表行。同一时间只会有一行处于展开状态。
+// 左滑出现「删除」（edit 为真时是「编辑 + 删除」）的列表行。同一时间只会有一行处于展开状态。
 let opened = null;
 const BTN_RPX = 168;
 
 Component({
   options: { addGlobalClass: true, multipleSlots: true },
-  properties: { disabled: { type: Boolean, value: false } },
+  properties: { disabled: { type: Boolean, value: false }, round: { type: Boolean, value: false }, edit: { type: Boolean, value: false } }, // round：圆角卡片；edit：多一个「编辑」
   data: { x: 0, anim: true },
   lifetimes: {
-    attached() { const w = (wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()).windowWidth; this.W = w / 750 * BTN_RPX; },
+    attached() { const w = (wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()).windowWidth; this.W = w / 750 * BTN_RPX * (this.data.edit ? 2 : 1); },
     detached() { if (opened === this) opened = null; },
   },
   methods: {
@@ -40,5 +40,6 @@ Component({
       this.triggerEvent('tapbody');
     },
     del() { this.close(); this.triggerEvent('delete'); },
+    doEdit() { this.close(); this.triggerEvent('edit'); },
   },
 });

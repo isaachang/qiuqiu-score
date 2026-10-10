@@ -76,3 +76,6 @@
 /* 【临时测试】上线前删除 */
 .ltest{margin:0 32rpx 24rpx;padding:14rpx 0;text-align:center;border-radius:20rpx;border:2rpx dashed #F0444D;color:#F0444D;font-size:24rpx;font-weight:700}
 .ltest.sel{background:#F0444D;color:#fff;border-style:solid}
+
+/* 限时比赛放在选项第一个：它下面的那一行补一条分隔线 */
+.row.after-lim::before{content:"";position:absolute;top:0;left:32rpx;right:0;height:1rpx;background:var(--line)}

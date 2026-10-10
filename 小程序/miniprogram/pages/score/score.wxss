@@ -39,3 +39,7 @@
 .top-press{background:rgba(255,255,255,.14)}
 .top .odo{transition:transform .25s cubic-bezier(.3,1.4,.5,1)}
 .top-press .odo{transform:scale(.96)}
+
+/* 名字牌：三人局小一号；底栏 5 个按钮 */
+.trio .nmp{font-size:38rpx;padding:6rpx 22rpx;max-width:300rpx}
+.dock .db{width:132rpx}

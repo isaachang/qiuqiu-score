@@ -37,20 +37,7 @@
   </view>
   <view class="list">
     <view class="hc-wrap" wx:for="{{rows}}" wx:key="id" style="--d:{{index<8?index:8}}">
-      <swipe-row data-id="{{item.id}}" bind:tapbody="open" bind:delete="askDelete">
-        <view class="hc {{item.resK}}">
-          <view class="hct">
-            <view class="mode-ic m{{item.mode==='双人'?2:3}}">{{item.mode==='双人'?'2':'3'}}</view>
-            <text class="hcm">{{item.mode}}追分</text><text class="hcd">{{item.full}} · {{item.rounds}} 局</text>
-            <text class="res {{item.resK}}">{{item.resK==='W'?'胜利':item.resK==='L'?'失败':'平局'}}</text>
-          </view>
-          <view class="chips2">
-            <view wx:for="{{item.chips}}" wx:for-item="p" wx:key="id" class="pchip {{p.cls}}">
-              <text wx:if="{{p.me}}" class="metag">我</text><text class="pn">{{p.name}}</text><text class="ps num">{{p.s}}</text>
-            </view>
-          </view>
-        </view>
-      </swipe-row>
+      <swipe-row round data-id="{{item.id}}" bind:tapbody="open" bind:delete="askDelete"><match-card c="{{item.card}}"/></swipe-row>
     </view>
   </view>
   <view style="height:80rpx"></view>

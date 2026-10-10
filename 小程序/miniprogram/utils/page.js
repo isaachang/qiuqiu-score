@@ -41,10 +41,13 @@ function countUp(page, key, text, ms = 700) {
     page.setData({ [key]: (v ? sign : '') + v + suf });
     if (k >= steps) { clearInterval(t); page.setData({ [key]: text }); }
   }, ms / steps);
+  (page._cu || (page._cu = [])).push(t);
 }
+/** 停掉页面上还在滚的数字（重新渲染前调用，否则旧动画会把旧数字写回去） */
+function stopCountUp(page) { (page._cu || []).forEach(clearInterval); page._cu = []; }
 /** 弹出面板时把 Tab 滑走，关闭后滑回（只对有 Tab 的页面生效） */
 function tabBar(page, visible) {
   const tb = typeof page.getTabBar === 'function' && page.getTabBar();
   if (tb && tb.data.hidden === visible) tb.setData({ hidden: !visible });
 }
-module.exports = { enter, onScroll, countUp, tabBar };
+module.exports = { enter, onScroll, countUp, stopCountUp, tabBar };

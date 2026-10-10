@@ -63,7 +63,7 @@ const signed = v => (v > 0 ? '+' + v : v < 0 ? '−' + Math.abs(v) : '0');
 function isDraw(sc) { const max = Math.max(...sc); return max <= 0 || sc.filter(x => x === max).length > 1; }
 /** 某人这场的结果：W 胜（唯一最高且为正）/ L 负（净分为负）/ D 平 */
 function outcome(sc, i) { const my = sc[i]; if (my === Math.max(...sc) && my > 0 && !isDraw(sc)) return 'W'; return my < 0 ? 'L' : 'D'; }
-/** 实际打球时长（毫秒）：扣掉自动保存后又「继续这局」中间空着的时间 */
-function played(m, now) { return Math.max(0, (m.end || now || Date.now()) - m.start - (m.idle || 0)); }
+/** 实际打球时长（毫秒）：扣掉自动保存后「继续这局」中间空着的时间，以及暂停的时间（暂停中按暂停那一刻算） */
+function played(m, now) { return Math.max(0, (m.end || m.pauseAt || now || Date.now()) - m.start - (m.idle || 0)); }
 
 module.exports = { EV, MAIN, CHIPS, DEFAULT_RULES, PAY, FOULTO, derive, signed, isDraw, outcome, played };

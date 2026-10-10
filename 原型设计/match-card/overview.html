@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>球球记分 · 对局卡片 · 方案 A</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#F6F4F0;--card:#fff;--card2:#EEECE7;--tx:#16161A;--tx2:#6B6B73;--tx3:#A9A9B0;--line:rgba(20,20,30,.08);--ink:#16161A;--pos:#13B57A;--neg:#F0444D;
+  --A:#FF5A5F;--B:#3D7BFF;--C:#FFC53D}
+body{width:1660px;font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;color:var(--tx);-webkit-font-smoothing:antialiased;background:#EFECE6}
+.num{font-family:"DIN Alternate","SF Pro Rounded",-apple-system,sans-serif;font-variant-numeric:tabular-nums}
+.board{position:relative;overflow:hidden;padding:72px 80px 80px;background:var(--bg)}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);opacity:.42}
+.hd{display:flex;align-items:center;gap:24px;margin-bottom:56px;position:relative}
+.hd .ic{width:84px;height:84px;border-radius:24px;background:linear-gradient(135deg,#FF5A5F,#FF8A3D);box-shadow:0 18px 36px -14px rgba(255,90,95,.6);display:flex;align-items:center;justify-content:center;color:#fff;font-size:40px;font-weight:900}
+.hd h1{font-size:56px;font-weight:900;letter-spacing:-.02em}
+.hd p{font-size:22px;color:var(--tx2);font-weight:600;margin-top:10px}
+.row{display:flex;gap:70px;align-items:flex-start;position:relative}
+.cap{margin-top:24px}
+.cap .t{display:flex;align-items:center;gap:12px;font-size:23px;font-weight:900}
+.cap .n{width:34px;height:34px;border-radius:50%;background:var(--ink);color:#fff;font-size:17px;display:flex;align-items:center;justify-content:center}
+.cap .d{font-size:16px;color:var(--tx2);margin-top:10px;line-height:1.65;max-width:410px}
+
+/* 手机 */
+.ph{width:410px;border-radius:60px;padding:10px;background:linear-gradient(145deg,#2A2A2E,#0C0C0E 40%,#1C1C20);box-shadow:0 0 0 1.5px #3A3A40 inset,0 50px 90px -40px rgba(40,24,10,.55);flex:none}
+.sc{position:relative;width:390px;height:844px;border-radius:50px;overflow:hidden;background:var(--bg)}
+.di{position:absolute;left:50%;top:11px;width:122px;height:35px;margin-left:-61px;border-radius:20px;background:#000;z-index:50}
+.sb{height:47px;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 42px;font-size:17px;font-weight:700}
+.capx{position:absolute;right:7px;top:51px;width:87px;height:32px;border-radius:16px;background:rgba(255,255,255,.65);box-shadow:inset 0 0 0 .5px rgba(0,0,0,.14);display:flex;align-items:center;z-index:40}
+.capx>span{flex:1;display:flex;align-items:center;justify-content:center;gap:3px}
+.capx i{width:.5px;height:18px;background:rgba(0,0,0,.18)}
+.capx .d3 b{width:5px;height:5px;border-radius:50%;background:#000}
+.capx .rg{flex:none;width:15px;height:15px;border-radius:50%;box-shadow:inset 0 0 0 2px #000;display:flex;align-items:center;justify-content:center}
+.capx .rg b{width:6px;height:6px;border-radius:50%;background:#000}
+.hi{position:absolute;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:#000;z-index:60}
+.pad{padding:0 12px}
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin:20px 4px 10px;font-size:17px;font-weight:800}
+.sec small{font-size:13px;color:var(--tx2);font-weight:600}
+.tab{position:absolute;left:20px;right:20px;bottom:24px;height:62px;border-radius:31px;display:flex;align-items:center;padding:5px;z-index:30;
+  background:linear-gradient(135deg,rgba(255,255,255,.82),rgba(255,255,255,.55));backdrop-filter:blur(14px);box-shadow:inset 0 1px 0 #fff,0 12px 28px -12px rgba(40,30,20,.36)}
+.tab div{flex:1;height:52px;border-radius:26px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#4A4A52}
+.tab div.on{background:#fff;color:#FF5A5F;box-shadow:0 6px 14px -6px rgba(0,0,0,.2)}
+
+/* ---------- 对局卡片 ---------- */
+.mc{background:var(--card);border-radius:24px;padding:12px 14px 14px;box-shadow:0 12px 30px -16px rgba(60,40,20,.3);position:relative;overflow:hidden}
+.mc+.mc{margin-top:10px}
+.mt{display:flex;align-items:center;justify-content:space-between}
+.tag{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:var(--tx2)}
+.tag i{width:8px;height:8px;border-radius:50%}
+.tag b{color:var(--tx)}
+.when{font-size:12px;color:var(--tx3);font-weight:700}
+.vs2{display:flex;align-items:center;margin-top:10px}
+.pp{width:92px;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative}
+.av{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:19px;flex:none}
+.pp .nm{font-size:13px;font-weight:800;max-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pp.lose .av{opacity:.55;filter:saturate(.6)}
+.pp.lose .nm{color:var(--tx2)}
+.won{position:absolute;top:-6px;right:12px;font-size:12px;font-weight:900;color:#fff;padding:2px 7px;border-radius:9px;transform:rotate(12deg);box-shadow:0 6px 12px -6px rgba(0,0,0,.4)}
+.mid{flex:1;display:flex;flex-direction:column;align-items:center}
+.big{font-size:40px;font-weight:900;line-height:1;letter-spacing:-.01em}
+.big .w{color:var(--tx)}.big .l{color:var(--tx3)}
+.big .c{font-size:28px;color:var(--tx3);margin:0 8px;vertical-align:4px}
+.cmp2{display:flex;align-items:stretch;height:24px;margin-top:9px;border-radius:12px;overflow:hidden;font-size:12px;font-weight:900}
+.cmp2 span{display:flex;align-items:center;justify-content:center;padding:0 10px;min-width:34px}
+.cmp2 .lb{background:#F0EEE9;color:var(--tx2);font-weight:800}
+.sub{font-size:11px;color:var(--tx2);font-weight:700;margin-top:8px}
+.net{font-size:30px;font-weight:900;line-height:1}
+.net .pos{color:var(--pos)}.net .neg{color:var(--neg)}
+.tri{display:grid;grid-template-columns:repeat(3,1fr);margin-top:10px}
+.tri .pp{width:auto}
+.tri .s{font-size:26px;font-weight:900;line-height:1;margin-top:2px}
+.tri .crown{position:absolute;top:-12px;font-size:16px}
+.foot{display:flex;justify-content:center;margin-top:10px}
+.pill{font-size:11px;font-weight:800;color:var(--tx2);padding:4px 10px;border-radius:999px;background:#F0EEE9}
+.swipe{position:absolute;right:0;top:0;bottom:0;width:6px;border-radius:0 24px 24px 0}
+
+/* 放大的结构说明 */
+.anat{width:520px;flex:none}
+.anat .mc{transform-origin:top left;overflow:visible}
+.note{position:relative;margin-top:14px;font-size:15px;line-height:1.7;color:#3A3A42}
+.note b{color:var(--tx)}
+.lbl{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#FF5A5F;color:#fff;font-size:12px;font-weight:900;margin-right:6px;vertical-align:1px}
+.big3 .mc{padding:18px 20px 20px;border-radius:30px}
+.big3 .av{width:60px;height:60px;font-size:23px}
+.big3 .pp{width:110px}
+.big3 .big{font-size:50px}
+.big3 .net{font-size:38px}
+.big3 .tri .s{font-size:32px}
+.dot{position:absolute;width:22px;height:22px;border-radius:50%;background:#FF5A5F;color:#fff;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #fff;z-index:5}
+
+.cal{display:flex;gap:6px;margin:8px 0 6px}
+.cal div{flex:1;height:56px;border-radius:16px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:var(--tx2);font-weight:700}
+.cal div b{font-size:17px;color:var(--tx);margin-top:2px}
+.cal div.on{background:var(--ink);color:rgba(255,255,255,.7)}.cal div.on b{color:#fff}
+.dayh{display:flex;justify-content:space-between;align-items:baseline;margin:14px 4px 8px;font-size:16px;font-weight:900}
+.dayh small{font-size:12px;color:var(--tx2)}
+</style>
+</head>
+<body>
+<div class="board">
+  <div class="blob" style="background:#FF5A5F;width:600px;height:600px;left:-200px;top:-260px"></div>
+  <div class="blob" style="background:#1FA86A;width:520px;height:520px;right:-120px;top:-160px"></div>
+  <div class="blob" style="background:#3D7BFF;width:560px;height:560px;left:900px;bottom:-300px"></div>
+  <div class="hd"><div class="ic">A</div><div><h1>对局卡片 · 方案 A</h1><p>首页最近对局改成 3 张一样大的卡片；同一张卡片在历史日历、交手详情里复用</p></div></div>
+
+  <div class="row">
+    <!-- ① 首页 -->
+    <div>
+      <div class="ph"><div class="sc">
+        <div class="di"></div>
+        <div class="sb"><span>9:41</span><span style="font-size:13px">●●●  ▮</span></div>
+        <div class="capx"><span class="d3"><b></b><b></b><b></b></span><i></i><span><span class="rg"><b></b></span></span></div>
+        <div class="pad" style="padding-top:44px">
+          <div class="sec" style="margin-top:0">更多玩法<small>持续上新</small></div>
+          <div style="display:flex;gap:8px">
+            <div style="flex:1;height:86px;border-radius:22px;background:linear-gradient(150deg,#2BC07E,#14875A);color:#fff;padding:12px;font-weight:900;font-size:15px;display:flex;flex-direction:column;justify-content:flex-end;box-shadow:0 14px 24px -14px rgba(20,135,90,.75)">斯诺克<span style="font-size:11px;opacity:.9">开始记分 ›</span></div>
+            <div style="flex:1;height:86px;border-radius:22px;background:linear-gradient(150deg,#FFC14A,#FF8A3D);color:#fff;padding:12px;font-weight:900;font-size:15px;display:flex;flex-direction:column;justify-content:flex-end;box-shadow:0 14px 24px -14px rgba(255,138,61,.7)">中式八球<span style="font-size:11px;opacity:.85">即将上线</span></div>
+            <div style="flex:1;height:86px;border-radius:22px;background:linear-gradient(150deg,#AE88FF,#7650E6);color:#fff;padding:12px;font-weight:900;font-size:15px;display:flex;flex-direction:column;justify-content:flex-end;box-shadow:0 14px 24px -14px rgba(118,80,230,.7)">九球抢局<span style="font-size:11px;opacity:.85">即将上线</span></div>
+          </div>
+          <div class="sec">最近对局<small>左滑可删除 · 查看全部 ›</small></div>
+
+          <div class="mc">
+            <div class="mt"><span class="tag"><i style="background:#1FA86A"></i><b>斯诺克</b> · 5 局 3 胜 · 48 分钟</span><span class="when">今天 21:40</span></div>
+            <div class="vs2">
+              <div class="pp"><span class="won" style="background:var(--A)">胜</span><div class="av" style="background:var(--A)">I</div><span class="nm">Isaac</span></div>
+              <div class="mid"><div class="big num"><span class="w">3</span><span class="c">:</span><span class="l">1</span></div>
+                <div class="cmp2"><span style="background:var(--A);color:#fff">52</span><span class="lb">单杆最高</span><span style="background:var(--B);color:#fff">31</span></div></div>
+              <div class="pp lose"><div class="av" style="background:var(--B)">H</div><span class="nm">Henry</span></div>
+            </div>
+          </div>
+
+          <div class="mc">
+            <div class="mt"><span class="tag"><i style="background:#FF5A5F"></i><b>双人追分</b> · 24 局 · 36 分钟</span><span class="when">昨天 21:23</span></div>
+            <div class="vs2">
+              <div class="pp lose"><div class="av" style="background:var(--A)">I</div><span class="nm">Isaac</span></div>
+              <div class="mid"><div class="net num"><span class="neg">−11</span><span style="color:var(--tx3);font-size:22px;margin:0 8px;vertical-align:3px">:</span><span class="pos">+11</span></div>
+                <div class="cmp2"><span style="background:var(--A);color:#fff">2</span><span class="lb">金球</span><span style="background:var(--B);color:#fff">4</span></div></div>
+              <div class="pp"><span class="won" style="background:var(--B)">胜</span><div class="av" style="background:var(--B)">H</div><span class="nm">Henry</span></div>
+            </div>
+          </div>
+
+          <div class="mc">
+            <div class="mt"><span class="tag"><i style="background:#3D7BFF"></i><b>三人追分</b> · 28 局 · 1 小时 12 分</span><span class="when">10月7日</span></div>
+            <div class="tri">
+              <div class="pp"><span class="won" style="background:var(--A);right:28%">胜</span><div class="av" style="background:var(--A)">I</div><span class="nm">Isaac</span><span class="s num" style="color:var(--pos)">+25</span></div>
+              <div class="pp lose"><div class="av" style="background:var(--B)">H</div><span class="nm">Henry</span><span class="s num" style="color:var(--neg)">−44</span></div>
+              <div class="pp lose"><div class="av" style="background:var(--C)">H</div><span class="nm">Hugo</span><span class="s num" style="color:var(--pos)">+19</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="tab"><div class="on">开火</div><div>战绩</div><div>我的</div></div>
+        <div class="hi"></div>
+      </div></div>
+      <div class="cap"><div class="t"><span class="n">1</span>首页 · 最近 3 场</div>
+        <div class="d">从 5 条小行改成 3 张大卡片，打完回来一眼看到胜负。点卡片进战报，左滑删除；「查看全部」进历史日历。</div></div>
+    </div>
+
+    <!-- ② 三种卡片的结构 -->
+    <div class="anat big3">
+      <div style="font-size:24px;font-weight:900;margin-bottom:16px">三种卡片，一个组件</div>
+      <div class="mc" style="position:relative">
+        <span class="dot" style="left:-10px;top:10px">1</span>
+        <div class="mt"><span class="tag" style="font-size:14px"><i style="background:#1FA86A"></i><b>斯诺克</b> · 5 局 3 胜 · 48 分钟</span><span class="when" style="font-size:14px">今天 21:40</span></div>
+        <div class="vs2" style="margin-top:14px">
+          <div class="pp"><span class="dot" style="left:-6px;top:-4px">2</span><span class="won" style="background:var(--A);right:14px">胜</span><div class="av" style="background:var(--A)">I</div><span class="nm" style="font-size:15px">Isaac</span></div>
+          <div class="mid" style="position:relative"><span class="dot" style="left:50%;margin-left:-70px;top:-4px">3</span><div class="big num"><span class="w">3</span><span class="c">:</span><span class="l">1</span></div>
+            <div class="cmp2" style="height:28px;font-size:14px;position:relative"><span style="background:var(--A);color:#fff">52</span><span class="lb">单杆最高</span><span style="background:var(--B);color:#fff">31</span></div></div>
+          <div class="pp lose"><div class="av" style="background:var(--B)">H</div><span class="nm" style="font-size:15px">Henry</span></div>
+        </div>
+      </div>
+      <div class="note"><span class="lbl">1</span><b>顶部一行</b>：玩法色点 + 玩法 · 赛制 / 局数 · 用时；右边是日期<br>
+        <span class="lbl">2</span><b>赢家</b>：头像右上角盖一个「胜」字章（赢家的颜色），输的一方头像和名字变淡<br>
+        <span class="lbl">3</span><b>中间</b>：斯诺克是局分 + 「单杆最高」对比条；双人追分是净胜分 + 「金球」对比条</div>
+
+      <div class="mc" style="margin-top:26px">
+        <div class="mt"><span class="tag" style="font-size:14px"><i style="background:#3D7BFF"></i><b>三人追分</b> · 28 局 · 1 小时 12 分</span><span class="when" style="font-size:14px">10月7日</span></div>
+        <div class="tri" style="margin-top:14px">
+          <div class="pp"><span class="won" style="background:var(--A);right:30%">胜</span><div class="av" style="background:var(--A)">I</div><span class="nm" style="font-size:15px">Isaac</span><span class="s num" style="color:var(--pos)">+25</span></div>
+          <div class="pp lose"><div class="av" style="background:var(--B)">H</div><span class="nm" style="font-size:15px">Henry</span><span class="s num" style="color:var(--neg)">−44</span></div>
+          <div class="pp lose"><div class="av" style="background:var(--C)">H</div><span class="nm" style="font-size:15px">Hugo</span><span class="s num" style="color:var(--pos)">+19</span></div>
+        </div>
+      </div>
+      <div class="note"><b>三人局</b>放不下左右对站，改成三列并排：头像、名字、净分；赢家盖「胜」字章，其余两人变淡</div>
+
+      <div class="mc" style="margin-top:26px">
+        <div class="mt"><span class="tag" style="font-size:14px"><i style="background:#1FA86A"></i><b>斯诺克</b> · 单局 · 22 分钟</span><span class="when" style="font-size:14px">10月6日</span></div>
+        <div class="vs2" style="margin-top:14px">
+          <div class="pp"><div class="av" style="background:var(--A)">I</div><span class="nm" style="font-size:15px">Isaac</span></div>
+          <div class="mid"><div class="big num"><span class="w">0</span><span class="c">:</span><span class="w">0</span></div><div class="sub" style="font-size:13px">提前结束 · 未分胜负</div></div>
+          <div class="pp"><div class="av" style="background:var(--B)">H</div><span class="nm" style="font-size:15px">Henry</span></div>
+        </div>
+      </div>
+      <div class="note"><b>平局 / 未分胜负</b>：不盖章，双方都不变淡</div>
+    </div>
+
+    <!-- ③ 历史日历复用 -->
+    <div>
+      <div class="ph"><div class="sc">
+        <div class="di"></div>
+        <div class="sb"><span>9:41</span><span style="font-size:13px">●●●  ▮</span></div>
+        <div class="capx"><span class="d3"><b></b><b></b><b></b></span><i></i><span><span class="rg"><b></b></span></span></div>
+        <div style="height:44px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700">全部对局</div>
+        <div class="pad">
+          <div class="cal"><div>日<b>4</b></div><div>一<b>5</b></div><div>二<b>6</b></div><div>三<b>7</b></div><div>四<b>8</b></div><div class="on">五<b>9</b></div><div>六<b>10</b></div></div>
+          <div class="dayh">10月9日 周五<small>2 场 · 1 胜 1 负</small></div>
+          <div class="mc">
+            <div class="mt"><span class="tag"><i style="background:#1FA86A"></i><b>斯诺克</b> · 5 局 3 胜 · 48 分钟</span><span class="when">21:40</span></div>
+            <div class="vs2">
+              <div class="pp"><span class="won" style="background:var(--A)">胜</span><div class="av" style="background:var(--A)">I</div><span class="nm">Isaac</span></div>
+              <div class="mid"><div class="big num"><span class="w">3</span><span class="c">:</span><span class="l">1</span></div>
+                <div class="cmp2"><span style="background:var(--A);color:#fff">52</span><span class="lb">单杆最高</span><span style="background:var(--B);color:#fff">31</span></div></div>
+              <div class="pp lose"><div class="av" style="background:var(--B)">H</div><span class="nm">Henry</span></div>
+            </div>
+          </div>
+          <div class="mc">
+            <div class="mt"><span class="tag"><i style="background:#FF5A5F"></i><b>双人追分</b> · 18 局 · 27 分钟</span><span class="when">19:26</span></div>
+            <div class="vs2">
+              <div class="pp lose"><div class="av" style="background:var(--A)">I</div><span class="nm">Isaac</span></div>
+              <div class="mid"><div class="net num"><span class="neg">−20</span><span style="color:var(--tx3);font-size:22px;margin:0 8px;vertical-align:3px">:</span><span class="pos">+20</span></div>
+                <div class="cmp2"><span style="background:var(--A);color:#fff">1</span><span class="lb">金球</span><span style="background:var(--C);color:#fff">3</span></div></div>
+              <div class="pp"><span class="won" style="background:var(--C)">胜</span><div class="av" style="background:var(--C)">H</div><span class="nm">Hugo</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="hi"></div>
+      </div></div>
+      <div class="cap"><div class="t"><span class="n">3</span>历史日历 · 同一张卡</div>
+        <div class="d">点某一天，下面列出当天的对局，用的是和首页一模一样的卡片。以后的交手详情也用它。</div></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,6 +1,6 @@
 // 当前运行的是哪个版本：develop 开发版（预览码 / 开发者工具）、trial 体验版、release 正式版
 // 开发版：自动载入演示数据、显示测试按钮；体验版 / 正式版：都没有
-const VERSION = '0.3.0';
+const VERSION = '0.4.0';
 
 // 【临时】在开发版里模拟体验版：预览码打开后和朋友看到的一样，并且用一份全新的空白数据（不动开发数据）
 // 看完改回 ''
@@ -13,6 +13,11 @@ function envVersion() { return simulating() ? SIMULATE : realEnv(); }
 const isDev = () => envVersion() === 'develop';
 /** 「我的」里显示的版本 */
 const versionText = () => (isDev() ? '开发版 ' : '内测版 ') + VERSION;
-/** 本地存储的 key 前缀：模拟时用另一套，等于全新安装 */
-const keyPrefix = () => (simulating() ? 'sim_' : '');
+/**
+ * 本地存储的 key 前缀：
+ * - 开发版用 dev_ 一套：同一台手机上开发版和体验版的本地数据可能是共用的，
+ *   开发版写进去的新数据（比如斯诺克对局）会让还没更新的体验版显示出错，所以彻底分开
+ * - 模拟体验版用 sim_ 一套，等于全新安装
+ */
+const keyPrefix = () => (simulating() ? 'sim_' : realEnv() === 'develop' ? 'dev_' : '');
 module.exports = { VERSION, envVersion, isDev, versionText, keyPrefix, simulating };

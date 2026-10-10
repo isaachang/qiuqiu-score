@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>球球记分 · 斯诺克 · 可交互原型</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#F6F4F0;--card:#fff;--card2:#EEECE7;--tx:#16161A;--tx2:#6B6B73;--tx3:#A9A9B0;--line:rgba(20,20,30,.08);
+  --ink:#16161A;--pos:#13B57A;--neg:#F0444D;--spring:cubic-bezier(.3,1.4,.5,1);
+}
+html,body{height:100%}
+body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;color:var(--tx);-webkit-font-smoothing:antialiased;background:#E9E5DE;overflow:hidden;user-select:none}
+.num{font-family:"DIN Alternate","SF Pro Rounded",-apple-system,sans-serif;font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+
+/* ---------- 外层：演示面板 + 手机 ---------- */
+.wrap{height:100%;display:flex}
+.panel{width:320px;flex:none;padding:28px 24px;overflow:auto;background:rgba(255,255,255,.55);border-right:1px solid rgba(0,0,0,.05);display:flex;flex-direction:column;gap:18px}
+.panel h1{font-size:22px;font-weight:900;display:flex;align-items:center;gap:10px}
+.panel h1 img{width:36px;height:36px;border-radius:10px}
+.panel p{font-size:13px;color:var(--tx2);line-height:1.6}
+.panel h2{font-size:13px;font-weight:900;color:var(--tx3);letter-spacing:.04em}
+.qa{display:flex;flex-direction:column;gap:8px}
+.qa button{height:42px;border-radius:14px;background:#fff;font-size:14px;font-weight:800;text-align:left;padding:0 14px;box-shadow:0 6px 16px -10px rgba(0,0,0,.3);transition:transform .2s var(--spring)}
+.qa button:active{transform:scale(.96)}
+.qa button.dk{background:var(--ink);color:#fff}
+.how{font-size:13px;line-height:1.7;color:#3A3A42}
+.how b{color:var(--tx)}
+.kbd{display:inline-block;font-size:12px;font-weight:900;padding:0 7px;border-radius:6px;background:#fff;box-shadow:0 1px 0 rgba(0,0,0,.08)}
+.evlog{font:12px/1.6 ui-monospace,Menlo,monospace;color:#4A4A52;background:#fff;border-radius:14px;padding:10px 12px;min-height:80px;max-height:240px;overflow:auto;white-space:pre}
+.stage{flex:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.stage .bgs{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.stage .bg{position:absolute;border-radius:50%;filter:blur(90px);opacity:.45}
+.holder{position:relative;flex:none}
+.holder>.ph{transform-origin:0 0;position:absolute;left:0;top:0}
+/* 手机 / 窄屏：演示面板变成顶部一排横向滑动的按钮 */
+@media (max-width:900px){
+  .wrap{flex-direction:column}
+  .panel{width:auto;flex-direction:row;align-items:center;padding:10px 12px;gap:8px;overflow-x:auto;border-right:0;border-bottom:1px solid rgba(0,0,0,.05);-webkit-overflow-scrolling:touch}
+  .panel h1,.panel p,.panel h2,.panel .how,.panel .evlog{display:none}
+  .qa{flex-direction:row;gap:8px}
+  .qa button{white-space:nowrap;height:36px;font-size:13px;padding:0 12px;flex:none}
+  .stage{min-height:0}
+}
+
+/* ---------- 手机 ---------- */
+.ph{border-radius:60px;padding:10px;background:linear-gradient(145deg,#2A2A2E,#0C0C0E 40%,#1C1C20);box-shadow:0 0 0 1.5px #3A3A40 inset,0 50px 90px -40px rgba(40,24,10,.55);transition:width .5s var(--spring),height .5s var(--spring)}
+.sc{position:relative;border-radius:50px;overflow:hidden;background:var(--bg)}
+#content{position:absolute;inset:0;display:flex;flex-direction:column}
+#fx{position:absolute;inset:0;pointer-events:none;z-index:70}
+.still{animation:none!important}
+.portrait .sc{width:390px;height:844px}
+.landscape .sc{width:844px;height:390px}
+.di{position:absolute;background:#000;border-radius:20px;z-index:90}
+.portrait .di{left:50%;top:11px;width:122px;height:35px;margin-left:-61px}
+.landscape .di{top:50%;left:11px;width:35px;height:122px;margin-top:-61px}
+.sb{height:47px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 42px;font-size:17px;font-weight:700}
+.landscape .sb{display:none}
+.capx{position:absolute;right:7px;top:51px;width:87px;height:32px;border-radius:16px;background:rgba(255,255,255,.65);box-shadow:inset 0 0 0 .5px rgba(0,0,0,.14);display:flex;align-items:center;z-index:80}
+.landscape .capx{top:10px;right:54px}
+.capx>span{flex:1;display:flex;align-items:center;justify-content:center;gap:3px}
+.capx i{width:.5px;height:18px;background:rgba(0,0,0,.18)}
+.capx .d3 b{width:5px;height:5px;border-radius:50%;background:#000}
+.capx .rg{flex:none;width:15px;height:15px;border-radius:50%;box-shadow:inset 0 0 0 2px #000;display:flex;align-items:center;justify-content:center}
+.capx .rg b{width:6px;height:6px;border-radius:50%;background:#000}
+.hi{position:absolute;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:#000;z-index:95;pointer-events:none}
+.view{flex:1;min-height:0;display:flex;flex-direction:column;position:relative}
+.nav{height:44px;flex:none;display:flex;align-items:center;position:relative;padding:0 14px}
+.nav .bk{width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:500;border-radius:50%}
+.nav .tt{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.nav .t1{font-size:17px;font-weight:700}
+.nav .t2{font-size:11px;color:var(--tx2)}
+.card{background:var(--card);border-radius:22px;box-shadow:0 10px 28px -14px rgba(60,40,20,.28)}
+.av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;flex:none;color:#fff}
+.av.sm{width:26px;height:26px;font-size:12px}
+.btn{height:52px;border-radius:26px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;width:100%;transition:transform .25s var(--spring)}
+.btn:active{transform:scale(.96)}
+.btn.pri{background:var(--ink);color:#fff}
+.btn.soft{background:#F0EEE9}
+.btn.red{background:#F0EEE9;color:#E5383B}
+.press{transition:transform .25s var(--spring)}
+.press:active{transform:scale(.95)}
+
+/* 球 */
+.ball{border-radius:50%;flex:none;position:relative;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;
+  background:radial-gradient(circle at 34% 28%,rgba(255,255,255,.85) 0 8%,transparent 22%),radial-gradient(circle at 60% 72%,transparent 40%,rgba(0,0,0,.35) 100%),var(--bc);
+  box-shadow:0 8px 14px -6px rgba(0,0,0,.4);text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.ball.y{color:#5A4200;text-shadow:none}.ball.p{color:#7A1F45;text-shadow:none}
+
+/* ---------- 首页 ---------- */
+.home{padding:40px 12px 0;display:flex;flex-direction:column;gap:10px}
+.large{display:flex;align-items:flex-end;justify-content:space-between;padding:8px 10px 2px}
+.large .g{font-size:13px;color:var(--tx2)}
+.large .t{font-size:32px;font-weight:900;margin-top:2px}
+.snk{height:150px;border-radius:26px;position:relative;overflow:hidden;color:#fff;padding:16px;background:linear-gradient(135deg,#1FA86A,#17855A);box-shadow:0 18px 34px -16px rgba(23,133,90,.7);cursor:pointer;transition:transform .3s var(--spring)}
+.snk:active{transform:scale(.97)}
+.snk .felt{position:absolute;inset:0;background:radial-gradient(circle at 80% 30%,rgba(255,255,255,.18),transparent 55%)}
+.snk .t{position:absolute;left:16px;bottom:44px;font-size:26px;font-weight:900}
+.snk .sub{position:absolute;left:16px;bottom:18px;font-size:12px;font-weight:700;opacity:.92}
+.snk .new{position:absolute;left:16px;top:16px;font-size:11px;font-weight:900;padding:3px 9px;border-radius:999px;background:#fff;color:#17855A}
+.snk .ball{position:absolute;animation:bob 4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-6px) rotate(8deg)}}
+.modes{display:flex;gap:10px}
+.mode{flex:1;height:118px;border-radius:24px;position:relative;overflow:hidden;color:#fff;padding:14px;cursor:pointer}
+.mode b{position:absolute;left:14px;bottom:30px;font-size:19px;font-weight:900}
+.mode span{position:absolute;left:14px;bottom:12px;font-size:11px;font-weight:700;opacity:.9}
+.live{padding:12px 14px;cursor:pointer}
+.live .lh{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--tx2);font-weight:700}
+.live .lh .dt{width:10px;height:10px;border-radius:50%;background:#22C993;box-shadow:0 0 0 4px #22C99333}
+.live .lh .go{margin-left:auto;font-size:12px;font-weight:800;color:#fff;background:var(--ink);padding:5px 11px;border-radius:999px}
+.live .lg{display:flex;align-items:center;justify-content:space-around;margin-top:12px}
+.live .lp{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--tx2)}
+.live .lp b{font-size:20px;color:var(--tx);font-weight:900}
+.live .vs{font-size:12px;color:var(--tx3);font-weight:800;text-align:center}
+.live .vs b{display:block;font-size:24px;color:var(--tx);font-weight:900}
+.tab{position:absolute;left:20px;right:20px;bottom:24px;height:62px;border-radius:31px;display:flex;align-items:center;padding:5px;z-index:30;
+  background:linear-gradient(135deg,rgba(255,255,255,.8),rgba(255,255,255,.5));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:inset 0 1px 0 #fff,0 12px 28px -12px rgba(40,30,20,.36)}
+.tab div{flex:1;height:52px;border-radius:26px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#4A4A52}
+.tab div.on{background:#fff;color:#FF5A5F;box-shadow:0 6px 14px -6px rgba(0,0,0,.2)}
+
+/* ---------- 设置 ---------- */
+.setup{flex:1;overflow:auto;padding:6px 12px 110px;display:flex;flex-direction:column;gap:10px}
+.sl{font-size:15px;font-weight:900;display:flex;justify-content:space-between;align-items:baseline;padding:6px 4px 0}
+.sl small{font-size:12px;color:var(--tx2);font-weight:600}
+.slot2{display:flex;align-items:center;gap:12px;padding:12px 14px;position:relative}
+.slot2+.slot2::before{content:"";position:absolute;left:62px;right:0;top:0;height:1px;background:var(--line)}
+.slot2 .nm{flex:1;font-size:16px;font-weight:700}
+.slot2 .brk{font-size:12px;font-weight:900;padding:5px 11px;border-radius:999px;background:#F0EEE9;color:var(--tx2);cursor:pointer;transition:all .25s}
+.slot2 .brk.on{background:var(--ink);color:#fff}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{height:38px;padding:0 13px;border-radius:12px;background:#F0EEE9;display:flex;align-items:center;font-size:13px;font-weight:800;color:var(--tx2);cursor:pointer;transition:background .2s,color .2s,transform .25s var(--spring)}
+.chip:active{transform:scale(.94)}
+.chip.on{background:var(--ink);color:#fff}
+.rowx{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;font-size:15px;font-weight:600;position:relative}
+.rowx+.rowx::before{content:"";position:absolute;left:14px;right:0;top:0;height:1px;background:var(--line)}
+.rowx small{display:block;font-size:11px;color:var(--tx2);font-weight:600;margin-top:2px}
+.tg{width:46px;height:28px;border-radius:14px;background:#E5E5EA;position:relative;cursor:pointer;transition:background .25s}
+.tg::after{content:"";position:absolute;left:2px;top:2px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.18);transition:left .3s var(--spring)}
+.tg.on{background:#22C993}.tg.on::after{left:20px}
+.cta{position:absolute;left:12px;right:12px;bottom:30px}
+
+/* ---------- 记分（竖屏） ---------- */
+.body{flex:1;min-height:0;padding:6px 12px 0;display:flex;flex-direction:column;gap:10px}
+.mstrip{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:18px}
+.mstrip .pn{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800}
+.mstrip .fs{display:flex;flex-direction:column;align-items:center}
+.mstrip .fs b{font-size:24px;font-weight:900;line-height:1}
+.mstrip .fs span{font-size:10px;color:var(--tx2);margin-top:3px;font-weight:700}
+.pls{display:flex;gap:10px}
+.pl{flex:1;border-radius:24px;padding:14px 14px 12px;position:relative;overflow:hidden;min-height:172px;display:flex;flex-direction:column;transition:background .35s,color .35s,box-shadow .35s}
+.pl .h{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:900}
+.pl .st{font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;margin-left:auto;transition:all .3s}
+.pl .s{font-size:64px;font-weight:900;line-height:1;margin:14px 0 auto;letter-spacing:-.02em;display:inline-block;transform-origin:left center}
+.pl .s.bump{animation:bump .45s var(--spring)}
+@keyframes bump{30%{transform:scale(1.14)}}
+.pl .bk{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800;margin-top:10px;min-height:16px}
+.dots{display:flex;gap:3px;flex-wrap:wrap}
+.dots i{width:10px;height:10px;border-radius:50%;display:block;box-shadow:inset 0 -1px 2px rgba(0,0,0,.25)}
+.pl.on{color:#fff}
+.pl.on .st{background:#fff}
+.pl.off{background:var(--card);box-shadow:0 10px 28px -14px rgba(60,40,20,.25)}
+.pl.off .st{background:var(--card2);color:var(--tx2)}
+.pl.off .bk{color:var(--tx2)}
+.info{display:flex;padding:10px 4px}
+.info>div{flex:1;text-align:center;position:relative}
+.info>div+div::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:1px;background:var(--line)}
+.info b{display:block;font-size:22px;font-weight:900;line-height:1.1}
+.info span{display:block;font-size:11px;color:var(--tx2);margin-top:3px;font-weight:700}
+.ask{display:flex;align-items:center;justify-content:space-between;padding:2px 4px 0}
+.ask b{font-size:15px;font-weight:900}
+.ask .nx{font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px;background:var(--ink);color:#fff;display:flex;align-items:center;gap:6px}
+.ask .nx.free{background:#9B6BFF}
+.ask .nx i{width:10px;height:10px;border-radius:50%;display:block}
+.redbtn{height:76px;border-radius:24px;background:var(--card);display:flex;align-items:center;gap:14px;padding:0 18px;box-shadow:0 10px 28px -14px rgba(60,40,20,.28);position:relative;cursor:pointer;transition:transform .25s var(--spring),opacity .3s,box-shadow .3s,filter .3s}
+.redbtn:active{transform:scale(.97)}
+.redbtn .tx b{display:block;font-size:19px;font-weight:900}
+.redbtn .tx span{display:block;font-size:12px;color:var(--tx2);font-weight:700;margin-top:2px}
+.redbtn .left{margin-left:auto;display:flex;flex-wrap:wrap;gap:3px;width:96px;justify-content:flex-end}
+.redbtn .left i{width:9px;height:9px;border-radius:50%;background:#E5383B;display:block;transition:background .3s}
+.redbtn .left i.gone{background:var(--card2)}
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cb{height:64px;border-radius:20px;background:var(--card);display:flex;align-items:center;gap:10px;padding:0 12px;box-shadow:0 10px 28px -16px rgba(60,40,20,.28);position:relative;cursor:pointer;transition:transform .25s var(--spring),opacity .3s,box-shadow .3s,filter .3s}
+.cb:active{transform:scale(.94)}
+.cb .tx{font-size:15px;font-weight:900}
+.hl{box-shadow:0 0 0 3px var(--ink),0 14px 28px -12px rgba(0,0,0,.35)}
+.hl.fb{box-shadow:0 0 0 3px #9B6BFF,0 14px 28px -12px rgba(155,107,255,.5)}
+.dim{opacity:.32;filter:saturate(.3)}
+.done{opacity:.35}
+.done::after{content:"✓";position:absolute;right:10px;top:8px;font-size:13px;font-weight:900;color:var(--pos)}
+.badge{position:absolute;top:-9px;right:10px;font-size:10px;font-weight:900;color:#fff;background:var(--ink);padding:2px 7px;border-radius:999px}
+.acts{display:flex;gap:8px}
+.acts .foul{width:108px;height:58px;border-radius:22px;background:var(--card);color:var(--neg);font-size:16px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 28px -14px rgba(60,40,20,.28)}
+.acts .swap{flex:1;height:58px;border-radius:22px;background:var(--ink);color:#fff;font-size:17px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:8px}
+.acts .swap small{font-size:12px;opacity:.6;font-weight:700}
+.dock{position:absolute;left:8px;right:8px;bottom:26px;height:64px;border-radius:24px;display:flex;align-items:center;justify-content:space-around;z-index:30;
+  background:linear-gradient(135deg,rgba(255,255,255,.82),rgba(255,255,255,.55));-webkit-backdrop-filter:blur(14px) saturate(200%);backdrop-filter:blur(14px) saturate(200%);box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 12px 28px -12px rgba(40,30,20,.36)}
+.dock .db{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:700;color:#4A4A52;width:72px;height:56px;justify-content:center;border-radius:18px}
+.dock .db:active{background:rgba(0,0,0,.05)}
+.dock .db svg{width:22px;height:22px}
+.dock .db.end{color:#FF5A5F}
+
+/* ---------- 记分（横屏） ---------- */
+.ltop{height:52px;flex:none;position:relative;display:flex;align-items:center;padding:0 54px 0 68px}
+.lseg{display:flex;align-items:center;height:38px;border-radius:999px;padding:0 4px;background:#fff;box-shadow:0 6px 16px -8px rgba(0,0,0,.25)}
+.lsb{height:100%;padding:0 14px;display:flex;align-items:center;gap:6px;font-size:14px;font-weight:800;color:#4A4A52;border-radius:999px}
+.lsb.hl2{color:var(--tx)}
+.lsd{width:1px;height:18px;background:rgba(20,20,30,.14)}
+.lend{height:38px;padding:0 16px;border-radius:999px;background:#fff;color:#FF5A5F;font-size:14px;font-weight:900;display:flex;align-items:center;gap:6px;box-shadow:0 6px 16px -8px rgba(0,0,0,.25);margin-left:auto;margin-right:96px}
+.lt{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.lt b{font-size:15px;font-weight:800}
+.lt span{font-size:11px;color:var(--tx2)}
+.lbody{flex:1;min-height:0;display:flex;gap:12px;padding:4px 58px 20px 68px}
+.lbody .pl{flex:none;width:210px;min-height:0}
+.lbody .pl .s{font-size:88px;margin-top:26px}
+.lmid{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;gap:8px}
+.lmid .info{padding:7px 2px}
+.lmid .info b{font-size:18px}
+.lmid .redbtn{height:68px;border-radius:20px;padding:0 14px}
+.lmid .redbtn .tx b{font-size:16px}
+.lmid .cols{grid-template-columns:repeat(6,1fr);gap:6px}
+.lmid .cb{height:82px;flex-direction:column;justify-content:center;gap:4px;padding:0;border-radius:18px}
+.lmid .cb .tx{font-size:12px}
+.lmid .acts .foul,.lmid .acts .swap{height:58px;border-radius:20px}
+
+/* ---------- 飘分 / 提示 / 面板 ---------- */
+.fly{position:absolute;z-index:70;font-size:30px;font-weight:900;color:var(--pos);pointer-events:none;animation:fly 1s cubic-bezier(.2,.8,.3,1) forwards;text-shadow:0 2px 0 #fff,0 6px 16px rgba(0,0,0,.15)}
+.fly.neg{color:var(--neg)}
+@keyframes fly{0%{opacity:0;transform:translateY(12px) scale(.6)}20%{opacity:1;transform:translateY(0) scale(1.1)}100%{opacity:0;transform:translateY(-60px) scale(1)}}
+.toast{position:absolute;left:50%;top:110px;transform:translateX(-50%);z-index:85;background:rgba(22,22,26,.9);color:#fff;font-size:14px;font-weight:700;padding:10px 16px;border-radius:16px;max-width:320px;text-align:center;line-height:1.45;animation:tIn .3s var(--spring)}
+.landscape .toast{top:60px}
+@keyframes tIn{from{opacity:0;transform:translate(-50%,-10px)}}
+.mask{position:absolute;inset:0;background:rgba(10,10,20,.4);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);z-index:60;animation:fade .25s ease}
+@keyframes fade{from{opacity:0}}
+.sheet{position:absolute;left:8px;right:8px;bottom:8px;border-radius:32px;background:var(--card);z-index:61;padding:10px 18px 34px;animation:up .42s cubic-bezier(.2,.95,.25,1.05);max-height:calc(100% - 60px);overflow:auto}
+.landscape .sheet{left:50%;right:auto;width:470px;margin-left:-235px;padding:8px 18px 16px}
+@keyframes up{from{transform:translateY(110%)}}
+.sheet .grab{width:36px;height:5px;border-radius:3px;background:var(--tx3);opacity:.5;margin:2px auto 14px}
+.sheet .st{text-align:center;font-size:20px;font-weight:900}
+.sheet .ss{text-align:center;font-size:13px;color:var(--tx2);margin-top:4px;line-height:1.5}
+.lab{font-size:12px;font-weight:800;color:var(--tx3);margin:16px 4px 8px}
+.pens{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pen{height:70px;border-radius:20px;background:#F0EEE9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:22px;font-weight:900;cursor:pointer;transition:all .2s}
+.pen small{font-size:10px;color:var(--tx2);font-weight:700}
+.pen.sel{background:var(--ink);color:#fff}.pen.sel small{color:rgba(255,255,255,.6)}
+.opt{display:flex;gap:8px}
+.opt>div{flex:1;border-radius:18px;background:#F0EEE9;padding:12px;font-size:14px;font-weight:800;cursor:pointer;transition:all .2s}
+.opt>div small{display:block;font-size:11px;color:var(--tx2);font-weight:700;margin-top:3px}
+.opt>div.sel{background:#fff;box-shadow:inset 0 0 0 2.5px var(--ink)}
+.sw{display:flex;align-items:center;justify-content:space-between;padding:12px 6px 0;font-size:14px;font-weight:800}
+.sw small{display:block;font-size:11px;color:var(--tx2);font-weight:700}
+.lnk{text-align:center;font-size:14px;color:var(--tx2);font-weight:700;margin-top:14px;cursor:pointer}
+.big2{display:flex;align-items:center;justify-content:center;gap:26px;margin:18px 0 6px}
+.big2 .p{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;font-weight:800}
+.logrow{display:flex;align-items:center;gap:10px;padding:10px 4px;font-size:13px;font-weight:700}
+.logrow+.logrow{border-top:1px solid var(--line)}
+.logrow .v{width:38px;font-size:18px;font-weight:900;text-align:right}
+.banner{position:absolute;inset:0;z-index:75;display:flex;align-items:center;justify-content:center;background:rgba(246,244,240,.35);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);animation:fade .25s ease;cursor:pointer}
+.banner .bx{background:#fff;border-radius:36px;padding:26px 34px 20px;display:flex;flex-direction:column;align-items:center;box-shadow:0 40px 80px -30px rgba(0,0,0,.4);animation:pop .5s var(--spring)}
+@keyframes pop{from{transform:scale(.6);opacity:0}}
+.banner .bt{font-size:34px;font-weight:900;margin-top:14px}
+.banner .bs{font-size:14px;color:var(--tx2);font-weight:700;margin-top:6px}
+.banner .btap{font-size:12px;color:var(--tx3);margin-top:12px}
+
+/* ---------- 战报 ---------- */
+.res{flex:1;overflow:auto;padding:6px 12px 110px;display:flex;flex-direction:column;gap:10px}
+.hero{border-radius:26px;padding:16px;background:linear-gradient(180deg,#fff,#FFF6EC)}
+.hero .ht{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700;color:var(--tx2)}
+.hero .ht b{background:var(--ink);color:#fff;padding:4px 10px;border-radius:999px;font-size:12px}
+.hero .w{text-align:center;font-size:22px;font-weight:900;margin-top:14px}
+.hero .vs{display:flex;align-items:center;justify-content:center;gap:22px;margin-top:14px}
+.hero .vs .p{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;font-weight:800}
+.hero .vs .sc2{font-size:56px;font-weight:900;letter-spacing:-.02em}
+.frames{padding:6px 12px}
+.fr{display:flex;align-items:center;gap:10px;height:38px;font-size:13px;font-weight:700}
+.fr+.fr{border-top:1px solid var(--line)}
+.fr .no{width:44px;color:var(--tx2);font-size:12px}
+.fr .bar{flex:1;height:8px;border-radius:4px;background:var(--card2);position:relative;overflow:hidden}
+.fr .bar i{position:absolute;top:0;bottom:0;left:0;border-radius:4px}
+.fr .s{width:62px;text-align:right;font-weight:900}
+.fr .hb{width:34px;text-align:right;font-size:11px;color:var(--tx2)}
+.bks{padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.bk2{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700}
+.bk2 .v{width:40px;font-size:22px;font-weight:900}
+.bk2 .dots i{width:8px;height:8px}
+.bk2 small{color:var(--tx2);font-size:11px;margin-left:auto;white-space:nowrap}
+.cmp{padding:6px 14px}
+.cmp .r{display:flex;align-items:center;height:36px;font-size:13px}
+.cmp .r+.r{border-top:1px solid var(--line)}
+.cmp .r span{flex:1;color:var(--tx2)}
+.cmp .r b{width:70px;text-align:center;font-weight:900}
+.cmp .r b.w{color:#E5383B}
+.empty{font-size:13px;color:var(--tx2);text-align:center;padding:14px}
+
+/* ---------- 进球区：红球单独 + 六格（组合 / 单颗彩球） ---------- */
+.redbtn{height:62px}
+.redbtn .tx{display:flex;align-items:baseline;gap:8px}
+.redbtn .tx b{font-size:18px}
+.redbtn .tx em{font-style:normal;font-size:22px;font-weight:900;color:#E5383B}
+.cb{height:70px;padding:0 12px;gap:10px}
+.cb .tx{display:flex;flex-direction:column;line-height:1.05}
+.cb .tx small{font-size:12px;font-weight:800;color:var(--tx2);white-space:nowrap}
+.cb .tx b{font-size:22px;font-weight:900;color:var(--tx)}
+.cb.fb{box-shadow:0 0 0 3px #9B6BFF,0 14px 28px -12px rgba(155,107,255,.5)}
+.duo{position:relative;width:46px;height:34px;flex:none}
+.duo .ball:first-child{position:absolute;left:0;top:6px;box-shadow:0 4px 8px -4px rgba(0,0,0,.4)}
+.duo .ball:last-child{position:absolute;right:0;top:0}
+.cols.combo .cb{background:linear-gradient(135deg,#fff 60%,#FFF1F1)}
+/* 横屏：和竖屏一样 3×2，同一位置同一颗球 */
+.lmid .cols{grid-template-columns:repeat(3,1fr)!important;gap:6px!important}
+.lmid .cb{height:52px!important;flex-direction:row!important;justify-content:center!important;gap:6px!important;padding:0 6px!important;border-radius:16px!important}
+.lmid .cb .tx small{font-size:11px}
+.lmid .cb .tx b{font-size:18px}
+.lmid .duo{width:34px;height:26px}
+.lmid .redbtn{height:50px!important}
+.lmid .info{padding:5px 2px!important}
+.lmid .info b{font-size:17px!important}
+.lmid .acts .foul,.lmid .acts .swap{height:52px!important}
+.lmid{gap:6px!important}
+
+/* ---------- 超分 ---------- */
+.supt{font-size:11px;font-weight:900;padding:2px 8px;border-radius:999px;background:linear-gradient(90deg,#FF5A5F,#FFB020);color:#fff;box-shadow:0 4px 10px -4px rgba(255,90,95,.8)}
+.pl.on .supt{background:#fff;color:#F0444D;box-shadow:none}
+.supl{color:#F0444D!important;font-weight:900!important}
+.pl.sup.off{box-shadow:0 0 0 2.5px #FF5A5F,0 16px 30px -14px rgba(255,90,95,.6)}
+.pl.supfx::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.75) 50%,transparent 70%);transform:translateX(-120%);animation:sweep 1.1s ease .35s 2}
+@keyframes sweep{to{transform:translateX(120%)}}
+.supov{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;pointer-events:auto;cursor:pointer;
+  background:radial-gradient(circle at 50% 46%,rgba(255,176,32,.28),rgba(246,244,240,.35) 55%);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);animation:fade .25s ease}
+.supov.out{animation:fadeOut .3s ease forwards}
+@keyframes fadeOut{to{opacity:0}}
+.supbx{position:relative;display:flex;flex-direction:column;align-items:center}
+.supbadge{position:relative;z-index:2;font-size:64px;font-weight:900;letter-spacing:.06em;color:#fff;padding:14px 40px;border-radius:999px;
+  background:linear-gradient(135deg,#FF5A5F,#FF8A3D 55%,#FFB020);box-shadow:0 24px 50px -16px rgba(255,90,95,.8),inset 0 2px 0 rgba(255,255,255,.5);
+  animation:supIn .7s cubic-bezier(.3,1.6,.45,1) both,supPulse 1.4s ease-in-out .7s infinite}
+@keyframes supIn{0%{transform:scale(.2) rotate(-12deg);opacity:0}60%{opacity:1}100%{transform:none}}
+@keyframes supPulse{50%{transform:scale(1.05)}}
+.supname{display:flex;align-items:center;gap:8px;margin-top:18px;font-size:20px;font-weight:900;animation:up2 .5s ease .25s both}
+.supsub{margin-top:6px;font-size:15px;font-weight:800;color:var(--tx2);animation:up2 .5s ease .35s both}
+@keyframes up2{from{opacity:0;transform:translateY(12px)}}
+.rings{position:absolute;left:50%;top:48px;width:0;height:0}
+.rings i{position:absolute;left:-60px;top:-60px;width:120px;height:120px;border-radius:50%;border:3px solid #FFB020;opacity:0;animation:ring 1.4s ease-out infinite}
+.rings i:nth-child(2){animation-delay:.45s;border-color:#FF5A5F}.rings i:nth-child(3){animation-delay:.9s}
+@keyframes ring{0%{transform:scale(.6);opacity:.9}100%{transform:scale(2.6);opacity:0}}
+.sparks{position:absolute;left:50%;top:48px;width:0;height:0}
+.sparks i{position:absolute;left:-5px;top:-5px;width:10px;height:10px;border-radius:3px;background:var(--c);opacity:0;transform:rotate(var(--a)) translateY(0);animation:spark .9s cubic-bezier(.2,.8,.3,1) .15s forwards}
+@keyframes spark{0%{opacity:1;transform:rotate(var(--a)) translateY(0) scale(1)}100%{opacity:0;transform:rotate(var(--a)) translateY(-150px) scale(.4)}}
+.landscape .supbadge{font-size:52px;padding:10px 34px}
+
+/* ---------- 设置：积分规则（只读）/ 让分 ---------- */
+.rules{border-radius:22px;padding:14px 14px 12px;background:#FAF8F4;box-shadow:inset 0 0 0 1px rgba(20,20,30,.06)}
+.rules .rh{display:flex;align-items:center;justify-content:space-between}
+.rules .rh b{font-size:14px;font-weight:900}
+.rules .rh span{font-size:11px;font-weight:800;color:var(--tx3);padding:2px 8px;border-radius:999px;background:var(--card2)}
+.rballs{display:flex;justify-content:space-between;margin-top:12px}
+.rb{display:flex;flex-direction:column;align-items:center;gap:4px}
+.rb b{font-size:17px;font-weight:900;line-height:1}
+.rb small{font-size:10px;color:var(--tx2);font-weight:700}
+.rfoot{display:flex;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+.rfoot>div{flex:1;text-align:center}
+.rfoot>div+div{border-left:1px solid var(--line)}
+.rfoot small{display:block;font-size:10px;color:var(--tx2);font-weight:700}
+.rfoot b{display:block;font-size:15px;font-weight:900;margin-top:2px}
+.hc{padding:10px}
+.hseg{display:flex;gap:6px;padding:4px;border-radius:16px;background:#F0EEE9}
+.hs{flex:1;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:800;color:var(--tx2);cursor:pointer;transition:background .2s,color .2s}
+.hs .av.sm{width:22px;height:22px;font-size:11px}
+.hs.on{background:#fff;color:var(--tx);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.hamt{display:flex;align-items:center;justify-content:space-between;padding:14px 6px 6px}
+.hb{width:52px;height:52px;border-radius:18px;background:#F0EEE9;font-size:26px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.hv{text-align:center}
+.hv b{display:block;font-size:40px;font-weight:900;line-height:1;color:var(--pos)}
+.hv small{display:block;font-size:11px;color:var(--tx2);font-weight:700;margin-top:4px}
+.hq{justify-content:center;padding:6px 0 4px}
+.hq .chip{min-width:48px;justify-content:center}
+.hct{font-size:11px;font-weight:900;padding:2px 8px;border-radius:999px;background:#13B57A1F;color:#0E9F5E}
+.pl.on .hct{background:rgba(255,255,255,.25);color:#fff}
+
+/* ---------- 设置页 v3：对阵卡 / 通栏分段 / 红球与积分 ---------- */
+.vs{padding:18px 12px 14px;position:relative;overflow:hidden;background:linear-gradient(90deg,color-mix(in srgb,var(--a) 9%,#fff),#fff 38%,#fff 62%,color-mix(in srgb,var(--b) 9%,#fff))}
+.vrow{display:flex;align-items:flex-start}
+.side{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
+.av.big{width:66px;height:66px;font-size:26px;box-shadow:0 0 0 4px #fff,0 12px 26px -10px var(--pc)}
+.side .nm{font-size:17px;font-weight:900;margin-top:4px}
+.sp{font-size:12px;font-weight:800;color:var(--tx3);transition:color .2s}
+.sp.on{color:var(--pos)}
+.brk2{font-size:12px;font-weight:900;padding:6px 14px;border-radius:999px;background:#F0EEE9;color:var(--tx2);cursor:pointer;margin-top:2px;transition:all .25s}
+.brk2.on{background:var(--ink);color:#fff}
+.vsx{width:50px;height:50px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;font-style:italic;letter-spacing:-.02em;color:#fff;
+  background:linear-gradient(135deg,var(--a),var(--b));box-shadow:0 10px 22px -10px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.4);margin-top:8px}
+.hcw{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.hct2{display:flex;justify-content:space-between;align-items:baseline;padding:0 4px}
+.hct2 span{font-size:13px;font-weight:900}
+.hct2 b{font-size:14px;font-weight:900;color:var(--tx2);transition:color .2s}
+.trk{position:relative;height:44px;margin-top:10px;border-radius:22px;touch-action:none;cursor:grab;
+  background:linear-gradient(90deg,color-mix(in srgb,var(--a) 16%,#F3F1EC),#F3F1EC 50%,color-mix(in srgb,var(--b) 16%,#F3F1EC));box-shadow:inset 0 1px 3px rgba(0,0,0,.06)}
+.trk:active{cursor:grabbing}
+.trk .mid{position:absolute;left:50%;top:10px;bottom:10px;width:2px;margin-left:-1px;border-radius:1px;background:rgba(20,20,30,.22)}
+.trk .tick{position:absolute;top:50%;width:4px;height:4px;margin:-2px 0 0 -2px;border-radius:50%;background:rgba(20,20,30,.16)}
+.trk .tick.big{width:6px;height:6px;margin:-3px 0 0 -3px;background:rgba(20,20,30,.24)}
+.trk .fill{position:absolute;top:5px;bottom:5px;border-radius:17px;opacity:0;transition:opacity .2s}
+.trk .th{position:absolute;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 0 3px var(--tc,#A9A9B0),0 8px 18px -6px rgba(0,0,0,.35);z-index:2;transition:box-shadow .2s}
+.trk .th b{font-size:18px;font-weight:900}
+.ends{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding:0 2px;font-size:11px;font-weight:800;color:var(--tx3)}
+.ends>span{display:flex;align-items:center;gap:5px}
+.ends .av.sm{width:18px;height:18px;font-size:9px}
+.segw{padding:6px}
+.segx{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px}
+.sx{height:56px;border-radius:16px;display:flex;align-items:baseline;justify-content:center;gap:2px;padding-top:15px;cursor:pointer;transition:background .25s,color .25s,transform .25s var(--spring)}
+.sx:active{transform:scale(.95)}
+.sx b{font-size:24px;font-weight:900;line-height:1}
+.sx small{font-size:11px;font-weight:800;color:var(--tx2);white-space:nowrap}
+.sx.on{background:var(--ink);color:#fff;box-shadow:0 10px 20px -10px rgba(0,0,0,.5)}
+.sx.on small{color:rgba(255,255,255,.7)}
+.rc{padding:6px}
+.rrule{margin-top:6px;border-radius:16px;background:#FAF8F4;padding:12px 12px 10px;box-shadow:inset 0 0 0 1px rgba(20,20,30,.05)}
+.rrule .rh{display:flex;align-items:center;justify-content:space-between}
+.rrule .rh b{font-size:13px;font-weight:900}
+.rrule .rh span{font-size:10px;font-weight:800;color:var(--tx3);padding:2px 8px;border-radius:999px;background:var(--card2)}
+.rrule .rballs{margin-top:10px;padding:0 4px}
+.rrule .rb b{font-size:15px}
+.setup>*,.res>*{flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="panel">
+    <h1><img src="data:image/png;base64,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">斯诺克 · 可交互原型</h1>
+    <p>规则引擎是真的：红彩轮换、清彩顺序、台面剩余分、超分、犯规、让分、平分重摆黑球、局分赛制都按斯诺克规则计算。</p>
+    <h2>怎么记</h2>
+    <div class="how">
+      <b>红 + 彩</b>：点下面六格，一下记两颗<br>
+      <b>只进红球</b>：点「红 +1」，六格变成单颗彩球<br>
+      <b>没进 / 安全球</b>：点 <span class="kbd">没进 · 换人</span><br>
+      <b>犯规</b>：点 <span class="kbd">犯规</span>，默认罚分直接确定<br>
+      <b>记错</b>：底栏 <span class="kbd">撤销</span>，一杆一杆往回退<br>
+      <b>横屏</b>：底栏 <span class="kbd">横屏</span>
+    </div>
+    <h2>快速演示</h2>
+    <div class="qa">
+      <button onclick="demoClearance()">⏩ 打到清彩阶段（触发超分）</button>
+      <button onclick="demoFrame()">⏩ 直接打完这一局</button>
+      <button onclick="demoBreak()">⏩ 来一杆 50+ 单杆</button>
+      <button onclick="demoTie()">⏩ 打成平分（重摆黑球）</button>
+      <button class="dk" onclick="resetAll()">↺ 从首页重新开始</button>
+    </div>
+    <h2>事件记录（引擎只存这些）</h2>
+    <div class="evlog" id="evlog"></div>
+  </div>
+  <div class="stage" id="stage">
+    <div class="bgs"><div class="bg" style="background:#1FA86A;width:520px;height:520px;left:-120px;top:-160px"></div>
+    <div class="bg" style="background:#FF5A5F;width:420px;height:420px;right:-80px;top:10%"></div>
+    <div class="bg" style="background:#3D7BFF;width:480px;height:480px;right:20%;bottom:-200px"></div></div>
+    <div class="holder" id="holder"><div class="ph portrait" id="ph"><div class="sc" id="sc"><div id="content"></div><div id="fx"></div></div></div></div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   斯诺克规则引擎（事件溯源）：只存事件，所有状态由 derive() 算出来
+   事件：{t:'pot', b:'red'|'yellow'…}  {t:'pot2', b:彩球}（红 + 彩一起记）  {t:'miss'}  {t:'foul', pts, again, free}  {t:'concede'}  {t:'next'}
+   ===================================================================== */
+const BALLS = [
+  { k: 'red', n: '红', v: 1, c: '#E5383B' }, { k: 'yellow', n: '黄', v: 2, c: '#FFC53D', cls: 'y' }, { k: 'green', n: '绿', v: 3, c: '#1FA86A' },
+  { k: 'brown', n: '棕', v: 4, c: '#8B5A3C' }, { k: 'blue', n: '蓝', v: 5, c: '#3D7BFF' }, { k: 'pink', n: '粉', v: 6, c: '#FF7FB0', cls: 'p' }, { k: 'black', n: '黑', v: 7, c: '#1E1E22' },
+];
+const B = Object.fromEntries(BALLS.map(b => [b.k, b]));
+const byV = v => BALLS.find(b => b.v === v && b.k !== 'red') || B.red;
+const PL = [{ n: 'Isaac', ch: 'I', c: '#FF5A5F', g: 'rgba(255,90,95,.7)' }, { n: 'Henry', ch: 'H', c: '#3D7BFF', g: 'rgba(61,123,255,.7)' }];
+
+function derive(cfg, events) {
+  const need = Math.floor(cfg.bestOf / 2) + 1;
+  const S = { fw: [0, 0], frames: [], need, over: false, winner: null };
+  const hc = cfg.hc && cfg.hc.p >= 0 ? cfg.hc : null; // 让分：被让的一方每局开局先加分
+  const mk = no => { const b = (cfg.first + no - 1) % 2; return { no, breaker: b, act: b, hc, sc: [hc && hc.p === 0 ? hc.pts : 0, hc && hc.p === 1 ? hc.pts : 0], reds: cfg.reds, phase: 'red', ci: 2, brk: 0, balls: [], last: [null, null], breaks: [], fouls: [0, 0], pens: [0, 0], free: false, respot: false, over: false, win: null }; };
+  let F = mk(1);
+  const endBreak = () => { if (F.brk > 0) { F.breaks.push({ p: F.act, v: F.brk, balls: F.balls.slice() }); F.last[F.act] = F.brk; } F.brk = 0; F.balls = []; };
+  const afterTurn = () => { if (F.phase === 'color') { F.phase = F.reds > 0 ? 'red' : 'clear'; F.ci = 2; } };
+  const finish = w => { endBreak(); F.over = true; F.win = w; S.fw[w]++; S.frames.push(F); if (S.fw[w] >= need) { S.over = true; S.winner = w; } };
+  const score = (v, k) => { F.sc[F.act] += v; F.brk += v; F.balls.push(k); };
+  // 「红 + 彩」组合键 = 先进红球、再进这颗彩球（撤销时整个退回）
+  const flat = events.flatMap(e => (e.t === 'pot2' ? [{ t: 'pot', b: 'red' }, { t: 'pot', b: e.b }] : [e]));
+  for (const e of flat) {
+    if (e.t === 'next') { if (F.over && !S.over) F = mk(S.frames.length + 1); continue; }
+    if (F.over) continue;
+    if (e.t === 'pot') {
+      if (F.free && !(F.phase === 'red' && e.b === 'red')) { // 自由球：任意球当作「该打的球」
+        F.free = false;
+        if (F.phase === 'red') { score(1, e.b); F.phase = 'color'; } else score(F.ci, e.b);
+      } else if (F.phase === 'red' && e.b === 'red') { F.free = false; F.reds--; score(1, 'red'); F.phase = 'color'; }
+      else if (F.phase === 'color' && e.b !== 'red') { score(B[e.b].v, e.b); F.phase = F.reds > 0 ? 'red' : 'clear'; F.ci = 2; }
+      else if (F.phase === 'clear' && B[e.b].v === F.ci) {
+        score(F.ci, e.b);
+        if (F.ci === 7) { if (F.sc[0] === F.sc[1]) F.respot = true; else finish(F.sc[0] > F.sc[1] ? 0 : 1); }
+        else F.ci++;
+      }
+    } else if (e.t === 'miss') { endBreak(); afterTurn(); F.act = 1 - F.act; F.free = false; }
+    else if (e.t === 'foul') {
+      endBreak(); F.sc[1 - F.act] += e.pts; F.fouls[F.act]++; F.pens[1 - F.act] += e.pts; afterTurn();
+      if (F.respot) { finish(1 - F.act); continue; } // 重摆黑球时犯规：直接输掉本局
+      if (!e.again) F.act = 1 - F.act;
+      F.free = !!e.free;
+    } else if (e.t === 'concede') { finish(F.sc[0] === F.sc[1] ? 1 - F.act : F.sc[0] > F.sc[1] ? 0 : 1); }
+  }
+  // 台面剩余分、该打的球、超分
+  F.rem = F.phase === 'red' ? F.reds * 8 + 27 : F.phase === 'color' ? F.reds * 8 + 27 + 7 : [2, 3, 4, 5, 6, 7].filter(v => v >= F.ci).reduce((a, b) => a + b, 0);
+  F.onVal = F.phase === 'clear' ? F.ci : F.phase === 'red' ? 1 : 7;
+  F.minPen = Math.max(4, F.phase === 'clear' ? F.ci : 4);
+  // 超分：领先的分数已经超过台面剩余分（对手只靠进球追不回来了）
+  const lead = F.sc[0] - F.sc[1];
+  F.sup = F.over ? -1 : lead > F.rem ? 0 : -lead > F.rem ? 1 : -1;
+  S.F = F;
+  S.cur = F.over ? null : F;
+  return S;
+}
+
+/* =====================================================================
+   界面
+   ===================================================================== */
+const app = { screen: 'home', cfg: { bestOf: 7, reds: 15, first: 0, hc: { p: -1, pts: 14 } }, ev: [], land: false, sheet: null, toast: null, banner: null, sup: null, supFx: -1, t0: Date.now(), bump: -1 };
+let D = derive(app.cfg, app.ev);
+const $ = s => document.querySelector(s);
+const esc = s => String(s);
+const ball = (k, size, txt) => { const b = B[k]; return `<span class="ball ${b.cls || ''}" style="--bc:${b.c};width:${size}px;height:${size}px;font-size:${Math.round(size * .4)}px">${txt == null ? b.v : txt}</span>`; };
+const dots = list => `<span class="dots">${list.map(k => `<i style="background:${B[k].c}"></i>`).join('')}</span>`;
+const clock = () => { const s = Math.floor((Date.now() - app.t0) / 1000); return [s / 3600 | 0, (s / 60 | 0) % 60, s % 60].map(x => String(x).padStart(2, '0')).join(':'); };
+const STATUS = `<div class="sb"><span>9:41</span><svg width="70" height="13" viewBox="0 0 70 13"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/><rect x="42.5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="#000" opacity=".4"/><rect x="44" y="2" width="20" height="9" rx="2.5"/></svg></div>`;
+const CAP = `<div class="capx"><span class="d3"><b></b><b></b><b></b></span><i></i><span><span class="rg"><b></b></span></span></div>`;
+const ICON = {
+  undo: '<svg viewBox="0 0 24 24" fill="none" stroke="#16161A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>',
+  log: '<svg viewBox="0 0 24 24" fill="none" stroke="#4A4A52" stroke-width="2.2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>',
+  rot: '<svg viewBox="0 0 24 24" fill="none" stroke="#4A4A52" stroke-width="2.2"><rect x="5" y="2" width="14" height="20" rx="3"/></svg>',
+  flag: '<svg viewBox="0 0 24 24" fill="none" stroke="#FF5A5F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4h11l-2 4 2 4H5"/></svg>',
+};
+
+function render() {
+  D = derive(app.cfg, app.ev);
+  const ph = $('#ph'); ph.className = 'ph ' + (app.land && app.screen === 'score' ? 'landscape' : 'portrait');
+  let html = `<div class="di"></div>${STATUS}${CAP}<div class="view">`;
+  html += app.screen === 'home' ? vHome() : app.screen === 'setup' ? vSetup() : app.screen === 'score' ? (app.land ? vLand() : vScore()) : vResult();
+  html += `</div>${vSheet()}${vBanner()}${app.toast ? `<div class="toast">${app.toast}</div>` : ''}<div class="hi"></div>`;
+  // 面板 / 提示 / 庆祝：已经显示着的不要重播进场动画
+  const keys = { sheet: app.screen === 'score' && D.F.over ? 'frame' + D.F.no + D.over : app.sheet ? app.sheet.k : '', toast: app.toast || '', banner: app.banner ? app.banner.t : '' };
+  $('#content').innerHTML = html;
+  const last = render.keys || {};
+  if (keys.sheet && keys.sheet === last.sheet) document.querySelectorAll('#content .sheet, #content .mask').forEach(e => e.classList.add('still'));
+  if (keys.toast && keys.toast === last.toast) document.querySelectorAll('#content .toast').forEach(e => e.classList.add('still'));
+  if (keys.banner && keys.banner === last.banner) document.querySelectorAll('#content .banner, #content .banner .bx').forEach(e => e.classList.add('still'));
+  keys.screen = app.screen; render.keys = keys;
+  if (app.screen === 'setup') paintHc(hcVal());
+  app.bump = -1;
+  fit(); log();
+}
+
+/* ---------- 首页 ---------- */
+function vHome() {
+  const live = app.ev.length && !D.over;
+  const F = D.F;
+  return `<div class="home">
+    <div class="large"><div><div class="g">晚上好，今晚一杆清台</div><div class="t">球球记分</div></div><div class="av" style="width:46px;height:46px;background:#FF5A5F;font-size:18px">I</div></div>
+    <div class="snk" onclick="go('setup')"><div class="felt"></div><span class="new">新玩法</span>
+      <span class="ball" style="--bc:#E5383B;width:54px;height:54px;right:92px;top:30px"></span>
+      <span class="ball" style="--bc:#1E1E22;width:46px;height:46px;right:40px;top:56px;animation-delay:-1.2s"></span>
+      <span class="ball p" style="--bc:#FF7FB0;width:38px;height:38px;right:110px;top:88px;animation-delay:-2.4s"></span>
+      <span class="t">斯诺克</span><span class="sub">1 v 1 · 一杆一按 · 自动算剩余分</span></div>
+    <div class="modes">
+      <div class="mode" style="background:#FF5A5F" onclick="toast('追分已经在小程序里了，这个原型只演示斯诺克')"><b>双人追分</b><span>1 v 1 · 赢家开球</span></div>
+      <div class="mode" style="background:#3D7BFF" onclick="toast('追分已经在小程序里了，这个原型只演示斯诺克')"><b>三人追分</b><span>胜者开球 · 上家付分</span></div>
+    </div>
+    ${live ? `<div class="card live" onclick="go('score')">
+      <div class="lh"><span class="dt"></span>斯诺克 · 第 ${F.no} 局 · <span class="clk">${clock()}</span><span class="go">继续 ›</span></div>
+      <div class="lg"><div class="lp"><div class="av" style="background:${PL[0].c}">I</div>Isaac<b class="num">${F.sc[0]}</b></div>
+        <div class="vs">局分<b class="num">${D.fw[0]} : ${D.fw[1]}</b>${app.cfg.bestOf === 1 ? '单局' : `${app.cfg.bestOf} 局 ${D.need} 胜`}</div>
+        <div class="lp"><div class="av" style="background:${PL[1].c}">H</div>Henry<b class="num">${F.sc[1]}</b></div></div></div>` : `<div class="card" style="padding:16px;font-size:13px;color:var(--tx2)">暂无进行中的对局</div>`}
+  </div>
+  <div class="tab"><div class="on">开火</div><div>战绩</div><div>我的</div></div>`;
+}
+
+/* ---------- 设置 ---------- */
+function vSetup() {
+  const c = app.cfg;
+  const seg = (k, list) => `<div class="segx">${list.map(([v, big, small]) => `<div class="sx ${c[k] === v ? 'on' : ''}" onclick="setCfg('${k}',${v})"><b class="num">${big}</b><small>${small}</small></div>`).join('')}</div>`;
+  const max = c.reds * 8 + 27;
+  return `<div class="nav"><button class="bk press" onclick="go('home')">‹</button><div class="tt"><span class="t1">斯诺克</span></div></div>
+  <div class="setup">
+    <div class="sl">对阵</div>
+    ${matchCard()}
+    <div class="sl">赛制</div>
+    <div class="card segw">${seg('bestOf', [[1, '1', '局定胜负'], [3, '3', '局 2 胜'], [5, '5', '局 3 胜'], [7, '7', '局 4 胜']])}</div>
+    <div class="sl">红球与积分</div>
+    <div class="card rc">
+      ${seg('reds', [[15, '15', '颗'], [10, '10', '颗'], [6, '6', '颗']])}
+      <div class="rrule">
+        <div class="rh"><b>积分规则</b><span>标准 · 不可修改</span></div>
+        <div class="rballs">${BALLS.map(b => `<div class="rb">${ball(b.k, 28, '')}<b class="num">${b.v}</b></div>`).join('')}</div>
+        <div class="rfoot"><div><small>犯规罚分</small><b class="num">4–7</b></div><div><small>单杆满分</small><b class="num">${max}</b></div><div><small>彩球顺序</small><b>黄 → 黑</b></div></div>
+      </div>
+    </div>
+    <div class="sl">选项</div>
+    <div class="card"><div class="rowx"><div>屏幕常亮</div><span class="tg on" onclick="this.classList.toggle('on')"></span></div></div>
+  </div>
+  <div class="cta"><button class="btn pri" style="height:56px;border-radius:28px;font-size:17px" onclick="start()">开始对局</button></div>`;
+}
+/* ---------- 对阵卡：左右两位选手 + 拔河式让分滑杆 ---------- */
+const HC_MAX = 50;
+const hcVal = () => (app.cfg.hc.p < 0 ? 0 : app.cfg.hc.p === 0 ? -app.cfg.hc.pts : app.cfg.hc.pts); // 负数 = Isaac 加分，正数 = Henry 加分
+function matchCard() {
+  const c = app.cfg, v = hcVal();
+  const side = i => {
+    const p = PL[i], pts = (i === 0 ? -v : v) > 0 ? Math.abs(v) : 0;
+    return `<div class="side">
+      <div class="av big" style="background:${p.c};--pc:${p.c}">${p.ch}</div>
+      <div class="nm">${p.n}</div>
+      <div class="sp ${pts ? 'on' : ''}" id="sp${i}">起始 ${pts ? '+' + pts : '0'}</div>
+      <span class="brk2 ${c.first === i ? 'on' : ''}" onclick="setCfg('first',${i})">${c.first === i ? '开球' : '后手'}</span></div>`;
+  };
+  const ticks = [7, 14, 21, 28, 35, 42, 49].flatMap(t => [-t, t]).map(t => `<i class="tick ${t % 14 === 0 ? 'big' : ''}" style="left:${hcPos(t)}"></i>`).join('');
+  return `<div class="card vs" style="--a:${PL[0].c};--b:${PL[1].c}">
+    <div class="vrow">${side(0)}<div class="vsx">VS</div>${side(1)}</div>
+    <div class="hcw">
+      <div class="hct2"><span>让分</span><b id="hcLbl">${hcText(v)}</b></div>
+      <div class="trk" id="hcTrack"><span class="mid"></span>${ticks}<span class="fill" id="hcFill"></span><span class="th" id="hcThumb"><b class="num" id="hcNum"></b></span></div>
+      <div class="ends"><span><span class="av sm" style="background:${PL[0].c}">${PL[0].ch}</span>加分</span><span>拖动选择 · 点中间归零</span><span>加分<span class="av sm" style="background:${PL[1].c}">${PL[1].ch}</span></span></div>
+    </div></div>`;
+}
+const hcPos = v => `calc(23px + (100% - 46px) * ${(v + HC_MAX) / (HC_MAX * 2)})`;
+const hcText = v => (v ? `${PL[v < 0 ? 0 : 1].n} 每局 +${Math.abs(v)}` : '不让分');
+/** 把滑杆画到当前值（拖动时直接改 DOM，不重画整页） */
+function paintHc(v) {
+  const t = $('#hcThumb'); if (!t) return;
+  const col = v < 0 ? PL[0].c : v > 0 ? PL[1].c : '#A9A9B0';
+  t.style.left = hcPos(v); t.style.setProperty('--tc', col);
+  $('#hcNum').textContent = Math.abs(v); $('#hcNum').style.color = v ? col : 'var(--tx2)';
+  const f = $('#hcFill');
+  f.style.background = col; f.style.opacity = v ? 1 : 0;
+  f.style.left = v < 0 ? hcPos(v) : hcPos(0); f.style.right = v > 0 ? `calc(100% - ${hcPos(v)})` : `calc(100% - ${hcPos(0)})`;
+  $('#hcLbl').textContent = hcText(v); $('#hcLbl').style.color = v ? col : '';
+  [0, 1].forEach(i => { const e = $('#sp' + i), pts = (i === 0 ? -v : v) > 0 ? Math.abs(v) : 0; e.textContent = '起始 ' + (pts ? '+' + pts : '0'); e.classList.toggle('on', !!pts); });
+}
+function setHcVal(v) { app.cfg.hc = v === 0 ? { p: -1, pts: app.cfg.hc.pts } : { p: v < 0 ? 0 : 1, pts: Math.abs(v) }; }
+let hcDrag = null;
+document.addEventListener('pointerdown', e => {
+  const tr = e.target.closest && e.target.closest('#hcTrack'); if (!tr) return;
+  e.preventDefault(); try { tr.setPointerCapture(e.pointerId); } catch (_) {} hcDrag = { tr, last: null }; hcMove(e);
+});
+document.addEventListener('pointermove', e => { if (hcDrag) hcMove(e); });
+document.addEventListener('pointerup', () => { if (!hcDrag) return; hcDrag = null; render(); });
+function hcMove(e) {
+  const r = hcDrag.tr.getBoundingClientRect(), pad = 23 * r.width / hcDrag.tr.offsetWidth;
+  let k = (e.clientX - r.left - pad) / (r.width - pad * 2); k = Math.max(0, Math.min(1, k));
+  let v = Math.round(k * HC_MAX * 2 - HC_MAX);
+  const near7 = Math.round(v / 7) * 7; if (Math.abs(v - near7) <= 1 && Math.abs(near7) <= HC_MAX) v = near7; // 吸附到 7 的倍数（一颗黑球）
+  if (Math.abs(v) <= 2) v = 0;
+  if (v !== hcDrag.last) { hcDrag.last = v; setHcVal(v); paintHc(v); }
+}
+
+/* ---------- 记分：公用片段 ---------- */
+function fmtBest() { return app.cfg.bestOf === 1 ? '单局' : `${app.cfg.bestOf} 局 ${D.need} 胜`; }
+function playerCard(i, F, land) {
+  const p = PL[i], on = F.act === i && !F.over, sup = F.sup === i;
+  const sub = on ? (F.brk ? `本杆 ${F.brk}${dots(F.balls)}` : (F.free ? '自由球' : '')) : (F.last[i] != null ? `上一杆 ${F.last[i]}` : '');
+  return `<div class="pl ${on ? 'on' : 'off'} ${sup ? 'sup' : ''} ${sup && app.supFx === i ? 'supfx' : ''}" style="${on ? `background:${p.c};box-shadow:0 16px 30px -14px ${p.g}` : ''}">
+    <div class="h">${p.n}${sup ? '<span class="supt">超分</span>' : F.hc && F.hc.p === i ? `<span class="hct">让 +${F.hc.pts}</span>` : ''}<span class="st" style="${on ? `color:${p.c}` : ''}">${on ? '在打' : '等待'}</span></div>
+    <div><span class="s num ${app.bump === i ? 'bump' : ''}">${F.sc[i]}</span></div>
+    <div class="bk">${sub}</div></div>`;
+}
+function infoStrip(F) {
+  const lead = F.sc[0] - F.sc[1], who = lead >= 0 ? 0 : 1, a = Math.abs(lead);
+  const third = F.phase === 'clear' ? `<b class="num">${7 - F.ci + 1}</b><span>彩球剩余</span>` : `<b class="num">${F.reds}</b><span>红球剩余</span>`;
+  const mid = !a ? `<b class="num">0</b><span>平分</span>`
+    : F.sup >= 0 ? `<b class="num" style="color:#F0444D">+${a}</b><span class="supl">${PL[who].n} 超分</span>`
+    : `<b class="num" style="color:var(--pos)">+${a}</b><span>${PL[who].n} 领先</span>`;
+  return `<div class="card info"><div><b class="num">${F.rem}</b><span>台面剩余</span></div><div>${mid}</div><div>${third}</div></div>`;
+}
+function askRow(F) {
+  const nx = F.free ? `<span class="nx free">自由球</span>`
+    : F.phase === 'red' ? `<span class="nx"><i style="background:#E5383B"></i>红球</span>`
+    : F.phase === 'color' ? `<span class="nx"><i style="background:linear-gradient(90deg,#FFC53D,#3D7BFF,#1E1E22)"></i>彩球</span>`
+    : `<span class="nx"><i style="background:${byV(F.ci).c}"></i>${F.respot ? '重摆黑球' : byV(F.ci).n + '球'}</span>`;
+  return `<div class="ask"><b>${F.phase === 'clear' ? '清彩' : '进球'}</b>${nx}</div>`;
+}
+function redButton(F, land) {
+  if (F.phase === 'clear') return `<div class="redbtn" style="opacity:.45;cursor:default"><span class="ball" style="--bc:#C9C6BF;width:${land ? 34 : 40}px;height:${land ? 34 : 40}px"></span><div class="tx"><b>红球已清台</b></div></div>`;
+  const on = F.phase === 'red' || F.free;
+  const left = Array.from({ length: app.cfg.reds }, (_, k) => `<i class="${k < F.reds ? '' : 'gone'}"></i>`).join('');
+  return `<div class="redbtn ${on ? '' : 'dim'}" onclick="pot('red')">${ball('red', land ? 34 : 40)}<div class="tx"><b>红</b><em class="num">+1</em></div><div class="left">${left}</div></div>`;
+}
+/** 六格：该打红球时是「红 + 彩」组合，进了红球后是单颗彩球 —— 同一个位置永远是同一颗彩球 */
+function colorGrid(F, land) {
+  const combo = F.phase === 'red' && !F.free;
+  return `<div class="cols ${combo ? 'combo' : ''}">${BALLS.slice(1).map(b => {
+    let cls = '', badge = '', val = b.v, name = b.n, icon = ball(b.k, land ? 26 : 34, '');
+    if (combo) { val = 1 + b.v; name = '红' + b.n; icon = `<span class="duo">${ball('red', land ? 18 : 24, '')}${ball(b.k, land ? 26 : 34, '')}</span>`; }
+    else if (F.free) { cls = 'fb'; val = F.phase === 'clear' ? F.ci : 1; }
+    else if (F.phase === 'clear') {
+      if (b.v < F.ci) cls = 'done'; else if (b.v === F.ci) { cls = 'hl'; badge = `<span class="badge">下一颗</span>`; } else cls = 'dim';
+    }
+    return `<div class="cb ${cls}" onclick="pot('${b.k}')">${icon}<div class="tx"><small>${name}</small><b class="num">+${val}</b></div>${badge}</div>`;
+  }).join('')}</div>`;
+}
+function actRow(F) {
+  return `<div class="acts"><button class="foul press" onclick="openFoul()">犯规</button><button class="swap press" onclick="miss()">没进 · 换人</button></div>`;
+}
+
+/* ---------- 记分：竖屏 ---------- */
+function vScore() {
+  const F = D.F;
+  return `<div class="nav"><button class="bk press" onclick="go('home')">‹</button><div class="tt"><span class="t1">第 ${F.no} 局</span><span class="t2 num">${fmtBest()} · <span class="clk">${clock()}</span></span></div></div>
+  <div class="body">
+    <div class="card mstrip"><span class="pn"><span class="av sm" style="background:${PL[0].c}">I</span>Isaac</span><span class="fs"><b class="num">${D.fw[0]} : ${D.fw[1]}</b><span>局分</span></span><span class="pn">Henry<span class="av sm" style="background:${PL[1].c}">H</span></span></div>
+    <div class="pls" id="pls">${playerCard(0, F)}${playerCard(1, F)}</div>
+    ${infoStrip(F)}${askRow(F)}${redButton(F)}${colorGrid(F)}${actRow(F)}
+  </div>
+  <div class="dock"><button class="db" onclick="undo()">${ICON.undo}撤销</button><button class="db" onclick="openSheet({k:'log'})">${ICON.log}记录</button><button class="db" onclick="toggleLand()">${ICON.rot}横屏</button><button class="db end" onclick="openSheet({k:'fin'})">${ICON.flag}结算</button></div>`;
+}
+/* ---------- 记分：横屏 ---------- */
+function vLand() {
+  const F = D.F;
+  return `<div class="ltop">
+    <div class="lseg"><button class="lsb" onclick="toggleLand()">⤾ 竖屏</button><span class="lsd"></span><button class="lsb hl2" onclick="undo()">↶ 撤销</button></div>
+    <div class="lt"><b>第 ${F.no} 局 · 局分 ${D.fw[0]} : ${D.fw[1]}</b><span class="num">${fmtBest()} · <span class="clk">${clock()}</span></span></div>
+    <button class="lend press" onclick="openSheet({k:'fin'})">⚑ 结算</button>
+  </div>
+  <div class="lbody" id="pls">${playerCard(0, F, true)}
+    <div class="lmid">${infoStrip(F)}${redButton(F, true)}${colorGrid(F, true)}${actRow(F)}</div>
+    ${playerCard(1, F, true)}</div>`;
+}
+
+/* ---------- 面板 ---------- */
+function vSheet() {
+  const F = D.F;
+  if (app.screen === 'score' && F.over) return frameSheet();
+  const s = app.sheet; if (!s) return '';
+  let h = '';
+  if (s.k === 'foul') {
+    const off = F.act, opp = 1 - off;
+    h = `<div class="st">犯规 · ${PL[off].n}</div><div class="ss">罚分给 ${PL[opp].n} · 由 ${PL[opp].n} 接着打</div>
+      <div class="lab">罚分</div><div class="pens">${[4, 5, 6, 7].map(v => `<div class="pen ${s.pts === v ? 'sel' : ''}" onclick="setFoul('pts',${v})">${v > 4 ? `<span style="display:flex;align-items:center;gap:6px">${ball(byV(v).k, 16, '')}${v}</span>` : v}<small>${v === F.minPen ? '默认' : v > 4 ? '涉及' + byV(v).n + '球' : '最低'}</small></div>`).join('')}</div>
+      <button class="btn pri" style="margin-top:18px" onclick="confirmFoul()">确定 · ${PL[opp].n} +${s.pts}</button>`;
+  } else if (s.k === 'fin') {
+    h = `<div class="st">结算</div><div class="ss">局分 ${D.fw[0]} : ${D.fw[1]} · 本局 ${F.sc[0]} : ${F.sc[1]}</div>
+      <button class="btn pri" style="margin-top:18px" onclick="concede()">结束本局 · 判 ${PL[F.sc[0] === F.sc[1] ? 1 - F.act : F.sc[0] > F.sc[1] ? 0 : 1].n} 赢</button>
+      <button class="btn soft" style="margin-top:10px" onclick="endMatch()">结束比赛 · 查看战报</button>
+      <div class="lnk" onclick="closeSheet()">继续打</div>`;
+  } else if (s.k === 'log') {
+    const rows = F.breaks.slice().reverse();
+    h = `<div class="st">单杆记录 · 第 ${F.no} 局</div><div class="ss">犯规 ${PL[0].n} ${F.fouls[0]} 次 · ${PL[1].n} ${F.fouls[1]} 次</div>
+      <div style="margin-top:12px">${F.brk ? `<div class="logrow"><span class="v num" style="color:${PL[F.act].c}">${F.brk}</span>${dots(F.balls)}<small style="margin-left:auto;color:var(--tx2)">${PL[F.act].n} · 正在打</small></div>` : ''}
+      ${rows.map(r => `<div class="logrow"><span class="v num" style="color:${PL[r.p].c}">${r.v}</span>${dots(r.balls)}<small style="margin-left:auto;color:var(--tx2)">${PL[r.p].n}</small></div>`).join('') || (F.brk ? '' : '<div class="empty">这一局还没有得分</div>')}</div>
+      <div class="lnk" onclick="closeSheet()">关闭</div>`;
+  }
+  return `<div class="mask" onclick="closeSheet()"></div><div class="sheet"><div class="grab"></div>${h}</div>`;
+}
+function frameSheet() {
+  const F = D.F, w = F.win, hb = F.breaks.reduce((m, b) => (b.v > m.v ? b : m), { v: 0 });
+  if (D.over) {
+    return `<div class="mask"></div><div class="sheet"><div class="grab"></div>
+      <div style="display:flex;justify-content:center">${ball('black', 64)}</div>
+      <div class="st" style="margin-top:12px">${PL[D.winner].n} 赢下比赛</div><div class="ss">最后一局 ${F.sc[0]} : ${F.sc[1]}${hb.v ? ` · 单杆最高 ${PL[hb.p].n} ${hb.v}` : ''}</div>
+      <div class="big2"><div class="p"><div class="av" style="background:${PL[0].c};width:44px;height:44px">I</div>Isaac</div><div style="text-align:center"><div class="num" style="font-size:54px;font-weight:900;line-height:1">${D.fw[0]} : ${D.fw[1]}</div><div style="font-size:12px;color:var(--tx2);font-weight:700;margin-top:4px">局分 · ${fmtBest()}</div></div><div class="p"><div class="av" style="background:${PL[1].c};width:44px;height:44px">H</div>Henry</div></div>
+      <button class="btn pri" style="margin-top:16px" onclick="go('result')">保存战绩，查看战报</button>
+      <div class="lnk" onclick="undo()">撤销最后一杆</div></div>`;
+  }
+  const nb = (app.cfg.first + F.no) % 2;
+  return `<div class="mask"></div><div class="sheet"><div class="grab"></div>
+    <div style="display:flex;justify-content:center">${ball('black', 64)}</div>
+    <div class="st" style="margin-top:12px">第 ${F.no} 局 · ${PL[w].n} 拿下</div><div class="ss">${F.sc[0]} : ${F.sc[1]}${hb.v ? ` · 单杆最高 ${PL[hb.p].n} ${hb.v}` : ''}</div>
+    <div class="big2"><div class="p"><div class="av" style="background:${PL[0].c};width:44px;height:44px">I</div>Isaac</div><div style="text-align:center"><div class="num" style="font-size:54px;font-weight:900;line-height:1">${D.fw[0]} : ${D.fw[1]}</div><div style="font-size:12px;color:var(--tx2);font-weight:700;margin-top:4px">局分 · ${fmtBest()}</div></div><div class="p"><div class="av" style="background:${PL[1].c};width:44px;height:44px">H</div>Henry</div></div>
+    <button class="btn pri" style="margin-top:16px" onclick="nextFrame()">开始第 ${F.no + 1} 局 · ${PL[nb].n} 开球</button>
+    <button class="btn soft" style="margin-top:10px" onclick="endMatch()">结束比赛</button>
+    <div class="lnk" onclick="undo()">撤销最后一杆</div></div>`;
+}
+function vSup() {
+  const u = app.sup; if (!u || app.screen !== 'score') return '';
+  const p = PL[u.p];
+  return `<div class="supov" onclick="hideSup()"><div class="supbx">
+    <div class="rings"><i></i><i></i><i></i></div>
+    <div class="sparks">${Array.from({ length: 10 }, (_, k) => `<i style="--a:${k * 36}deg;--c:${['#FFB020', '#FF5A5F', '#FFFFFF', '#FFC53D', p.c][k % 5]}"></i>`).join('')}</div>
+    <div class="supbadge" style="--pc:${p.c}">超分</div>
+    <div class="supname"><span class="av sm" style="background:${p.c}">${p.ch}</span>${p.n}</div>
+    <div class="supsub num">领先 ${u.lead} · 台面剩余 ${u.rem}</div>
+  </div></div>`;
+}
+function vBanner() {
+  const b = app.banner; if (!b) return '';
+  return `<div class="banner" onclick="app.banner=null;render()"><div class="bx">${ball(b.k, 76, b.icon)}<div class="bt">${b.t}</div><div class="bs">${b.s}</div><div class="btap">轻点任意处继续</div></div></div>`;
+}
+
+/* ---------- 战报 ---------- */
+function vResult() {
+  const frames = D.frames, all = frames.concat(D.cur && (D.cur.sc[0] || D.cur.sc[1]) ? [] : []);
+  const w = D.fw[0] === D.fw[1] ? null : D.fw[0] > D.fw[1] ? 0 : 1;
+  const breaks = frames.flatMap(f => f.breaks.map(b => ({ ...b, no: f.no }))).sort((a, b) => b.v - a.v).slice(0, 4);
+  const tot = [0, 1].map(p => frames.reduce((a, f) => a + f.sc[p], 0));
+  const hi = [0, 1].map(p => Math.max(0, ...frames.flatMap(f => f.breaks.filter(b => b.p === p).map(b => b.v))));
+  const fifty = [0, 1].map(p => frames.flatMap(f => f.breaks.filter(b => b.p === p && b.v >= 50)).length);
+  const pens = [0, 1].map(p => frames.reduce((a, f) => a + f.pens[p], 0));
+  const r = (l, v, big = true) => `<div class="r"><span>${l}</span><b class="num ${v[0] !== v[1] && (big ? v[0] > v[1] : v[0] < v[1]) ? 'w' : ''}">${v[0]}</b><b class="num ${v[0] !== v[1] && (big ? v[1] > v[0] : v[1] < v[0]) ? 'w' : ''}">${v[1]}</b></div>`;
+  return `<div class="nav"><button class="bk press" onclick="go('home')">‹</button><div class="tt"><span class="t1">战报</span></div></div>
+  <div class="res">
+    <div class="hero card"><div class="ht"><b>斯诺克 · ${fmtBest()}</b><span>${new Date().getMonth() + 1}月${new Date().getDate()}日</span></div>
+      <div class="w">${w == null ? '比赛未分胜负' : `<span style="color:${PL[w].c}">${PL[w].n}</span> ${D.over ? '赢下比赛' : '领先时结束'}`}</div>
+      <div class="vs"><div class="p"><div class="av" style="background:${PL[0].c};width:50px;height:50px;font-size:20px">I</div>Isaac</div><div class="sc2 num">${D.fw[0]} : ${D.fw[1]}</div><div class="p"><div class="av" style="background:${PL[1].c};width:50px;height:50px;font-size:20px">H</div>Henry</div></div></div>
+    <div class="sl">每局比分<small>单杆最高</small></div>
+    <div class="card frames">${frames.map(f => { const m = Math.max(1, f.sc[0] + f.sc[1]); const hb = Math.max(0, ...f.breaks.map(b => b.v)); return `<div class="fr"><span class="no">第 ${f.no} 局</span><span class="bar"><i style="width:${Math.round(f.sc[f.win] / m * 100)}%;background:${PL[f.win].c}"></i></span><span class="s num">${f.sc[0]}:${f.sc[1]}</span><span class="hb num">${hb}</span></div>`; }).join('') || '<div class="empty">还没有打完的局</div>'}</div>
+    <div class="sl">单杆榜</div>
+    <div class="card bks">${breaks.map((b, i) => `<div class="bk2"><span class="v num" style="${i === 0 ? 'color:#E5383B' : ''}">${b.v}</span>${dots(b.balls)}<small>${PL[b.p].n} · 第 ${b.no} 局</small></div>`).join('') || '<div class="empty">还没有单杆</div>'}</div>
+    <div class="sl">数据对比</div>
+    <div class="card cmp"><div class="r"><span></span><b style="color:${PL[0].c}">Isaac</b><b style="color:${PL[1].c}">Henry</b></div>${r('总得分', tot)}${r('单杆最高', hi)}${r('50+ 单杆', fifty)}${r('对手犯规得分', pens)}${app.cfg.hc.p >= 0 ? r('让分', [0, 1].map(p => (app.cfg.hc.p === p ? app.cfg.hc.pts * frames.length : 0)), false) : ''}</div>
+  </div>
+  <div class="cta" style="display:flex;gap:10px"><button class="btn soft" onclick="go('home')">回首页</button><button class="btn pri" onclick="resetMatch();go('setup')">再来一局</button></div>`;
+}
+
+/* =====================================================================
+   操作
+   ===================================================================== */
+let toastT = null;
+function toast(t) { app.toast = t; render(); clearTimeout(toastT); toastT = setTimeout(() => { app.toast = null; const el = document.querySelector('#content .toast'); if (el) el.remove(); render.keys && (render.keys.toast = ''); }, 1900); } // 消失时只移除提示本身，不重画（避免吞掉正在进行的点击）
+function go(s) { app.screen = s; app.sheet = null; render(); }
+function setCfg(k, v) { app.cfg[k] = v; render(); }
+function setHc(k, v) { app.cfg.hc[k] = v; render(); }
+function stepHc(d) { const h = app.cfg.hc; h.pts = Math.max(1, Math.min(99, h.pts + d)); render(); }
+function start() { resetMatch(); app.screen = 'score'; render(); }
+function resetMatch() { app.ev = []; app.t0 = Date.now(); app.sheet = null; app.banner = null; app.sup = null; app.supFx = -1; }
+function resetAll() { resetMatch(); app.land = false; app.screen = 'home'; render(); }
+function push(e) { app.ev.push(e); }
+function fly(text, neg) {
+  const box = $('#pls'); if (!box) return;
+  const cards = box.querySelectorAll('.pl'), i = neg != null ? neg : D.F.act;
+  const r = cards[i].getBoundingClientRect(), s = $('#sc').getBoundingClientRect(), k = scale;
+  const el = document.createElement('div'); el.className = 'fly num'; el.textContent = text;
+  el.style.left = ((r.left - s.left + r.width / 2) / k - 22) + 'px'; el.style.top = ((r.top - s.top) / k + 50) + 'px';
+  $('#fx').appendChild(el); setTimeout(() => el.remove(), 1000);
+}
+function pot(k) {
+  const F = D.cur; if (!F || app.sheet) return;
+  let e = null;
+  if (F.free) e = { t: 'pot', b: k };
+  else if (F.phase === 'red') e = k === 'red' ? { t: 'pot', b: 'red' } : { t: 'pot2', b: k };
+  else if (F.phase === 'color') e = k !== 'red' ? { t: 'pot', b: k } : null;
+  else e = k !== 'red' && B[k].v === F.ci ? { t: 'pot', b: k } : null;
+  if (!e) { toast(F.phase === 'color' ? '先打一颗彩球' : k === 'red' ? '红球已清台' : `按顺序：${byV(F.ci).n}球`); return; }
+  const before = F.brk, who = F.act, sup0 = F.sup;
+  push(e);
+  const N = derive(app.cfg, app.ev).F, gain = N.sc[who] - F.sc[who];
+  app.bump = who; render(); fly('+' + gain);
+  const after = N.over ? N.breaks.filter(x => x.p === who).slice(-1)[0]?.v || 0 : N.brk;
+  const ms = [147, 100, 50].find(m => before < m && after >= m);
+  if (ms) setTimeout(() => { app.banner = { k: ms === 147 ? 'black' : 'pink', icon: ms, t: ms === 147 ? '147 满分杆' : `单杆破 ${ms}`, s: `${PL[who].n} · 本杆 ${after}` }; render(); }, 250);
+  else checkSup(sup0);
+  if (N.respot && !F.respot) setTimeout(() => toast('平分 · 重摆黑球'), 300);
+}
+/** 超分提醒：刚刚超过台面剩余分时播一次动效 */
+let supT = null;
+function checkSup(sup0) {
+  const F = D.cur; if (!F || F.sup < 0 || F.sup === sup0) return;
+  const p = F.sup, lead = Math.abs(F.sc[0] - F.sc[1]);
+  app.supFx = p; app.sup = { p, lead, rem: F.rem }; render();
+  document.querySelectorAll('#fx .supov').forEach(e => e.remove());
+  $('#fx').insertAdjacentHTML('beforeend', vSup()); // 动效层不跟着重画，动画只播一次
+  clearTimeout(supT); supT = setTimeout(hideSup, 2400);
+}
+function hideSup() {
+  clearTimeout(supT); app.sup = null; app.supFx = -1;
+  const el = document.querySelector('#fx .supov'); if (el) { el.classList.add('out'); setTimeout(() => el.remove(), 300); }
+  document.querySelectorAll('#content .supfx').forEach(e => e.classList.remove('supfx'));
+}
+function miss() { const F = D.cur; if (!F || app.sheet) return; push({ t: 'miss' }); render(); }
+function openFoul() { const F = D.cur; if (!F) return; app.sheet = { k: 'foul', pts: F.minPen, again: false, free: false }; render(); }
+function setFoul(k, v) { app.sheet[k] = v; render(); }
+function confirmFoul() {
+  const s = app.sheet, F = D.cur, opp = 1 - F.act;
+  const sup0 = F.sup;
+  push({ t: 'foul', pts: s.pts, again: s.again, free: s.free }); app.sheet = null; app.bump = opp; render(); fly('+' + s.pts, opp);
+  checkSup(sup0);
+  if (s.free) setTimeout(() => toast(`自由球：${PL[s.again ? F.act : opp].n} 可以任选一颗当目标球`), 200);
+}
+function openSheet(s) { app.sheet = s; render(); }
+function closeSheet() { app.sheet = null; render(); }
+function undo() {
+  if (!app.ev.length) { toast('没有可撤销的记录'); return; }
+  const e = app.ev.pop(); app.sheet = null; app.banner = null;
+  hideSup();
+  toast('已撤销：' + (e.t === 'pot2' ? '红 + ' + B[e.b].n : e.t === 'pot' ? B[e.b].n + '球' : e.t === 'miss' ? '换人' : e.t === 'foul' ? '犯规 ' + e.pts + ' 分' : e.t === 'next' ? '开始下一局' : '结束本局'));
+}
+function nextFrame() { push({ t: 'next' }); render(); }
+function concede() { push({ t: 'concede' }); app.sheet = null; render(); }
+function endMatch() { app.sheet = null; if (D.cur && (D.cur.sc[0] || D.cur.sc[1])) push({ t: 'concede' }); go('result'); }
+function toggleLand() { app.land = !app.land; app.sheet = null; render(); }
+
+/* ---------- 快速演示：用真实事件把对局推进到某个状态 ---------- */
+function ensureScore() { if (app.screen !== 'score' || D.over) { resetMatch(); app.screen = 'score'; } D = derive(app.cfg, app.ev); }
+function run(seq) { const sup0 = D.cur ? D.cur.sup : -1; seq.forEach(e => { D = derive(app.cfg, app.ev); if (D.cur) push(e); }); render(); checkSup(sup0); }
+function demoClearance() {
+  resetMatch(); app.screen = 'score';
+  // 一局固定的比赛：每一项是一杆（谁打不用写，换人自动轮换）
+  const breaks = [
+    ['red', 'black', 'red', 'black'],   // Isaac 16
+    ['red', 'blue'],                    // Henry 6
+    ['red', 'pink', 'red', 'black'],    // Isaac 31
+    ['red', 'green', 'red', 'blue'],    // Henry 16
+    ['red', 'black'],                   // Isaac 39
+    ['red', 'pink'],                    // Henry 23
+    ['red', 'black', 'red', 'black'],   // Isaac 55
+    ['red', 'blue', 'red', 'green'],    // Henry 33
+    ['red', 'black', 'red', 'brown'],   // Isaac 68（红球清台）
+    ['yellow', 'green'],                // Henry 38，正在清彩
+  ];
+  const seq = [];
+  breaks.forEach((bk, i) => { if (i) seq.push({ t: 'miss' }); bk.forEach(b => seq.push({ t: 'pot', b })); });
+  run(seq);
+}
+function demoFrame() {
+  ensureScore();
+  const seq = [], F = () => derive(app.cfg, app.ev.concat(seq)).F;
+  let k = 0;
+  while (!F().over && k++ < 400) {
+    const f = F();
+    if (f.phase === 'red') { seq.push({ t: 'pot', b: 'red' }); continue; }
+    if (f.phase === 'color') { seq.push({ t: 'pot', b: ['black', 'pink', 'blue', 'black'][k % 4] }); if (k % 3 === 0) seq.push({ t: 'miss' }); continue; }
+    seq.push({ t: 'pot', b: byV(f.ci).k });
+  }
+  run(seq);
+}
+function demoBreak() {
+  ensureScore();
+  const F = D.cur; if (!F || F.phase === 'clear' || F.reds < 7) { toast('红球不够了，先「从首页重新开始」'); return; }
+  if (F.brk || F.phase === 'color') { push({ t: 'miss' }); }
+  const seq = []; for (let i = 0; i < 6; i++) seq.push({ t: 'pot', b: 'red' }, { t: 'pot', b: 'black' });
+  run(seq); setTimeout(() => pot('red'), 350); setTimeout(() => pot('black'), 900);
+}
+function demoTie() {
+  resetMatch(); app.screen = 'score';
+  // 前 14 颗红：两人各 7 次「红 + 黑」→ 56 : 56
+  const seq = [];
+  for (let i = 0; i < 14; i++) seq.push({ t: 'pot', b: 'red' }, { t: 'pot', b: 'black' }, { t: 'miss' });
+  seq.push({ t: 'pot', b: 'red' }, { t: 'pot', b: 'pink' }, { t: 'miss' });   // Isaac 最后一颗红 + 粉 → 63
+  seq.push({ t: 'pot', b: 'yellow' }, { t: 'miss' });                           // Henry 黄 → 58
+  seq.push({ t: 'pot', b: 'green' }, { t: 'miss' });                            // Isaac 绿 → 66
+  seq.push({ t: 'pot', b: 'brown' }, { t: 'pot', b: 'blue' }, { t: 'pot', b: 'pink' }, { t: 'miss' }); // Henry 棕蓝粉 → 73
+  run(seq); toast('只剩黑球：Henry 73 领先 Isaac 66<br>点「黑 7」让 Isaac 打成平分');
+}
+
+/* ---------- 缩放适配 & 事件日志 ---------- */
+let scale = 1;
+function fit() {
+  const st = $('#stage'), ph = $('#ph'), h = $('#holder');
+  const W = ph.offsetWidth || 410, H = ph.offsetHeight || 864;
+  scale = Math.min(1, (st.clientWidth - 40) / W, (st.clientHeight - 40) / H);
+  ph.style.transform = `scale(${scale})`; // 外层按缩放后的尺寸占位，不会溢出
+  h.style.width = W * scale + 'px'; h.style.height = H * scale + 'px';
+}
+function log() {
+  const el = $('#evlog'); if (!el) return;
+  const name = e => e.t === 'pot2' ? `pot2  red+${e.b}` : e.t === 'pot' ? `pot   ${e.b}` : e.t === 'foul' ? `foul  ${e.pts}${e.again ? ' again' : ''}${e.free ? ' free' : ''}` : e.t;
+  el.textContent = app.ev.length ? app.ev.slice(-14).map((e, i) => `${String(app.ev.length - Math.min(14, app.ev.length) + i + 1).padStart(3)}  ${name(e)}`).join('\n') : '（还没有事件）';
+  el.scrollTop = el.scrollHeight;
+}
+window.addEventListener('resize', fit);
+setInterval(() => { document.querySelectorAll('.clk').forEach(e => { e.textContent = clock(); }); }, 1000);
+render();
+</script>
+</body>
+</html>

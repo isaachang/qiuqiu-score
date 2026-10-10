@@ -48,3 +48,26 @@
 /* 限时比赛：最后 5 分钟 / 超时 变红 */
 .lclk{font-variant-numeric:tabular-nums}
 .lclk.warn,.lclk.over{color:#F0444D;font-weight:700}
+
+/* 更多玩法 v2：和双人 / 三人追分一样的立体卡片（渐变底 + 静态装饰圆 + 光泽台球 + 同色投影），不加动画 */
+.mm{position:relative;overflow:hidden;height:212rpx;border-radius:44rpx;padding:24rpx;color:#fff;justify-content:flex-end;gap:4rpx;
+  box-shadow:inset 0 2rpx 0 rgba(255,255,255,.35),0 26rpx 44rpx -24rpx var(--sh)}
+.mm.m-snk{background:linear-gradient(150deg,#2BC07E,#14875A);--sh:rgba(20,135,90,.75)}
+.mm.m-8{background:linear-gradient(150deg,#FFC14A,#FF8A3D);--sh:rgba(255,138,61,.7)}
+.mm.m-9{background:linear-gradient(150deg,#AE88FF,#7650E6);--sh:rgba(118,80,230,.7)}
+.mmo{position:absolute;right:-56rpx;top:-56rpx;width:180rpx;height:180rpx;border-radius:50%;background:rgba(255,255,255,.16)}
+.mm::after{content:"";position:absolute;left:0;right:0;top:0;height:46%;background:linear-gradient(180deg,rgba(255,255,255,.16),transparent);pointer-events:none}
+.mi3{position:absolute;right:20rpx;top:20rpx;width:68rpx;height:68rpx;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:1;
+  box-shadow:0 14rpx 22rpx -10rpx rgba(0,0,0,.45)}
+.mi3 text{width:32rpx;height:32rpx;border-radius:50%;background:#fff;color:#16161A;font-size:20rpx;font-weight:900;display:flex;align-items:center;justify-content:center}
+.b-red{background:radial-gradient(circle at 34% 28%,rgba(255,255,255,.85) 0 8%,transparent 22%),radial-gradient(circle at 60% 72%,transparent 40%,rgba(0,0,0,.35) 100%),#E5383B}
+.b-8{background:radial-gradient(circle at 34% 28%,rgba(255,255,255,.7) 0 8%,transparent 22%),radial-gradient(circle at 60% 72%,transparent 40%,rgba(0,0,0,.4) 100%),#1E1E22}
+.b-9{background:radial-gradient(circle at 34% 28%,rgba(255,255,255,.9) 0 8%,transparent 22%),radial-gradient(circle at 60% 72%,transparent 40%,rgba(0,0,0,.3) 100%),linear-gradient(180deg,#fff 0 26%,#FFC21A 26% 74%,#fff 74%)}
+.mm .mmt{position:relative;z-index:1;font-size:30rpx;font-weight:900;text-shadow:0 2rpx 6rpx rgba(0,0,0,.12)}
+.mm .mtag{position:relative;z-index:1;align-self:flex-start;font-size:21rpx;font-weight:800;opacity:.85}
+.mm .mtag.go{opacity:1;padding:4rpx 14rpx;border-radius:99rpx;background:rgba(255,255,255,.24)}
+.mpress2{transform:scale(.95)}
+
+/* 最近对局：大卡片 */
+.mcs{display:flex;flex-direction:column;gap:20rpx}
+.more-btn{height:96rpx;border-radius:36rpx;background:#fff;box-shadow:0 20rpx 56rpx -28rpx rgba(60,40,20,.28);display:flex;align-items:center;justify-content:center;font-size:28rpx;font-weight:800;color:var(--tx)}

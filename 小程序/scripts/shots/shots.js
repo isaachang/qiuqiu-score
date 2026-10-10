@@ -3,7 +3,7 @@
 // 用模拟运行时跑出真实页面数据 → 渲染成 HTML → 无头 Chrome 截图（iPhone 14 尺寸，3 倍图）
 const fs = require('fs');
 const path = require('path');
-const { execFileSync } = require('child_process');
+const { snap } = require('./chrome');
 const { install, ROOT } = require('./runtime');
 const R = require('./render');
 
@@ -119,13 +119,14 @@ body{width:${W}px;height:${H}px;overflow:hidden;--sbh:${win.sb}px}
   const htmlFile = path.join(TMP, name + '.html');
   fs.writeFileSync(htmlFile, html);
   const png = path.join(OUT, name + '.png');
-  execFileSync(CHROME, ['--headless=new', '--disable-gpu', '--hide-scrollbars', '--force-device-scale-factor=3', `--window-size=${W},${H}`,
-    '--allow-file-access-from-files', '--virtual-time-budget=1500', '--default-background-color=00000000', `--screenshot=${png}`, 'file://' + htmlFile], { stdio: 'ignore' });
+  snap(['--headless=new', '--disable-gpu', '--hide-scrollbars', '--force-device-scale-factor=3', `--window-size=${W},${H}`,
+    '--allow-file-access-from-files', '--virtual-time-budget=1500', '--default-background-color=00000000', `--user-data-dir=${path.join(TMP, 'chrome-' + name)}`, 'file://' + htmlFile], png);
   console.log('✓', name, `${W}×${H}`);
   return png;
 }
 
-/* ---------- 场景 ---------- */
+/* ---------- 场景（README 用） ---------- */
+function readme() {
 const g = rt.APP.globalData;
 const s = store.get();                       // 开发版：自动载入演示数据（Isaac / Henry / Hugo）
 s.settings.welcomed = true; s.settings.coach2 = true; s.settings.coach3 = true;
@@ -173,11 +174,37 @@ const m = s.history.find(x => x.mode === 3 && x.demo);
 p = rt.loadPage('result', { id: m.id }); shot('result', 'result', p, { h: 2330 });
 p.data.scrolled = true; p.data.conf = []; shot('result-table', 'result', p, { scroll: 1150 });
 // 9. 战绩（长图）
-p = rt.loadPage('stats'); shot('stats', 'stats', p, { h: 3220, tab: 1 });
+p = rt.loadPage('stats'); shot('stats', 'stats', p, { h: 3450, tab: 1 });
 shot('stats-top', 'stats', p, { tab: 1 });
-p.data.scrolled = true; shot('stats-mid', 'stats', p, { scroll: 960, tab: 1 });
+p.data.scrolled = true; shot('stats-mid', 'stats', p, { scroll: 700, tab: 1 });
 // 10. 历史日历
 p = rt.loadPage('history', { seg: 'all', days: '0' }); p.toggleMode(); rt.flush(); shot('history', 'history', p);
 // 11. 我的
 p = rt.loadPage('me'); shot('me', 'me', p, { tab: 2 });
+// 12. 斯诺克：设置（让分拔河）→ 记分 → 战报
+s.live = null; const sd = store.snkDraft(); sd.players = [me, henry]; sd.cfg = { first: 0, bestOf: 3, reds: 15, hc: { p: 1, pts: 14 } }; store.save();
+p = rt.loadPage('snk-setup'); shot('snk-setup', 'snk-setup', p);
+store.startSnk();
+p = rt.loadPage('snk-score'); p.once = () => true;
+const tap = k => { p._lock = 0; p.onBall({ currentTarget: { dataset: { k } } }); };
+const fresh = () => { rt.dropTimers(); p.data.flies = []; p.data.banner = null; p.hideSup(); };
+// 第 1 局：Isaac 打满一杆后失误，Henry 收掉
+['black', 'black', 'pink', 'black', 'blue'].forEach(tap); p.onMiss(); ['black', 'black'].forEach(tap); p.onMiss();
+let gn = 0; while (p.data.vm.phase !== 'clear' && gn++ < 40) tap('black');
+['yellow', 'green', 'brown', 'blue', 'pink', 'black'].forEach(tap); fresh(); p.closeBanner(); rt.flush(); p.nextFrame();
+// 第 2 局打到一半截图
+['black', 'black', 'pink', 'red', 'blue'].forEach(tap); p.onMiss(); ['black', 'pink'].forEach(tap); fresh();
+s.live.start = Date.now() - 52 * 60e3; s.live.touch = Date.now(); store.save(); p.startClock && p.startClock(); rt.dropTimers();
+shot('snk-score', 'snk-score', p);
+// 打完第 2 局 → 保存 → 战报
+gn = 0; while (p.data.vm.phase !== 'clear' && gn++ < 40) tap('black');
+['yellow', 'green', 'brown', 'blue', 'pink', 'black'].forEach(tap); fresh(); p.closeBanner(); rt.flush();
+if (!p.S.over) { p.nextFrame(); gn = 0; while (p.data.vm.phase !== 'clear' && gn++ < 40) tap('black'); ['yellow', 'green', 'brown', 'blue', 'pink', 'black'].forEach(tap); fresh(); p.closeBanner(); rt.flush(); }
+{ const L = s.live, t0 = Date.now() - 80 * 60e3; L.start = t0; L.events.forEach((e, k) => { e.t = t0 + k * 45e3; }); store.save(); } // 每局时长摊开，战报里显示真实的分钟数
+p.saveMatch(); rt.flush();
+p = rt.loadPage('snk-result', { id: s.history[0].id }); shot('snk-result', 'snk-result', p);
 console.log('→', OUT);
+}
+
+module.exports = { shot, rt, store, win, OUT };
+if (require.main === module) readme();

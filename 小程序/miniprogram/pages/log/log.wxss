@@ -3,7 +3,7 @@
 .sn{flex:1;min-width:0;font-size:26rpx;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sv{font-size:38rpx;font-weight:800}
 .lr{display:flex;align-items:center;gap:20rpx;padding:24rpx 28rpx;position:relative}
-.lr+.lr::before{content:"";position:absolute;top:0;left:200rpx;right:0;height:1rpx;background:var(--line)}
+.lr.sep::before{content:"";position:absolute;top:0;left:200rpx;right:0;height:1rpx;background:var(--line)}
 .rowp{background:var(--line)}
 .rd{width:64rpx;display:flex;flex-direction:column;align-items:center;flex:none}
 .rn{font-size:32rpx;font-weight:800;line-height:1}
@@ -13,3 +13,18 @@
 .ls{font-size:24rpx;color:var(--tx2);margin-top:4rpx}
 .ln{font-size:22rpx;color:var(--tx3);margin-top:4rpx}
 .ld{display:flex;flex-direction:column;align-items:flex-end;font-size:26rpx;font-weight:700;line-height:1.5;white-space:nowrap}
+
+/* 编辑面板 */
+.elab{font-size:24rpx;font-weight:800;color:var(--tx3);margin:30rpx 8rpx 14rpx}
+.eseg{display:flex;gap:12rpx}
+.es2{flex:1;height:96rpx;border-radius:30rpx;background:#F0EEE9;display:flex;align-items:center;justify-content:center;gap:12rpx;font-size:27rpx;font-weight:800;color:var(--tx2);transition:background .2s,color .2s}
+.es2.on{background:var(--ink);color:#fff}
+.eevs{display:grid;grid-template-columns:repeat(3,1fr);gap:12rpx}
+.eev{height:110rpx;border-radius:30rpx;background:#F0EEE9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4rpx;transition:background .2s,color .2s}
+.een{font-size:26rpx;font-weight:800}
+.eev2{font-size:30rpx;font-weight:900}
+.ebtn{margin-top:36rpx}
+.ecancel{text-align:center;color:var(--tx2);font-size:30rpx;font-weight:600;padding:30rpx 0 4rpx}
+
+/* 左滑的白色行会盖住卡片圆角，裁一下 */
+.lgc{overflow:hidden}

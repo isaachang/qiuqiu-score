@@ -1,1 +1,1 @@
-{"usingComponents": {"trend-chart": "/components/trend-chart/trend-chart", "nav-bar": "/components/nav-bar/nav-bar"}, "navigationStyle": "custom"}
+{"usingComponents": {"trend-chart": "/components/trend-chart/trend-chart", "nav-bar": "/components/nav-bar/nav-bar", "match-card": "/components/match-card/match-card"}, "navigationStyle": "custom"}

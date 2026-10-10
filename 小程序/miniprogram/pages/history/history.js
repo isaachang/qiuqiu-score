@@ -4,6 +4,8 @@ const store = require('../../utils/store');
 const nav = require('../../utils/nav');
 const { matchRow } = require('../../utils/rows');
 const { derived } = require('../../utils/cache');
+const { isChase, isSnk, resultUrl } = require('../../utils/game');
+const SN = require('../../utils/snooker');
 const { signed, outcome } = require('../../utils/engine');
 const { enter, onScroll } = require('../../utils/page');
 const { ask, uiDone } = require('../../utils/ui');
@@ -31,17 +33,21 @@ Page({
   /** 把对局按天归档：每天的场次、胜负、净胜分 */
   index() {
     const s = store.get(), me = s.friends.find(f => f.me), since = this.days ? Date.now() - this.days * 864e5 : 0;
-    const ms = s.history.filter(m => m.status === 'done' && m.players.includes(me.id) && (this.seg === 'all' || m.mode === +this.seg) && m.start >= since);
+    // 「全部」里也有斯诺克；按双人 / 三人筛选时只看追分
+    const ms = s.history.filter(m => m.status === 'done' && (this.seg === 'all' ? (isChase(m) || isSnk(m)) : this.seg === 'snk' ? isSnk(m) : isChase(m) && m.mode === +this.seg) && m.players.includes(me.id) && m.start >= since);
     const idx = {};
     ms.forEach(m => {
-      const k = keyOf(new Date(m.start)), D = derived(m), i = m.players.indexOf(me.id), my = D.scores[i], oc = outcome(D.scores, i);
+      const k = keyOf(new Date(m.start)), i = m.players.indexOf(me.id);
       const g = idx[k] || (idx[k] = { ms: [], w: 0, l: 0, net: 0 });
-      g.ms.push(m); g.net += my;
+      g.ms.push(m);
+      let oc;
+      if (isSnk(m)) oc = SN.outcome(SN.derive(m), i); // 斯诺克按局分算胜负，不计入净胜分
+      else { const D = derived(m); g.net += D.scores[i]; oc = outcome(D.scores, i); }
       if (oc === 'W') g.w++; else if (oc === 'L') g.l++;
     });
     this.idx = idx;
     this.latest = Object.keys(idx).map(Number).sort((a, b) => b - a)[0] || 0;
-    const f = [this.seg === 'all' ? '' : this.seg === '2' ? '双人' : '三人', this.days ? `近 ${this.days} 天` : ''].filter(Boolean).join(' · ');
+    const f = [this.seg === 'all' ? '' : this.seg === 'snk' ? '斯诺克' : this.seg === '2' ? '双人' : '三人', this.days ? `近 ${this.days} 天` : ''].filter(Boolean).join(' · ');
     this.setData({ total: ms.length, filterTxt: f });
   },
 
@@ -74,7 +80,7 @@ Page({
     const lat = this.latest && this.latest !== this.sel ? dateOf(this.latest) : null;
     this.setData({
       title: `${a.getFullYear()}年${month + 1}月`, cells, day,
-      rows: g ? [...g.ms].sort((x, y) => y.start - x.start).map(matchRow) : [],
+      rows: g ? [...g.ms].sort((x, y) => y.start - x.start).map(m => matchRow(m, { time: true })) : [],
       monthSum: { n: mn, w: mw, net: signed(mnet), cls: mnet > 0 ? 'pos' : mnet < 0 ? 'neg' : '' },
       latestTxt: lat ? `${lat.getMonth() + 1}月${lat.getDate()}日` : '',
     });
@@ -111,7 +117,7 @@ Page({
     if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) dx < 0 ? this.next() : this.prev();
   },
 
-  open(e) { nav.to('/pages/result/result?id=' + e.currentTarget.dataset.id); },
+  open(e) { const m = store.match(e.currentTarget.dataset.id); if (m) nav.to(resultUrl(m)); },
   askDelete(e) {
     const id = e.currentTarget.dataset.id;
     ask(this, { icon: 'warn', title: '删除这场对局？', desc: '删除后战绩统计会同步更新，无法恢复。', actions: [{ k: 'del', t: '删除', type: 'danger' }] })

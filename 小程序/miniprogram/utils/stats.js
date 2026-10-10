@@ -1,6 +1,7 @@
 // 球球记分 · 战绩统计（纯函数，输入历史对局，输出统计页 / 交手页需要的全部数据）
 const { EV, signed, outcome, played } = require('./engine');
 const { derived } = require('./cache');
+const { isChase } = require('./game');
 
 const pct = (a, b) => (b ? Math.round(a / b * 100) : 0);
 const md = t => { const d = new Date(t); return `${d.getMonth() + 1}/${d.getDate()}`; };
@@ -48,7 +49,7 @@ function titleOf(p) {
 /** 统计页 */
 function overview(history, meId, seg, view, days) {
   const since = days ? Date.now() - days * 864e5 : 0;
-  const ms = history.filter(m => m.status === 'done' && m.players.includes(meId) && (seg === 'all' || m.mode === +seg) && m.start >= since);
+  const ms = history.filter(m => m.status === 'done' && isChase(m) && m.players.includes(meId) && (seg === 'all' || m.mode === +seg) && m.start >= since);
   const P = personal(ms, meId);
   const chrono = [...ms].reverse();
 
@@ -70,7 +71,8 @@ function overview(history, meId, seg, view, days) {
     const D = derived(m), i = m.players.indexOf(meId);
     m.players.forEach((id, j) => {
       if (id === meId) return;
-      const r = rel[id] || (rel[id] = { id, n: 0, w: 0, l: 0, net: 0 });
+      const r = rel[id] || (rel[id] = { id, n: 0, w: 0, l: 0, net: 0, last: 0 });
+      r.last = Math.max(r.last, m.start);
       r.n++; if (D.scores[i] > D.scores[j]) r.w++; else if (D.scores[i] < D.scores[j]) r.l++;
       r.net += transfer(m, D, i, j);
     });
@@ -86,20 +88,17 @@ function overview(history, meId, seg, view, days) {
   const mm = Math.round(P.durAvg / 6e4);
   return {
     wld: { rate: pct(P.mWins, P.n), w: P.mWins, l: P.mLoss, d: P.mDraw },
-    grid: [
-      { l: '累计得分', v: signed(P.score), cls: P.score > 0 ? 'pos' : P.score < 0 ? 'neg' : '' },
-      { l: '场均得分', v: signed(P.avg), cls: P.avg > 0 ? 'pos' : P.avg < 0 ? 'neg' : '' },
-      { l: '出金率', v: P.goldRate + '%', hot: true },
-      { l: '最高连胜', v: P.best },
-      { l: '普胜', v: P.ev.pu, c: EV.pu.t }, { l: '大金', v: P.ev.dj, c: EV.dj.t }, { l: '小金', v: P.ev.xj, c: EV.xj.t }, { l: '黄金九', v: P.ev.h9, c: EV.h9.t },
-      { l: '犯规', v: P.ev.foul, c: EV.foul.t }, { l: '场均犯规', v: P.foulPerMatch }, { l: '总局数', v: P.rounds }, { l: '场均时长', v: P.n ? (mm >= 60 ? `${mm / 60 | 0}h${mm % 60}m` : `${mm}分`) : '—' },
-    ],
-    sources: gt ? [{ k: 'pu', l: '普胜', v: g.pu, c: EV.pu.c, w: Math.round(g.pu / gt * 100) }, { k: 'gold', l: '金球', v: g.gold, c: EV.dj.c, w: Math.round(g.gold / gt * 100) },
-      { k: 'foul', l: '对手犯规', v: g.foul, c: '#9B6BFF', w: Math.round(g.foul / gt * 100) }].filter(x => x.v) : [],
-    gainTotal: gt,
+    // 我的数据：效率（比率类）/ 进球（次数）/ 得分来源，分组放在一张卡片里；净胜分不展示
+    groups: [
+      { t: '效率', items: [{ l: '每局胜率', v: P.roundRate + '%' }, { l: '出金率', v: P.goldRate + '%', hot: true }, { l: '最长连胜', v: P.best }, { l: '场均犯规', v: P.foulPerMatch }] },
+      { t: '进球', s: `金球共 ${P.gold} 次`, items: [{ l: '普胜', v: P.ev.pu, c: EV.pu.t }, { l: '大金', v: P.ev.dj, c: EV.dj.t }, { l: '小金', v: P.ev.xj, c: EV.xj.t }, { l: '黄金九', v: P.ev.h9, c: EV.h9.t }, { l: '犯规', v: P.ev.foul, c: EV.foul.t }] },
+      gt ? { t: '得分来源', s: `赢来的 ${gt} 分`, bar: [{ k: 'pu', l: '普胜', v: g.pu, c: EV.pu.c, w: Math.round(g.pu / gt * 100) }, { k: 'gold', l: '金球', v: g.gold, c: EV.dj.c, w: Math.round(g.gold / gt * 100) },
+        { k: 'foul', l: '对手犯规', v: g.foul, c: '#9B6BFF', w: Math.round(g.foul / gt * 100) }].filter(x => x.v) } : null,
+    ].filter(Boolean),
+    foot: `${P.n} 场 · ${P.rounds} 局` + (P.n ? ` · 场均 ${mm >= 60 ? `${mm / 60 | 0}小时${mm % 60 ? mm % 60 + '分' : ''}` : `${mm}分钟`}` : ''),
 
     P, title: titleOf(P), recent: days ? results.slice(-30) : results.slice(-10),
-    kpis: [{ l: '对局', v: P.n }, { l: '胜率', v: pct(P.mWins, P.n) + '%' }, { l: '净胜分', v: signed(P.score), cls: P.score > 0 ? 'pos' : P.score < 0 ? 'neg' : '' }, { l: '单场最高', v: P.n ? signed(P.top) : '—' }],
+    kpis: [{ l: '对局', v: P.n }, { l: '出金率', v: P.goldRate + '%' }, { l: '单场最高', v: P.n ? signed(P.top) : '—' }], // 胜率在名片里单独大字显示
 
     chart: { series: [series], colors: ['#FF5A5F'], names: ['累计净胜'], titles, notes, ticks },
     friends, bank, nemesis, mate,
@@ -109,7 +108,7 @@ function overview(history, meId, seg, view, days) {
 
 /** 交手页：我 vs 某位球友 */
 function headToHead(history, meId, fid, view) {
-  const ms = history.filter(m => m.status === 'done' && m.players.includes(meId) && m.players.includes(fid));
+  const ms = history.filter(m => m.status === 'done' && isChase(m) && m.players.includes(meId) && m.players.includes(fid));
   const chrono = [...ms].reverse();
   let w = 0, l = 0, d = 0, gain = 0, loss = 0, bigW = null, bigL = null;
   const sA = [0], sB = [0], titles = ['起点'], notes = [''];

@@ -1,0 +1,35 @@
+<view wx:if="{{c}}" class="mc">
+  <view class="mt">
+    <view class="mtg"><view class="tdot" style="background:{{c.dot}}"></view><text class="tg">{{c.tag}}</text><text wx:if="{{c.info}}" class="ti">· {{c.info}}</text></view>
+    <text class="when">{{c.when}}</text>
+  </view>
+
+  <!-- 双人：左右对站 -->
+  <view wx:if="{{c.kind==='duo'}}" class="vs2">
+    <view class="pp {{c.L.lose?'lose':''}}">
+      <view class="avw"><view class="av ma" style="background:{{c.L.c}};color:{{c.L.i}}">{{c.L.ch}}</view><text wx:if="{{c.L.won}}" class="won" style="background:{{c.L.c}};color:{{c.L.i}}">胜</text></view>
+      <text class="pn">{{c.L.name}}</text>
+    </view>
+    <view class="mid">
+      <view wx:if="{{c.big}}" class="big num"><text class="{{c.big.la}}">{{c.big.a}}</text><text class="co">:</text><text class="{{c.big.lb}}">{{c.big.b}}</text></view>
+      <view wx:elif="{{c.net}}" class="netv num"><text class="{{c.net.a.cls}}">{{c.net.a.t}}</text><text class="co2">:</text><text class="{{c.net.b.cls}}">{{c.net.b.t}}</text></view>
+      <view wx:if="{{c.cmp}}" class="cmp2">
+        <text class="cv num" style="background:{{c.L.c}};color:{{c.L.i}}">{{c.cmp.a}}</text><text class="cl">{{c.cmp.l}}</text><text class="cv num" style="background:{{c.R.c}};color:{{c.R.i}}">{{c.cmp.b}}</text>
+      </view>
+      <text wx:if="{{c.note}}" class="note">{{c.note}}</text>
+    </view>
+    <view class="pp {{c.R.lose?'lose':''}}">
+      <view class="avw"><view class="av ma" style="background:{{c.R.c}};color:{{c.R.i}}">{{c.R.ch}}</view><text wx:if="{{c.R.won}}" class="won" style="background:{{c.R.c}};color:{{c.R.i}}">胜</text></view>
+      <text class="pn">{{c.R.name}}</text>
+    </view>
+  </view>
+
+  <!-- 三人：三列并排 -->
+  <view wx:else class="tri">
+    <view wx:for="{{c.P}}" wx:key="id" class="pp {{item.lose?'lose':''}}">
+      <view class="avw"><view class="av ma" style="background:{{item.c}};color:{{item.i}}">{{item.ch}}</view><text wx:if="{{item.won}}" class="won" style="background:{{item.c}};color:{{item.i}}">胜</text></view>
+      <text class="pn">{{item.name}}</text>
+      <text class="ts num {{item.cls}}">{{item.s}}</text>
+    </view>
+  </view>
+</view>

@@ -12,6 +12,7 @@ Page({
     enter(this);
     const m = store.match(this.id);
     if (!m) { this.setData({ ok: false }); return; }
+    if (m.game === 'snooker') { nav.redirect('/pages/snk-result/snk-result?id=' + m.id); return; }
     const R = buildReport(m, id => store.view(id));
     this.match = m; this.R = R;
     const d = new Date(m.end || Date.now());

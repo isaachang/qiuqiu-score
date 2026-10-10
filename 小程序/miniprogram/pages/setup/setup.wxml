@@ -28,15 +28,12 @@
   <view style="--i:4" class="sec rise">计分规则<text class="s" bindtap="toRules">修改 ›</text></view>
   <view style="--i:5" class="card rsum rise">
     <view class="rs" wx:for="{{rules}}" wx:key="k" style="background:{{item.c}}1F">
-      <text wx:if="{{item.k==='h9'}}" class="b9"></text>
       <text>{{item.name}}</text><text class="rv num" style="color:{{item.t}}">{{item.v}}</text><text wx:if="{{item.pay}}" class="rp">{{item.pay}}</text>
     </view>
   </view>
 
   <view style="--i:6" class="sec rise">选项</view>
   <view style="--i:7" class="card rise">
-    <view class="row"><text class="ol">屏幕常亮</text><switch checked="{{keep}}" color="#22C993" data-k="keep" bindchange="toggle"/></view>
-    <view class="row"><text class="ol">计分震动反馈</text><switch checked="{{vib}}" color="#22C993" data-k="vib" bindchange="toggle"/></view>
     <view class="row lim"><text class="ol">限时比赛</text><switch checked="{{limOn}}" color="#22C993" bindchange="toggleLimit"/></view>
     <view class="lims {{limOn?'on':''}}">
       <view wx:for="{{limOpts}}" wx:key="m" class="lo {{item.m===limit?'sel':''}}" data-m="{{item.m}}" bindtap="pickLimit" hover-class="press">{{item.t}}</view>
@@ -44,6 +41,8 @@
     </view>
     <!-- 【测试】只在开发版显示：5 秒后到点，用来测「时间到」面板 -->
     <view wx:if="{{limOn&&dev}}" class="ltest {{limit===-1?'sel':''}}" bindtap="pickTest">测试：5 秒后到点{{limit===-1?' ✓':''}}</view>
+    <view class="row after-lim"><text class="ol">屏幕常亮</text><switch checked="{{keep}}" color="#22C993" data-k="keep" bindchange="toggle"/></view>
+    <view class="row"><text class="ol">计分震动反馈</text><switch checked="{{vib}}" color="#22C993" data-k="vib" bindchange="toggle"/></view>
   </view>
 </view>
 

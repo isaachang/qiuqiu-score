@@ -1,4 +1,13 @@
 .sw-wrap{position:relative;overflow:hidden}
-.sw-del{position:absolute;top:0;right:0;bottom:0;width:168rpx;background:#F0444D;color:#fff;font-size:30rpx;font-weight:700;display:flex;align-items:center;justify-content:center}
+.sw-acts{position:absolute;top:0;right:0;bottom:0;width:168rpx;display:flex}
+.sw-acts.two{width:336rpx}
+.sw-edit,.sw-del2{flex:1;color:#fff;font-size:30rpx;font-weight:700;display:flex;align-items:center;justify-content:center}
+.sw-edit{background:#3D7BFF}
+.sw-del2{background:#F0444D}
 .sw-body{position:relative;z-index:1;background:#fff}
 .sw-anim{transition:transform .35s cubic-bezier(.3,1.2,.5,1)}
+
+/* 圆角卡片：外层圆角 + 阴影，删除按钮跟着卡片的圆角 */
+.sw-wrap.rnd{border-radius:44rpx;box-shadow:0 20rpx 56rpx -28rpx rgba(60,40,20,.28);transform:translateZ(0)}
+.sw-wrap.rnd .sw-acts{border-radius:0 44rpx 44rpx 0;overflow:hidden}
+.sw-wrap.rnd .sw-body{background:#fff;border-radius:44rpx}

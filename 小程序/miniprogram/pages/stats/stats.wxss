@@ -15,10 +15,6 @@
 .empty-card{margin-top:28rpx;padding:56rpx 40rpx;display:flex;flex-direction:column;align-items:center;text-align:center}
 .ee{font-size:34rpx;font-weight:800}
 .es{font-size:26rpx;color:var(--tx2);margin-top:12rpx;line-height:1.6}
-.form{padding:28rpx;display:flex;gap:12rpx;flex-wrap:wrap}
-.fd{width:56rpx;height:56rpx;border-radius:18rpx;display:flex;align-items:center;justify-content:center;font-size:24rpx;font-weight:800;background:var(--card2);color:var(--tx2)}
-.fd.W{background:#1FC98E;color:#fff}
-.fd.L{background:#FF5A5F;color:#fff}
 .rel{display:grid;grid-template-columns:1fr 1fr;gap:20rpx}
 .rc{padding:32rpx 20rpx 28rpx;display:flex;flex-direction:column;align-items:center;text-align:center}
 .rt{font-size:22rpx;font-weight:800;color:#fff;padding:6rpx 18rpx;border-radius:99rpx;margin-bottom:20rpx}
@@ -59,48 +55,16 @@
 .rg{display:flex;gap:8rpx;padding:6rpx;border-radius:22rpx;background:#E9E7E1}
 .rgi{font-size:24rpx;font-weight:700;color:var(--tx2);padding:8rpx 18rpx;border-radius:16rpx;transition:all .25s}
 .rgi.on{background:#fff;color:var(--tx);box-shadow:0 4rpx 12rpx rgba(0,0,0,.08)}
-.ft{width:100%;display:flex;justify-content:space-between;font-size:24rpx;font-weight:700;color:var(--tx2);margin-bottom:8rpx}
-.fts{font-weight:500;color:var(--tx3)}
-.fe{width:100%;text-align:center;color:var(--tx2);font-size:26rpx;padding:20rpx 0 8rpx}
 .hn{display:flex;align-items:center;gap:10rpx}
 .rtag{font-size:20rpx;font-weight:800;color:#fff;padding:2rpx 12rpx;border-radius:99rpx}
 
-/* ---- 战绩概览 ---- */
-.wld{margin-top:20rpx;padding:32rpx}
-.wr1{display:flex;align-items:baseline;justify-content:space-between}
-.wrl{font-size:28rpx;font-weight:700;color:var(--tx2)}
-.wrv{font-size:88rpx;font-weight:900;color:#13B57A;line-height:1}
-.wbar{display:flex;gap:6rpx;height:16rpx;margin:24rpx 0 20rpx}
-.wb{height:100%;border-radius:8rpx;animation:fill 1s cubic-bezier(.2,1,.3,1)}
-.wb.w{background:#1FC98E}.wb.l{background:#FF5A5F}.wb.d{background:#D9D6CF}
-.wpills{display:grid;grid-template-columns:repeat(3,1fr);gap:16rpx}
-.wp{height:84rpx;border-radius:28rpx;display:flex;align-items:center;justify-content:center;gap:8rpx;font-size:26rpx;font-weight:700}
-.wp text{font-size:36rpx;font-weight:900}
-.wp.w{background:#1FC98E1F;color:#0E9F5E}.wp.l{background:#FF5A5F1F;color:#E5383B}.wp.d{background:var(--card2);color:var(--tx2)}
-/* ---- 个人数据 12 宫格 ---- */
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12rpx;padding:20rpx}
-.gc{border-radius:28rpx;background:var(--bg);padding:22rpx 8rpx;display:flex;flex-direction:column;align-items:center;gap:6rpx}
-.gc.hot{background:linear-gradient(160deg,#FFF3D6,#FFE7B0)}
-.gl{font-size:22rpx;color:var(--tx2);font-weight:600;white-space:nowrap}
-.gv{font-size:38rpx;font-weight:900;line-height:1.1}
-.gc.hot .gv{color:#D98200}
 /* ---- 得分来源 ---- */
-.src{padding:28rpx 32rpx}
 .sbar{display:flex;height:28rpx;border-radius:14rpx;overflow:hidden;gap:4rpx}
 .sb{height:100%;animation:fill 1s cubic-bezier(.2,1,.3,1)}
 .sl{display:flex;justify-content:space-around;margin-top:20rpx}
 .sli{display:flex;align-items:center;gap:10rpx;font-size:24rpx;color:var(--tx2);font-weight:600}
 .sd{width:16rpx;height:16rpx;border-radius:50%}
 .slv{color:var(--tx);font-weight:800}
-/* ---- 成就徽章 ---- */
-.ach{display:grid;grid-template-columns:repeat(4,1fr);gap:8rpx;padding:28rpx 12rpx 20rpx}
-.ac{display:flex;flex-direction:column;align-items:center;text-align:center;padding:8rpx 0 12rpx}
-.aci{width:88rpx;height:88rpx;border-radius:30rpx;background:#E3E0D9;color:#fff;font-size:30rpx;font-weight:900;display:flex;align-items:center;justify-content:center;transform:rotate(-6deg)}
-.ac.ok .aci{animation:popIn .55s cubic-bezier(.3,1.4,.5,1)}
-.act{font-size:22rpx;font-weight:800;margin-top:12rpx;color:var(--tx3)}
-.acd{font-size:19rpx;color:var(--tx3);margin-top:2rpx;padding:0 4rpx;line-height:1.3}
-.ac.ok .act{color:var(--tx)}
-.ac.ok .acd{color:var(--tx2)}
 /* ---- 历史对局卡片 ---- */
 .hist{display:flex;flex-direction:column;gap:20rpx}
 .hc-wrap{border-radius:40rpx;overflow:hidden;box-shadow:0 20rpx 56rpx -28rpx rgba(60,40,20,.28)}
@@ -122,3 +86,104 @@
 .metag{position:absolute;left:8rpx;top:8rpx;font-size:18rpx;font-weight:800;color:#fff;background:#16161A;padding:0 8rpx;border-radius:8rpx}
 
 .more-btn{margin-top:20rpx;height:96rpx;border-radius:36rpx;background:#fff;box-shadow:0 20rpx 56rpx -28rpx rgba(60,40,20,.28);display:flex;align-items:center;justify-content:center;font-size:28rpx;font-weight:800;color:var(--tx)}
+
+/* 历史对局：对局卡片 */
+.mcs{display:flex;flex-direction:column;gap:20rpx}
+/* 球友关系：对阵卡（共 N 场 · 胜率 vs 胜率 · 胜负比例条） */
+.vcs{display:flex;flex-direction:column;gap:20rpx}
+.vc{position:relative;overflow:hidden;background:#fff;border-radius:44rpx;padding:0 28rpx 26rpx;box-shadow:0 20rpx 56rpx -28rpx rgba(60,40,20,.28);transition:transform .3s cubic-bezier(.3,1.4,.5,1)}
+.vcp{transform:scale(.98)}
+.vct{display:flex;align-items:flex-start;height:72rpx}
+.vtg{flex:1;padding-top:22rpx}
+.vrib{flex:none;height:56rpx;padding:0 40rpx;display:flex;align-items:center;font-size:26rpx;font-weight:900;color:#fff;background:var(--ink);border-radius:0 0 28rpx 28rpx}
+.vdate{flex:1;text-align:right;padding-top:22rpx;font-size:22rpx;color:var(--tx3);font-weight:700}
+.vcm{display:flex;align-items:center;margin-top:16rpx}
+.vp{width:164rpx;flex:none;display:flex;flex-direction:column;align-items:center;gap:10rpx}
+.av.vav{width:96rpx;height:96rpx;font-size:38rpx}
+.vpn{font-size:25rpx;font-weight:800;max-width:160rpx;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vmid{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center}
+.vsc{display:flex;align-items:baseline;gap:16rpx;font-size:60rpx;font-weight:900;line-height:1;color:var(--tx)}
+.vvs{font-size:28rpx;font-weight:900;font-style:italic;color:var(--tx3)}
+.vlab{font-size:27rpx;color:var(--tx2);font-weight:800;margin-top:12rpx}
+.vbar{position:relative;display:flex;height:44rpx;margin-top:24rpx;border-radius:22rpx;overflow:hidden;background:var(--card2)}
+.vb{height:100%;min-width:0}
+.vb.dr{background:#D9D6CF}
+.vbl{position:absolute;top:0;bottom:0;display:flex;align-items:center;font-size:21rpx;font-weight:900;color:#fff;text-shadow:0 1rpx 3rpx rgba(0,0,0,.25)}
+.vbl.l{left:20rpx}.vbl.r{right:20rpx}.vbl.m{left:50%;transform:translateX(-50%);color:var(--tx2);text-shadow:none}
+.vnet{display:block;text-align:center;font-size:21rpx;font-weight:800;color:var(--tx2);margin-top:14rpx}
+.vnet.pos{color:var(--pos)}.vnet.neg{color:var(--neg)}
+
+/* 玩法切换：横向滑动的胶囊 */
+.gsx{width:100%;white-space:nowrap;margin:0 0 20rpx}
+.gchips{display:inline-flex;gap:14rpx;padding:4rpx 2rpx 8rpx}
+.gch{display:inline-flex;align-items:center;gap:12rpx;height:76rpx;padding:0 30rpx;border-radius:38rpx;background:#fff;box-shadow:0 12rpx 30rpx -18rpx rgba(60,40,20,.35);font-size:28rpx;font-weight:800;color:var(--tx2);transition:background .25s,color .25s,transform .25s cubic-bezier(.3,1.4,.5,1)}
+.gch.on{background:var(--ink);color:#fff;box-shadow:0 16rpx 34rpx -16rpx rgba(0,0,0,.5)}
+.gchp{transform:scale(.95)}
+.gd{width:18rpx;height:18rpx;border-radius:50%}
+.gcnt{font-size:22rpx;font-weight:900;opacity:.55}
+.gch.on .gcnt{opacity:.7}
+/* 球友关系标签：左上角斜绶带 + 卡片描边，一眼看到「提款机 / 克星」 */
+.sash{position:absolute;top:30rpx;left:-64rpx;width:240rpx;height:44rpx;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;z-index:2;
+  font-size:22rpx;font-weight:900;color:#fff;letter-spacing:2rpx;box-shadow:0 8rpx 18rpx -8rpx rgba(0,0,0,.45)}
+.sash.bank{background:linear-gradient(90deg,#13B57A,#2BD18F)}
+.sash.nem{background:linear-gradient(90deg,#E5383B,#FF6B6E)}
+.vc.bank{box-shadow:0 0 0 4rpx #1FC98E,0 24rpx 56rpx -26rpx rgba(31,201,142,.55)}
+.vc.nem{box-shadow:0 0 0 4rpx #F0444D,0 24rpx 56rpx -26rpx rgba(240,68,77,.55)}
+
+/* ---- 筛选：人数 + 时间（同一行） ---- */
+.flt{display:flex;gap:14rpx;margin:0 0 28rpx}
+.rg.fg{flex:1;min-width:0}
+.rg.fg+.rg.fg{flex:1.2} /* 时间那组字多一点 */
+.fg .rgi{flex:1;text-align:center;padding:14rpx 0;font-size:23rpx;white-space:nowrap}
+/* ---- 名片：胜率大数字 + 胜平负 + 最近几场 + 关键数据 ---- */
+.hwr{display:flex;align-items:flex-end;gap:28rpx;margin-top:36rpx;position:relative}
+.hwl{display:flex;flex-direction:column;flex:none}
+.hwk{font-size:24rpx;font-weight:800;opacity:.85}
+.hwv{font-size:128rpx;font-weight:900;line-height:.95;margin-top:8rpx;letter-spacing:-2rpx}
+.hwp{font-size:56rpx;margin-left:4rpx;letter-spacing:0}
+.hwd{flex:1;min-width:0;padding-bottom:16rpx}
+.hwn{text-align:right;font-size:24rpx;font-weight:700}
+.hwn .num{font-size:36rpx;font-weight:900;margin-right:4rpx}
+.hdot{margin:0 12rpx;opacity:.55}
+.hbar{display:flex;gap:6rpx;height:16rpx;margin-top:16rpx}
+.hb{height:100%;border-radius:8rpx;animation:fill 1s cubic-bezier(.2,1,.3,1)}
+.hb.w{background:#fff}.hb.d{background:rgba(255,255,255,.5)}.hb.l{background:rgba(0,0,0,.2)}
+.hfh{display:flex;justify-content:space-between;margin-top:34rpx;font-size:22rpx;font-weight:800;opacity:.85;position:relative}
+.hfs{font-weight:500;opacity:.75}
+.hform{display:flex;gap:10rpx;margin-top:14rpx;position:relative}
+.hfd{flex:1;max-width:58rpx;height:54rpx;border-radius:16rpx;display:flex;align-items:center;justify-content:center;font-size:22rpx;font-weight:900;background:rgba(0,0,0,.18);color:#fff}
+.hfd.W{background:#fff;box-shadow:0 6rpx 14rpx -8rpx rgba(0,0,0,.4)}
+.hfd.D{background:rgba(255,255,255,.4)}
+.kpis.k3{grid-template-columns:repeat(3,1fr);margin-top:32rpx;padding-top:28rpx;border-top:1rpx solid rgba(255,255,255,.28)}
+.hemp{position:relative;display:flex;flex-direction:column;align-items:center;padding:56rpx 0 24rpx;font-size:30rpx;font-weight:800}
+.hems{font-size:24rpx;font-weight:600;opacity:.8;margin-top:8rpx}
+/* ---- 球友：没有绶带的卡片，左上角一句关系描述 ---- */
+.vrel{display:inline-block;font-size:22rpx;font-weight:800;color:var(--tx2);background:var(--card2);padding:6rpx 16rpx;border-radius:99rpx}
+.vrel.up{color:#0E9F5E;background:#1FC98E1F}
+.vrel.down{color:#E5383B;background:#FF5A5F1A}
+.vtg{padding-top:18rpx}
+/* ---- 我的数据：分组卡片 ---- */
+.dat{padding:4rpx 24rpx 28rpx}
+.dgp{padding-top:26rpx}
+.dgp+.dgp{margin-top:24rpx;border-top:1rpx solid var(--line)}
+.dgh{display:flex;justify-content:space-between;align-items:baseline;margin:0 6rpx 16rpx}
+.dgt{font-size:26rpx;font-weight:900}
+.dgs{font-size:22rpx;font-weight:600;color:var(--tx3)}
+.dgr{display:grid;gap:12rpx}
+.dgr .gc{border-radius:28rpx;background:var(--bg);padding:22rpx 4rpx;display:flex;flex-direction:column;align-items:center;gap:6rpx}
+.dgr .gc.hot{background:linear-gradient(160deg,#FFF3D6,#FFE7B0)}
+.dgr .gl{font-size:22rpx;color:var(--tx2);font-weight:600;white-space:nowrap}
+.dgr .gv{font-size:38rpx;font-weight:900;line-height:1.1}
+.dgr .gc.hot .gv{color:#D98200}
+.dgr .gv.pos{color:var(--pos)}.dgr .gv.neg{color:var(--neg)}
+.dgp .sl{justify-content:space-between;padding:0 6rpx}
+/* ---- 成就：横向滑动的小卡片 ---- */
+.achx{width:auto;margin:0 -32rpx;white-space:nowrap}
+.achs{display:inline-flex;gap:16rpx;padding:4rpx 32rpx 28rpx}
+.ac{width:184rpx;flex:none;white-space:normal;background:#fff;border-radius:40rpx;padding:30rpx 12rpx 24rpx;display:flex;flex-direction:column;align-items:center;text-align:center;box-shadow:0 16rpx 40rpx -24rpx rgba(60,40,20,.3)}
+.aci{width:88rpx;height:88rpx;border-radius:30rpx;background:#E3E0D9;color:#fff;font-size:30rpx;font-weight:900;display:flex;align-items:center;justify-content:center;transform:rotate(-6deg)}
+.ac.ok .aci{animation:popIn .55s cubic-bezier(.3,1.4,.5,1)}
+.act{font-size:23rpx;font-weight:800;margin-top:16rpx;color:var(--tx3)}
+.acd{font-size:19rpx;color:var(--tx3);margin-top:4rpx;line-height:1.35}
+.ac.ok .act{color:var(--tx)}
+.ac.ok .acd{color:var(--tx2)}

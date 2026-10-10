@@ -1,5 +1,5 @@
 // 通用确认面板：替代微信自带的 showModal / showActionSheet，统一样式和动效
-// actions: [{ k, t, type: 'pri' | 'danger' | 'plain' }]
+// actions: [{ k, t, type: 'pri' | 'danger' | 'plain' | 'soft-danger'（灰底红字，次要的危险操作） }]
 Component({
   options: { addGlobalClass: true },
   properties: {

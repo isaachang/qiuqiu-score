@@ -1,0 +1,32 @@
+@import "/styles/score.wxss";
+@import "/styles/snooker.wxss";
+/* 斯诺克 · 竖屏：上半部分看比分，下半部分（拇指区）是进球按钮，「红黑」在右下、「换人」在最下面 */
+.body{flex:1;min-height:0;display:flex;flex-direction:column;gap:18rpx;padding:4rpx 24rpx calc(190rpx + env(safe-area-inset-bottom))}
+.mstrip{flex:none;height:84rpx;display:flex;align-items:center;justify-content:space-between;padding:0 22rpx;border-radius:34rpx;background:var(--card);box-shadow:0 20rpx 56rpx -28rpx rgba(60,40,20,.28)}
+.mp{display:flex;align-items:center;gap:14rpx;min-width:0;flex:1}
+.mp.r{justify-content:flex-end}
+.mn{font-size:27rpx;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fs{display:flex;flex-direction:column;align-items:center;flex:none;padding:0 20rpx}
+.fv{font-size:44rpx;font-weight:900;line-height:1}
+.fl{font-size:19rpx;color:var(--tx2);font-weight:700;margin-top:4rpx}
+.pls{flex:1;min-height:250rpx;max-height:380rpx;display:flex;gap:18rpx}
+.info{flex:none;height:108rpx}
+.ask{flex:none;height:48rpx}
+.redbtn{flex:none;height:112rpx}
+.ctile{height:128rpx}
+.acts{flex:none;height:108rpx}
+
+/* 小屏手机（如 iPhone SE）：压缩间距和按钮高度 */
+@media (max-height: 700px){
+  .body{gap:12rpx}
+  .mstrip{height:72rpx}
+  .pls{min-height:210rpx}
+  .s{font-size:100rpx}
+  .info{height:92rpx}
+  .iv{font-size:36rpx}
+  .redbtn{height:96rpx}
+  .cols{gap:12rpx}
+  .ctile{height:108rpx}
+  .tv{font-size:36rpx}
+  .acts{height:96rpx}
+}

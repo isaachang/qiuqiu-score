@@ -2,7 +2,7 @@
 // 先运行 shots.js 生成原始截图（raw/），这里负责手机外框、排版和说明文字
 const fs = require('fs');
 const path = require('path');
-const { execFileSync } = require('child_process');
+const { snap } = require('./chrome');
 
 const DOCS = path.resolve(__dirname, '../../../docs/screenshots');
 const RAW = path.resolve(process.argv[2] || path.join(require('os').tmpdir(), 'qq-raw'));
@@ -48,19 +48,19 @@ function render(name, W, H, html) {
   const f = path.join(TMP, name + '.html');
   fs.writeFileSync(f, `<!doctype html><html><head><meta charset="utf-8"><style>${CSS}body{width:${W}px;height:${H}px;overflow:hidden}</style></head><body>${html}</body></html>`);
   const out = path.join(OUT, name + '.png');
-  execFileSync(CHROME, ['--headless=new', '--disable-gpu', '--hide-scrollbars', '--force-device-scale-factor=2', `--window-size=${W},${H}`,
-    '--allow-file-access-from-files', '--virtual-time-budget=1500', '--default-background-color=00000000', `--screenshot=${out}`, 'file://' + f], { stdio: 'ignore' });
+  snap(['--headless=new', '--disable-gpu', '--hide-scrollbars', '--force-device-scale-factor=2', `--window-size=${W},${H}`,
+    '--allow-file-access-from-files', '--virtual-time-budget=1500', '--default-background-color=00000000', 'file://' + f], out);
   console.log('✓', name);
 }
 
 /* ---------- 1. 主视觉 ---------- */
-const chips = ['双人 / 三人追分', '金球庆祝 + BGM', '限时比赛', '战报与战绩'];
+const chips = ['双人 / 三人追分', '斯诺克', '金球庆祝 + BGM', '战报与战绩'];
 render('hero', 1280, 720, `<div class="panel" style="width:1280px;height:720px">
   ${blobs([['#FF5A5F', 700, -160, 420], ['#FFC53D', 1040, 360, 380], ['#3D7BFF', 560, 470, 360], ['#1FC98E', -120, 520, 300], ['#9B6BFF', 1100, -120, 260]])}
   <div style="position:absolute;left:84px;top:150px;width:580px">
     <img src="file://${LOGO}" style="width:104px;height:104px;border-radius:28px;box-shadow:0 24px 48px -18px rgba(255,90,95,.7)">
     <div style="font-size:88px;font-weight:900;letter-spacing:-.02em;margin-top:30px;line-height:1">球球记分</div>
-    <div style="font-size:26px;font-weight:700;color:#6B6B73;margin-top:20px">台球追分记分 · 微信小程序</div>
+    <div style="font-size:26px;font-weight:700;color:#6B6B73;margin-top:20px">台球记分 · 微信小程序</div>
     <div style="font-size:19px;color:#6B6B73;margin-top:16px;line-height:1.6">一台手机记全场。轻点卡片记一局，<br>大金小金有庆祝，打完自动出战报。</div>
     <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:30px">${chips.map((t, i) => `<span style="padding:9px 16px;border-radius:999px;background:${['#FF5A5F', '#FFB020', '#3D7BFF', '#1FC98E'][i]};color:#fff;font-size:15px;font-weight:800;white-space:nowrap">${t}</span>`).join('')}</div>
   </div>
@@ -80,9 +80,9 @@ function trio(name, items, tint) {
     </div></div>`);
 }
 trio('scoring', [
-  ['score-duo', '轻点卡片，记一局', '谁赢了点谁的卡片，记一次普胜'],
+  ['score-duo', '轻点卡片，记一局', '名字牌放远也认得出；底栏可暂停'],
   ['score-trio', '三人局自动换位', '胜者开球，其余两人顺序不变'],
-  ['score-gold', '金球有庆祝', '大金、小金带音乐和彩纸，点一下关掉'],
+  ['score-gold', '金球有庆祝', '大金、小金、黄金九带音乐和彩纸'],
 ], [['#FF5A5F', -100, -120, 380], ['#3D7BFF', 1000, 520, 360], ['#FFC53D', 520, 640, 300]]);
 trio('flow', [
   ['setup-limit', '开局前选好规则', '双人 / 三人、开球顺序、限时比赛'],
@@ -92,19 +92,25 @@ trio('flow', [
 trio('report', [
   ['result', '自动生成战报', '领奖台、本场之最、分数走势'],
   ['result-table', '每人数据对比', '胜局、胜率、连胜、出金率一目了然'],
-  ['stats-top', '战绩总览', '胜率、最近场次、净胜分走势'],
+  ['stats-top', '战绩总览', '筛选人数和时间，胜率、胜平负、最近场次'],
 ], [['#FFC53D', -100, -100, 360], ['#FF5A5F', 1000, 560, 360], ['#3D7BFF', 560, 680, 280]]);
 trio('more', [
-  ['stats-mid', '成就与得分来源', '个人数据、八枚成就徽章'],
+  ['stats-mid', '球友与我的数据', '提款机 / 克星，效率、进球、得分来源'],
   ['history', '日历看每一天', '按天看胜负，周 / 月视图切换'],
   ['home', '首页一键开局', '进行中的对局随时继续'],
 ], [['#3D7BFF', -120, 520, 380], ['#1FC98E', 1000, -100, 340], ['#FF5A5F', 520, -180, 280]]);
+
+trio('snooker', [
+  ['snk-setup', '斯诺克开局', '红球 15 / 10 / 6，拔河滑杆设让分'],
+  ['snk-score', '点球记分', '红彩组合键、剩余分、超分提醒、清彩顺序'],
+  ['snk-result', '每局一张比分卡', '单杆、犯规、局分一目了然'],
+], [['#1FA86A', -100, -120, 380], ['#E5383B', 1000, 540, 340], ['#1E1E22', 520, 660, 260]]);
 
 /* ---------- 3. 横屏 ---------- */
 render('landscape', 1280, 700, `<div class="panel" style="width:1280px;height:700px">
   ${blobs([['#FF5A5F', -100, -100, 360], ['#FFC53D', 520, 480, 340], ['#3D7BFF', 1020, -60, 360]])}
   <div style="position:absolute;left:50%;top:60px;transform:translateX(-50%)">${landPhone('score-land', 1000)}</div>
-  <div class="cap" style="position:absolute;left:0;right:0;bottom:44px"><b>横屏记分</b><span>三张卡片并排，按钮更大；顶栏一键结算，自动转回竖屏</span></div>
+  <div class="cap" style="position:absolute;left:0;right:0;bottom:44px"><b>横屏记分</b><span>卡片并排、名字牌更大；顶栏暂停 / 撤销 / 一键结算</span></div>
 </div>`);
 /* ---------- 4. 长截图原图（README 里折叠展示） ---------- */
 fs.mkdirSync(path.join(OUT, 'long'), { recursive: true });

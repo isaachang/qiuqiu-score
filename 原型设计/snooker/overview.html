@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>球球记分 · 斯诺克模块 · 方案总览</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F6F4F0;--card:#fff;--card2:#EEECE7;--tx:#16161A;--tx2:#6B6B73;--tx3:#A9A9B0;--line:rgba(20,20,30,.08);
+  --ink:#16161A;--pos:#13B57A;--neg:#F0444D;
+  --red:#E5383B;--yel:#FFC53D;--grn:#1FA86A;--brn:#8B5A3C;--blu:#3D7BFF;--pnk:#FF7FB0;--blk:#1E1E22;
+  --pA:#FF5A5F;--pB:#3D7BFF;
+}
+body{width:2520px;font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;color:var(--tx);-webkit-font-smoothing:antialiased;background:#EFECE6}
+.num{font-family:"DIN Alternate","SF Pro Rounded",-apple-system,sans-serif;font-variant-numeric:tabular-nums}
+.board{position:relative;overflow:hidden;padding:80px 80px 90px;background:var(--bg)}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);opacity:.45;pointer-events:none}
+
+/* ---------- 标题 ---------- */
+.hd{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:70px;position:relative}
+.brand{display:flex;align-items:center;gap:28px}
+.brand img{width:96px;height:96px;border-radius:26px;box-shadow:0 20px 40px -16px rgba(255,90,95,.6)}
+.brand h1{font-size:64px;font-weight:900;letter-spacing:-.02em;line-height:1}
+.brand p{font-size:24px;color:var(--tx2);margin-top:14px;font-weight:600}
+.core{display:flex;gap:14px}
+.core .k{background:var(--card);border-radius:28px;padding:22px 26px;min-width:200px;box-shadow:0 20px 50px -30px rgba(60,40,20,.35)}
+.core .k b{display:block;font-size:22px;font-weight:900}
+.core .k span{display:block;font-size:16px;color:var(--tx2);margin-top:6px}
+.core .k i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:8px;vertical-align:1px}
+
+/* ---------- 行 ---------- */
+.row{display:flex;align-items:flex-start;justify-content:space-between;position:relative;margin-bottom:64px}
+.sec{font-size:26px;font-weight:900;margin:0 0 26px;display:flex;align-items:center;gap:14px;position:relative}
+.sec small{font-size:18px;color:var(--tx2);font-weight:600}
+.slot{width:410px;position:relative}
+.arrow{position:absolute;top:400px;right:-60px;width:44px;height:44px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;z-index:5;box-shadow:0 10px 24px -8px rgba(0,0,0,.45)}
+.cap{margin-top:26px;padding:0 6px}
+.cap .t{display:flex;align-items:center;gap:12px;font-size:23px;font-weight:900}
+.cap .n{width:34px;height:34px;border-radius:50%;background:var(--ink);color:#fff;font-size:17px;display:flex;align-items:center;justify-content:center;flex:none}
+.cap .n.new{background:#FF5A5F}
+.cap .d{font-size:16px;color:var(--tx2);margin-top:10px;line-height:1.6}
+.tag{display:inline-block;font-size:13px;font-weight:800;padding:3px 9px;border-radius:999px;background:#FF5A5F1F;color:#E5383B;margin-left:6px;vertical-align:2px}
+.tag.re{background:#3D7BFF1F;color:#2A62E0}
+
+/* ---------- 手机 ---------- */
+.ph{width:410px;border-radius:60px;padding:10px;background:linear-gradient(145deg,#2A2A2E,#0C0C0E 40%,#1C1C20);box-shadow:0 0 0 1.5px #3A3A40 inset,0 50px 90px -40px rgba(40,24,10,.55)}
+.sc{position:relative;width:390px;height:844px;border-radius:50px;overflow:hidden;background:var(--bg);display:flex;flex-direction:column}
+.di{position:absolute;left:50%;top:11px;width:122px;height:35px;margin-left:-61px;border-radius:20px;background:#000;z-index:50}
+.sb{height:47px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 42px;font-size:17px;font-weight:700}
+.sb svg{display:block}
+.cap2{position:absolute;right:7px;top:51px;width:87px;height:32px;border-radius:16px;background:rgba(255,255,255,.65);box-shadow:inset 0 0 0 .5px rgba(0,0,0,.14);display:flex;align-items:center;z-index:40}
+.cap2>span{flex:1;display:flex;align-items:center;justify-content:center;gap:3px}
+.cap2 i{width:.5px;height:18px;background:rgba(0,0,0,.18)}
+.cap2 .d3 b{width:5px;height:5px;border-radius:50%;background:#000}
+.cap2 .rg{flex:none;width:15px;height:15px;border-radius:50%;box-shadow:inset 0 0 0 2px #000;display:flex;align-items:center;justify-content:center}
+.cap2 .rg b{width:6px;height:6px;border-radius:50%;background:#000}
+.hi{position:absolute;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:#000;z-index:60}
+.nav{height:44px;flex:none;display:flex;align-items:center;position:relative;padding:0 14px}
+.nav .bk{width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:600}
+.nav .tt{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.nav .t1{font-size:17px;font-weight:700}
+.nav .t2{font-size:11px;color:var(--tx2)}
+.body{flex:1;min-height:0;padding:6px 12px 0;display:flex;flex-direction:column;gap:10px}
+.card{background:var(--card);border-radius:22px;box-shadow:0 10px 28px -14px rgba(60,40,20,.28)}
+.av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;flex:none}
+.av.sm{width:26px;height:26px;font-size:12px}
+.btn{height:52px;border-radius:26px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800}
+.btn.pri{background:var(--ink);color:#fff}
+.btn.soft{background:#F0EEE9}
+
+/* 球 */
+.ball{border-radius:50%;flex:none;position:relative;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;
+  background:radial-gradient(circle at 34% 28%,rgba(255,255,255,.85) 0 8%,transparent 22%),radial-gradient(circle at 60% 72%,transparent 40%,rgba(0,0,0,.35) 100%),var(--bc);
+  box-shadow:0 8px 14px -6px rgba(0,0,0,.4);text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.ball.y{color:#5A4200;text-shadow:none}
+.ball.p{color:#7A1F45;text-shadow:none}
+
+/* 底栏 */
+.dock{position:absolute;left:8px;right:8px;bottom:26px;height:64px;border-radius:24px;display:flex;align-items:center;justify-content:space-around;
+  background:linear-gradient(135deg,rgba(255,255,255,.78),rgba(255,255,255,.5));-webkit-backdrop-filter:blur(14px) saturate(200%);backdrop-filter:blur(14px) saturate(200%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 12px 28px -12px rgba(40,30,20,.36);z-index:30}
+.dock .db{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:700;color:#4A4A52}
+.dock .db svg{width:22px;height:22px}
+.dock .db.end{color:#FF5A5F}
+
+/* ---------- 记分页 ---------- */
+.mstrip{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:18px}
+.mstrip .pn{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800}
+.mstrip .fs{display:flex;flex-direction:column;align-items:center}
+.mstrip .fs b{font-size:24px;font-weight:900;line-height:1}
+.mstrip .fs span{font-size:10px;color:var(--tx2);margin-top:3px;font-weight:700}
+.pls{display:flex;gap:10px}
+.pl{flex:1;border-radius:24px;padding:14px 14px 12px;position:relative;overflow:hidden;min-height:172px;display:flex;flex-direction:column}
+.pl .h{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:900}
+.pl .st{font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;margin-left:auto}
+.pl .s{font-size:64px;font-weight:900;line-height:1;margin:14px 0 auto;letter-spacing:-.02em}
+.pl .bk{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800;margin-top:10px}
+.pl .bk .dots{display:flex;gap:3px}
+.pl .bk .dots i{width:10px;height:10px;border-radius:50%;display:block;box-shadow:inset 0 -1px 2px rgba(0,0,0,.25)}
+.pl.on{color:#fff;box-shadow:0 16px 30px -14px var(--g)}
+.pl.on .st{background:#fff}
+.pl.off{background:var(--card);box-shadow:0 10px 28px -14px rgba(60,40,20,.25)}
+.pl.off .st{background:var(--card2);color:var(--tx2)}
+.pl.off .h{color:var(--tx)}
+.pl.off .s{color:var(--tx)}
+.info{display:flex;padding:10px 4px}
+.info>div{flex:1;text-align:center;position:relative}
+.info>div+div::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:1px;background:var(--line)}
+.info b{display:block;font-size:22px;font-weight:900;line-height:1.1}
+.info span{display:block;font-size:11px;color:var(--tx2);margin-top:3px;font-weight:700}
+.ask{display:flex;align-items:center;justify-content:space-between;padding:2px 4px 0}
+.ask b{font-size:15px;font-weight:900}
+.ask .nx{font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px;background:var(--ink);color:#fff;display:flex;align-items:center;gap:6px}
+.ask .nx i{width:10px;height:10px;border-radius:50%;display:block}
+.redbtn{height:76px;border-radius:24px;background:var(--card);display:flex;align-items:center;gap:14px;padding:0 18px;box-shadow:0 10px 28px -14px rgba(60,40,20,.28);position:relative}
+.redbtn .tx b{display:block;font-size:19px;font-weight:900}
+.redbtn .tx span{display:block;font-size:12px;color:var(--tx2);font-weight:700;margin-top:2px}
+.redbtn .left{margin-left:auto;display:flex;flex-wrap:wrap;gap:3px;width:96px;justify-content:flex-end}
+.redbtn .left i{width:9px;height:9px;border-radius:50%;background:var(--red);display:block}
+.redbtn .left i.gone{background:var(--card2)}
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cb{height:64px;border-radius:20px;background:var(--card);display:flex;align-items:center;gap:10px;padding:0 12px;box-shadow:0 10px 28px -16px rgba(60,40,20,.28);position:relative}
+.cb .tx{font-size:15px;font-weight:900}
+.cb .tx small{display:block;font-size:11px;color:var(--tx2);font-weight:700}
+.hl{box-shadow:0 0 0 3px var(--ink),0 14px 28px -12px rgba(0,0,0,.35)!important}
+.dim{opacity:.32;filter:saturate(.3)}
+.done{opacity:.35}
+.done::after{content:"✓";position:absolute;right:10px;top:8px;font-size:13px;font-weight:900;color:var(--pos)}
+.badge{position:absolute;top:-9px;right:10px;font-size:10px;font-weight:900;color:#fff;background:var(--ink);padding:2px 7px;border-radius:999px}
+.acts{display:flex;gap:8px}
+.acts .foul{width:108px;height:58px;border-radius:22px;background:var(--card);color:var(--neg);font-size:16px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 28px -14px rgba(60,40,20,.28)}
+.acts .swap{flex:1;height:58px;border-radius:22px;background:var(--ink);color:#fff;font-size:17px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:8px}
+.acts .swap small{font-size:12px;opacity:.6;font-weight:700}
+.tip{position:absolute;z-index:45;background:#FFE27A;color:#3A2A00;font-size:13px;font-weight:800;padding:8px 12px;border-radius:14px;box-shadow:0 10px 24px -10px rgba(0,0,0,.35);line-height:1.4}
+.tip::after{content:"";position:absolute;width:12px;height:12px;background:#FFE27A;transform:rotate(45deg)}
+.tip.b::after{bottom:-5px;left:24px}
+.tip.t::after{top:-5px;left:24px}
+
+/* 面板 */
+.mask{position:absolute;inset:0;background:rgba(10,10,20,.4);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);z-index:35}
+.sheet{position:absolute;left:8px;right:8px;bottom:8px;border-radius:32px;background:var(--card);z-index:36;padding:10px 18px 26px}
+.sheet .grab{width:36px;height:5px;border-radius:3px;background:var(--tx3);opacity:.5;margin:2px auto 14px}
+.sheet .st{text-align:center;font-size:20px;font-weight:900}
+.sheet .ss{text-align:center;font-size:13px;color:var(--tx2);margin-top:4px}
+.lab{font-size:12px;font-weight:800;color:var(--tx3);margin:18px 4px 8px}
+.pens{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pen{height:74px;border-radius:20px;background:#F0EEE9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:22px;font-weight:900}
+.pen small{font-size:10px;color:var(--tx2);font-weight:700}
+.pen.sel{background:var(--ink);color:#fff}
+.pen.sel small{color:rgba(255,255,255,.6)}
+.opt{display:flex;gap:8px}
+.opt>div{flex:1;border-radius:18px;background:#F0EEE9;padding:12px;font-size:14px;font-weight:800}
+.opt>div small{display:block;font-size:11px;color:var(--tx2);font-weight:700;margin-top:3px}
+.opt>div.sel{background:#fff;box-shadow:inset 0 0 0 2.5px var(--ink)}
+.sw{display:flex;align-items:center;justify-content:space-between;padding:12px 6px 0;font-size:14px;font-weight:800}
+.sw small{display:block;font-size:11px;color:var(--tx2);font-weight:700}
+.tg{width:46px;height:28px;border-radius:14px;background:#E5E5EA;position:relative}
+.tg::after{content:"";position:absolute;left:2px;top:2px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.18)}
+.tg.on{background:#22C993}.tg.on::after{left:20px}
+
+/* 设置页 */
+.seg{display:flex;padding:3px;border-radius:14px;background:#E9E7E1;height:40px}
+.seg div{flex:1;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--tx2);border-radius:11px}
+.seg div.on{background:var(--card);color:var(--tx);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.sl{font-size:15px;font-weight:900;display:flex;justify-content:space-between;align-items:baseline;padding:4px 4px 0}
+.sl small{font-size:12px;color:var(--tx2);font-weight:600}
+.slot2{display:flex;align-items:center;gap:12px;padding:12px 14px;position:relative}
+.slot2+.slot2::before{content:"";position:absolute;left:62px;right:0;top:0;height:1px;background:var(--line)}
+.slot2 .nm{flex:1;font-size:16px;font-weight:700}
+.slot2 .brk{font-size:11px;font-weight:900;padding:3px 9px;border-radius:999px;background:var(--ink);color:#fff}
+.slot2 .x{width:28px;height:28px;border-radius:50%;background:#F0EEE9;display:flex;align-items:center;justify-content:center;color:var(--tx2)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{height:36px;padding:0 13px;border-radius:12px;background:#F0EEE9;display:flex;align-items:center;font-size:13px;font-weight:800;color:var(--tx2)}
+.chip.on{background:var(--ink);color:#fff}
+.rowx{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;font-size:15px;font-weight:600;position:relative}
+.rowx+.rowx::before{content:"";position:absolute;left:14px;right:0;top:0;height:1px;background:var(--line)}
+.rowx small{display:block;font-size:11px;color:var(--tx2);font-weight:600;margin-top:2px}
+.cta{position:absolute;left:12px;right:12px;bottom:30px}
+
+/* 首页 */
+.large{display:flex;align-items:flex-end;justify-content:space-between;padding:8px 10px 2px}
+.large .g{font-size:13px;color:var(--tx2)}
+.large .t{font-size:32px;font-weight:900;margin-top:2px}
+.modes{display:flex;gap:10px}
+.mode{flex:1;height:118px;border-radius:24px;position:relative;overflow:hidden;color:#fff;padding:14px}
+.mode b{position:absolute;left:14px;bottom:30px;font-size:19px;font-weight:900}
+.mode span{position:absolute;left:14px;bottom:12px;font-size:11px;font-weight:700;opacity:.9}
+.snk{height:150px;border-radius:26px;position:relative;overflow:hidden;color:#fff;padding:16px;background:linear-gradient(135deg,#1FA86A,#17855A);box-shadow:0 18px 34px -16px rgba(23,133,90,.7)}
+.snk .felt{position:absolute;inset:0;background:radial-gradient(circle at 80% 30%,rgba(255,255,255,.18),transparent 55%)}
+.snk b{position:absolute;left:16px;bottom:44px;font-size:26px;font-weight:900}
+.snk .sub{position:absolute;left:16px;bottom:18px;font-size:12px;font-weight:700;opacity:.92}
+.snk .new{position:absolute;left:16px;top:16px;font-size:11px;font-weight:900;padding:3px 9px;border-radius:999px;background:#fff;color:#17855A}
+.live{padding:12px 14px}
+.live .lh{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--tx2);font-weight:700}
+.live .lh .dt{width:10px;height:10px;border-radius:50%;background:#22C993;box-shadow:0 0 0 4px #22C99333}
+.live .lh .go{margin-left:auto;font-size:12px;font-weight:800;color:#fff;background:var(--ink);padding:5px 11px;border-radius:999px}
+.live .lg{display:flex;align-items:center;justify-content:space-around;margin-top:12px}
+.live .lp{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--tx2)}
+.live .lp b{font-size:20px;color:var(--tx);font-weight:900}
+.live .vs{font-size:12px;color:var(--tx3);font-weight:800;text-align:center}
+.live .vs b{display:block;font-size:24px;color:var(--tx);font-weight:900}
+.more{display:flex;gap:8px}
+.more>div{flex:1;border-radius:18px;padding:12px;font-size:14px;font-weight:900}
+.more>div small{display:block;font-size:11px;font-weight:800;margin-top:4px}
+.tab{position:absolute;left:20px;right:20px;bottom:24px;height:62px;border-radius:31px;display:flex;align-items:center;padding:5px;z-index:30;
+  background:linear-gradient(135deg,rgba(255,255,255,.8),rgba(255,255,255,.5));backdrop-filter:blur(14px);box-shadow:inset 0 1px 0 #fff,0 12px 28px -12px rgba(40,30,20,.36)}
+.tab div{flex:1;height:52px;border-radius:26px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;font-weight:800;color:#4A4A52}
+.tab div.on{background:#fff;color:#FF5A5F;box-shadow:0 6px 14px -6px rgba(0,0,0,.2)}
+
+/* 战报 */
+.hero{border-radius:26px;padding:16px;background:linear-gradient(180deg,#fff,#FFF6EC);position:relative}
+.hero .ht{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--tx2)}
+.hero .ht b{background:var(--ink);color:#fff;padding:4px 10px;border-radius:999px;font-size:12px}
+.hero .w{text-align:center;font-size:22px;font-weight:900;margin-top:14px}
+.hero .vs{display:flex;align-items:center;justify-content:center;gap:22px;margin-top:14px}
+.hero .vs .p{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;font-weight:800}
+.hero .vs .sc2{font-size:56px;font-weight:900;letter-spacing:-.02em}
+.frames{padding:6px 12px}
+.fr{display:flex;align-items:center;gap:10px;height:38px;font-size:13px;font-weight:700}
+.fr+.fr{border-top:1px solid var(--line)}
+.fr .no{width:44px;color:var(--tx2);font-size:12px}
+.fr .bar{flex:1;height:8px;border-radius:4px;background:var(--card2);position:relative;overflow:hidden}
+.fr .bar i{position:absolute;top:0;bottom:0;border-radius:4px}
+.fr .s{width:62px;text-align:right;font-weight:900}
+.fr .hb{width:44px;text-align:right;font-size:11px;color:var(--tx2)}
+.bks{padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.bk2{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700}
+.bk2 .v{width:40px;font-size:22px;font-weight:900}
+.bk2 .dts{display:flex;gap:2px;flex-wrap:wrap;flex:1}
+.bk2 .dts i{width:8px;height:8px;border-radius:50%;display:block}
+.bk2 small{color:var(--tx2);font-size:11px}
+.cmp{padding:6px 14px}
+.cmp .r{display:flex;align-items:center;height:34px;font-size:13px}
+.cmp .r+.r{border-top:1px solid var(--line)}
+.cmp .r span{flex:1;color:var(--tx2)}
+.cmp .r b{width:70px;text-align:center;font-weight:900}
+.cmp .r b.w{color:#E5383B}
+
+/* 战绩 */
+.gseg{display:flex;gap:8px}
+.gseg div{flex:1;height:44px;border-radius:16px;background:#E9E7E1;display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;font-weight:900;color:var(--tx2)}
+.gseg div.on{background:var(--ink);color:#fff}
+.namecard{border-radius:26px;padding:16px;color:#fff;background:#1FA86A;position:relative;overflow:hidden}
+.namecard .kp{display:flex;margin-top:14px}
+.namecard .kp div{flex:1;text-align:center}
+.namecard .kp b{display:block;font-size:24px;font-weight:900}
+.namecard .kp span{font-size:11px;opacity:.85;font-weight:700}
+.dist{padding:12px 14px}
+.dist .bars{display:flex;align-items:flex-end;gap:12px;height:96px;margin-top:10px}
+.dist .bars div{flex:1;border-radius:10px 10px 6px 6px;background:linear-gradient(180deg,#1FA86A,#7FD8AE);position:relative}
+.dist .bars div span{position:absolute;top:-20px;left:0;right:0;text-align:center;font-size:12px;font-weight:900}
+.dist .xl{display:flex;gap:12px;margin-top:6px}
+.dist .xl span{flex:1;text-align:center;font-size:11px;color:var(--tx2);font-weight:700}
+.mrow{display:flex;align-items:center;gap:10px;padding:12px 14px;font-size:13px;font-weight:800}
+.mrow+.mrow{border-top:1px solid var(--line)}
+.mrow .gi{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:900}
+.mrow .r{margin-left:auto;font-size:12px;padding:3px 9px;border-radius:999px}
+
+/* ---------- 说明区 ---------- */
+.notes{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;position:relative}
+.note{background:var(--card);border-radius:36px;padding:34px 34px 30px;box-shadow:0 30px 60px -36px rgba(60,40,20,.35)}
+.note h3{font-size:26px;font-weight:900;display:flex;align-items:center;gap:12px}
+.note h3 i{width:14px;height:14px;border-radius:50%}
+.note ul{list-style:none;margin-top:20px;display:flex;flex-direction:column;gap:14px}
+.note li{font-size:17px;line-height:1.55;color:#3A3A42;padding-left:22px;position:relative}
+.note li::before{content:"";position:absolute;left:2px;top:10px;width:8px;height:8px;border-radius:50%;background:var(--tx3)}
+.note li b{color:var(--tx)}
+.note .kbd{display:inline-block;font-size:14px;font-weight:900;padding:1px 9px;border-radius:8px;background:#F0EEE9;margin:0 2px}
+.note.q li::before{content:counter(q);counter-increment:q;width:24px;height:24px;left:-6px;top:1px;background:#FF5A5F;color:#fff;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;border-radius:50%}
+.note.q ul{counter-reset:q}
+.note.q li{padding-left:30px}
+</style>
+</head>
+<body>
+<div class="board">
+  <div class="blob" style="background:#1FA86A;width:700px;height:700px;left:-200px;top:-260px"></div>
+  <div class="blob" style="background:#FF5A5F;width:560px;height:560px;right:-120px;top:-180px"></div>
+  <div class="blob" style="background:#FFC53D;width:520px;height:520px;left:900px;top:1100px"></div>
+  <div class="blob" style="background:#3D7BFF;width:600px;height:600px;right:-160px;top:1500px"></div>
+
+  <div class="hd">
+    <div class="brand">
+      <img src="../../小程序/miniprogram/images/logo.png">
+      <div><h1>斯诺克记分 · 方案总览</h1><p>沿用追分的卡片、球按钮、底栏和结算逻辑 · 核心只有一条：一杆一按</p></div>
+    </div>
+    <div class="core">
+      <div class="k"><b><i style="background:#E5383B"></i>进球</b><span>点进了的那颗球</span></div>
+      <div class="k"><b><i style="background:#16161A"></i>没进</b><span>点「换人」</span></div>
+      <div class="k"><b><i style="background:#F0444D"></i>犯规</b><span>点「犯规」选罚分</span></div>
+      <div class="k"><b><i style="background:#A9A9B0"></i>记错</b><span>撤销，一步一步退</span></div>
+    </div>
+  </div>
+
+  <!-- ================= 第一行：主流程 ================= -->
+  <div class="sec">主流程<small>从首页进入，到一局里最常见的三种状态</small></div>
+  <div class="row">
+
+    <!-- ① 首页 -->
+    <div class="slot">
+      <div class="ph"><div class="sc">
+        <div class="di"></div>
+        <div class="sb"><span>9:41</span><svg width="70" height="13" viewBox="0 0 70 13"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/><rect x="42.5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="#000" opacity=".4"/><rect x="44" y="2" width="20" height="9" rx="2.5"/></svg></div>
+        <div class="cap2"><span class="d3"><b></b><b></b><b></b></span><i></i><span><span class="rg"><b></b></span></span></div>
+        <div class="body" style="padding-top:40px">
+          <div class="large"><div><div class="g">晚上好，今晚一杆清台</div><div class="t">球球记分</div></div><div class="av" style="width:46px;height:46px;background:#FF5A5F;color:#fff;font-size:18px">I</div></div>
+          <div class="snk"><div class="felt"></div><span class="new">新玩法</span>
+            <div class="ball" style="--bc:var(--red);width:54px;height:54px;position:absolute;right:92px;top:30px"></div>
+            <div class="ball" style="--bc:var(--blk);width:46px;height:46px;position:absolute;right:40px;top:56px"></div>
+            <div class="ball p" style="--bc:var(--pnk);width:38px;height:38px;position:absolute;right:110px;top:88px"></div>
+            <b>斯诺克</b><span class="sub">1 v 1 · 一杆一按 · 自动算剩余分</span></div>
+          <div class="modes">
+            <div class="mode" style="background:#FF5A5F"><b>双人追分</b><span>1 v 1 · 赢家开球</span></div>
+            <div class="mode" style="background:#3D7BFF"><b>三人追分</b><span>胜者开球 · 上家付分</span></div>
+          </div>
+          <div class="card live">
+            <div class="lh"><span class="dt"></span>斯诺克 · 第 3 局 · 00:42:10<span class="go">继续 ›</span></div>
+            <div class="lg">
+              <div class="lp"><div class="av" style="background:#FF5A5F;color:#fff">I</div>Isaac<b class="num">45</b></div>
+              <div class="vs">局分<b class="num">1 : 1</b>7 局 4 胜</div>
+              <div class="lp"><div class="av" style="background:#3D7BFF;color:#fff">H</div>Henry<b class="num">27</b></div>
+            </div>
+          </div>
+          <div class="sl" style="margin-top:4px">更多玩法<small>持续上新</small></div>
+          <div class="more">
+            <div style="background:#FFF3D6">中式八球<small style="color:#B07A00">即将上线</small></div>
+            <div style="background:#EEE7FF">九球抢局<small style="color:#7B4FE0">即将上线</small></div>
+          </div>
+        </div>
+        <div class="tab"><div class="on">开火</div><div>战绩</div><div>我的</div></div>
+        <div class="hi"></div>
+      </div></div>
+      <div class="arrow">›</div>
+      <div class="cap"><div class="t"><span class="n">1</span>首页入口<span class="tag re">改</span></div>
+        <div class="d">斯诺克升级成一张大卡片（绿色台呢），放在追分上面；进行中的斯诺克卡片显示<b>局分 + 本局比分</b>，点一下继续。</div></div>
+    </div>
+
+    <!-- ② 设置 -->
+    <div class="slot">
+      <div class="ph"><div class="sc">
+        <div class="di"></div>
+        <div class="sb"><span>9:41</span><svg width="70" height="13" viewBox="0 0 70 13"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/><rect x="42.5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="#000" opacity=".4"/><rect x="44" y="2" width="20" height="9" rx="2.5"/></svg></div>
+        <div class="cap2"><span class="d3"><b></b><b></b><b></b></span><i></i><span><span class="rg"><b></b></span></span></div>
+        <div class="nav"><span class="bk">‹</span><div class="tt"><span class="t1">斯诺克</span></div></div>
+        <div class="body">
+          <div class="sl">球员<small>点「开球」切换谁先开</small></div>
+          <div class="card">
+            <div class="slot2"><div class="av" style="background:#FF5A5F;color:#fff">I</div><span class="nm">Isaac</span><span class="brk">开球</span><span class="x">×</span></div>
+            <div class="slot2"><div class="av" style="background:#3D7BFF;color:#fff">H</div><span class="nm">Henry</span><span class="x">×</span></div>
+          </div>
+          <div class="sl">赛制<small>打满就自动结束整场</small></div>
+          <div class="card" style="padding:12px">
+            <div class="chips"><span class="chip">单局</span><span class="chip">3 局 2 胜</span><span class="chip">5 局 3 胜</span><span class="chip on">7 局 4 胜</span><span class="chip">自定义</span></div>
+          </div>
+          <div class="sl">红球数<small>小球台 / 娱乐可以少放</small></div>
+          <div class="card" style="padding:12px">
+            <div class="chips"><span class="chip on">15 颗 · 147</span><span class="chip">10 颗 · 107</span><span class="chip">6 颗 · 75</span></div>
+          </div>
+          <div class="sl">选项</div>
+          <div class="card">
+            <div class="rowx"><div>犯规罚分<small>最低 4 分，按涉及的球最高 7 分</small></div><span style="color:var(--tx2);font-size:13px">标准 ›</span></div>
+            <div class="rowx"><div>限时比赛<small>到点只提醒，不自动结算</small></div><span class="tg"></span></div>
+            <div class="rowx"><div>屏幕常亮</div><span class="tg on"></span></div>
+          </div>
+        </div>
+        <div class="cta"><div class="btn pri" style="height:56px;border-radius:28px;font-size:17px">开始对局</div></div>
+        <div class="hi"></div>
+      </div></div>
+      <div class="arrow">›</div>
+      <div class="cap"><div class="t"><span class="n new">2</span>斯诺克设置<span class="tag">新</span></div>
+        <div class="d">只有 1 v 1。三个选择：<b>谁开球、几局几胜、几颗红球</b>；罚分默认标准规则，限时、常亮沿用追分。</div></div>
+    </div>
+
+    <!-- ③ 记分：打红球 -->
+    <div class="slot">
+      <div class="ph"><div class="sc">
+        <div class="di"></div>
+        <div class="sb"><span>9:41</span><svg width="70" height="13" viewBox="0 0 70 13"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/><rect x="42.5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="#000" opacity=".4"/><rect x="44" y="2" width="20" height="9" rx="2.5"/></svg></div>
+        <div class="cap2"><span class="d3"><b></b><b></b><b></b></span><i></i><span><span class="rg"><b></b></span></span></div>
+        <div class="nav"><span class="bk">‹</span><div class="tt"><span class="t1">第 3 局</span><span class="t2 num">7 局 4 胜 · 00:42:10</span></div></div>
+        <div class="body">
+          <div class="card mstrip"><span class="pn"><span class="av sm" style="background:#FF5A5F;color:#fff">I</span>Isaac</span><span class="fs"><b class="num">1 : 1</b><span>局分</span></span><span class="pn">Henry<span class="av sm" style="background:#3D7BFF;color:#fff">H</span></span></div>
+          <div class="pls">
+            <div class="pl on" style="background:#FF5A5F;--g:rgba(255,90,95,.7)"><div class="h">Isaac<span class="st" style="color:#FF5A5F">在打</span></div><div class="s num">45</div>
+              <div class="bk">本杆 23<span class="dots"><i style="background:var(--red)"></i><i style="background:var(--blk)"></i><i style="background:var(--red)"></i><i style="background:var(--blk)"></i><i style="background:var(--red)"></i><i style="background:var(--pnk)"></i></span></div></div>
+            <div class="pl off"><div class="h">Henry<span class="st">等待</span></div><div class="s num">27</div><div class="bk" style="color:var(--tx2)">上一杆 12</div></div>
+          </div>
+          <div class="card info"><div><b class="num">75</b><span>台面剩余</span></div><div><b class="num" style="color:var(--pos)">+18</b><span>Isaac 领先</span></div><div><b class="num">6</b><span>红球剩余</span></div></div>
+          <div class="ask"><b>这一杆进了什么？</b><span class="nx"><i style="background:var(--red)"></i>该打红球</span></div>
+          <div class="redbtn hl"><div class="ball" style="--bc:var(--red);width:48px;height:48px;font-size:18px">1</div><div class="tx"><b>红球 +1</b><span>进一颗点一下</span></div>
+            <div class="left"><i></i><i></i><i></i><i></i><i></i><i></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i></div></div>
+          <div class="cols dim">
+            <div class="cb"><div class="ball y" style="--bc:var(--yel);width:34px;height:34px;font-size:14px">2</div><div class="tx">黄</div></div>
+            <div class="cb"><div class="ball" style="--bc:var(--grn);width:34px;height:34px;font-size:14px">3</div><div class="tx">绿</div></div>
+            <div class="cb"><div class="ball" style="--bc:var(--brn);width:34px;height:34px;font-size:14px">4</div><div class="tx">棕</div></div>
+            <div class="cb"><div class="ball" style="--bc:var(--blu);width:34px;height:34px;font-size:14px">5</div><div class="tx">蓝</div></div>
+            <div class="cb"><div class="ball p" style="--bc:var(--pnk);width:34px;height:34px;font-size:14px">6</div><div class="tx">粉</div></div>
+            <div class="cb"><div class="ball" style="--bc:var(--blk);width:34px;height:34px;font-size:14px">7</div><div class="tx">黑</div></div>
+          </div>
+          <div class="acts"><div class="foul">犯规</div><div class="swap">没进 · 换人<small>→ Henry</small></div></div>
+        </div>
+        <div class="dock"><div class="db"><svg viewBox="0 0 24 24" fill="none" stroke="#16161A" stroke-width="2.2" stroke-linecap="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>撤销</div><div class="db"><svg viewBox="0 0 24 24" fill="none" stroke="#4A4A52" stroke-width="2.2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>记录</div><div class="db"><svg viewBox="0 0 24 24" fill="none" stroke="#4A4A52" stroke-width="2.2"><rect x="5" y="2" width="14" height="20" rx="3"/></svg>横屏</div><div class="db end"><svg viewBox="0 0 24 24" fill="none" stroke="#FF5A5F" stroke-width="2.2" stroke-linecap="round"><path d="M5 21V4h11l-2 4 2 4H5"/></svg>结算</div></div>
+        <div class="hi"></div>
+      </div></div>
+      <div class="arrow">›</div>
+      <div class="cap"><div class="t"><span class="n new">3</span>记分 · 该打红球<span class="tag">新</span></div>
+        <div class="d">在打的人整张卡片亮起来，<b>本杆得分 + 进球顺序</b>实时显示。该打红球时，红球按钮高亮，彩球变暗；右边的小点是剩下的红球。</div></div>
+    </div>
+
+    <!-- ④ 记分：打彩球 -->
+    <div class="slot">
+      <div class="ph"><div class="sc">
+        <div class="di"></div>
+        <div class="sb"><span>9:41</span><svg width="70" height="13" viewBox="0 0 70 13"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/><rect x="42.5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="#000" opacity=".4"/><rect x="44" y="2" width="20" height="9" rx="2.5"/></svg></div>
+        <div class="cap2"><span class="d3"><b></b><b></b><b></b></span><i></i><span><span class="rg"><b></b></span></span></div>
+        <div class="nav"><span class="bk">‹</span><div class="tt"><span class="t1">第 3 局</span><span class="t2 num">7 局 4 胜 · 00:42:31</span></div></div>
+        <div class="body">
+          <div class="card mstrip"><span class="pn"><span class="av sm" style="background:#FF5A5F;color:#fff">I</span>Isaac</span><span class="fs"><b class="num">1 : 1</b><span>局分</span></span><span class="pn">Henry<span class="av sm" style="background:#3D7BFF;color:#fff">H</span></span></div>
+          <div class="pls">
+            <div class="pl on" style="background:#FF5A5F;--g:rgba(255,90,95,.7)"><div class="h">Isaac<span class="st" style="color:#FF5A5F">在打</span></div><div class="s num">46</div>
+              <div class="bk">本杆 24<span class="dots"><i style="background:var(--red)"></i><i style="background:var(--blk)"></i><i style="background:var(--red)"></i><i style="background:var(--blk)"></i><i style="background:var(--red)"></i><i style="background:var(--pnk)"></i><i style="background:var(--red)"></i></span></div></div>
+            <div class="pl off"><div class="h">Henry<span class="st">等待</span></div><div class="s num">27</div><div class="bk" style="color:var(--tx2)">上一杆 12</div></div>
+          </div>
+          <div class="card info"><div><b class="num">74</b><span>台面剩余</span></div><div><b class="num" style="color:var(--pos)">+19</b><span>Isaac 领先</span></div><div><b class="num">5</b><span>红球剩余</span></div></div>
+          <div class="ask"><b>这一杆进了什么？</b><span class="nx"><i style="background:linear-gradient(90deg,var(--yel),var(--blu),var(--blk))"></i>该打彩球</span></div>
+          <div class="redbtn dim"><div class="ball" style="--bc:var(--red);width:48px;height:48px;font-size:18px">1</div><div class="tx"><b>红球 +1</b><span>先打一颗彩球</span></div>
+            <div class="left"><i></i><i></i><i></i><i></i><i></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i></div></div>
+          <div class="cols" style="position:relative">
+            <div class="cb hl"><div class="ball y" style="--bc:var(--yel);width:34px;height:34px;font-size:14px">2</div><div class="tx">黄</div></div>
+            <div class="cb hl"><div class="ball" style="--bc:var(--grn);width:34px;height:34px;font-size:14px">3</div><div class="tx">绿</div></div>
+            <div class="cb hl"><div class="ball" style="--bc:var(--brn);width:34px;height:34px;font-size:14px">4</div><div class="tx">棕</div></div>
+            <div class="cb hl"><div class="ball" style="--bc:var(--blu);width:34px;height:34px;font-size:14px">5</div><div class="tx">蓝</div></div>
+            <div class="cb hl"><div class="ball p" style="--bc:var(--pnk);width:34px;height:34px;font-size:14px">6</div><div class="tx">粉</div></div>
+            <div class="cb hl" style="background:#1E1E22;color:#fff"><div class="ball" style="--bc:var(--blk);width:34px;height:34px;font-size:14px;box-shadow:0 0 0 2px #fff3">7</div><div class="tx">黑</div><span class="badge" style="background:#13B57A;font-size:12px;top:-12px">+7</span></div>
+          </div>
+          <div class="acts"><div class="foul">犯规</div><div class="swap">没进 · 换人<small>→ Henry</small></div></div>
+        </div>
+        <div class="tip t" style="left:150px;top:770px;width:220px;top:auto;bottom:118px;display:none"></div>
+        <div class="dock"><div class="db"><svg viewBox="0 0 24 24" fill="none" stroke="#16161A" stroke-width="2.2" stroke-linecap="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>撤销</div><div class="db"><svg viewBox="0 0 24 24" fill="none" stroke="#4A4A52" stroke-width="2.2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>记录</div><div class="db"><svg viewBox="0 0 24 24" fill="none" stroke="#4A4A52" stroke-width="2.2"><rect x="5" y="2" width="14" height="20" rx="3"/></svg>横屏</div><div class="db end"><svg viewBox="0 0 24 24" fill="none" stroke="#FF5A5F" stroke-width="2.2" stroke-linecap="round"><path d="M5 21V4h11l-2 4 2 4H5"/></svg>结算</div></div>
+        <div class="hi"></div>
+      </div></div>
+      <div class="arrow">›</div>
+      <div class="cap"><div class="t"><span class="n new">4</span>记分 · 该打彩球<span class="tag">新</span></div>
+        <div class="d">进了红球后自动切到彩球：六颗彩球亮起、红球变暗。点「黑 7」就是 +7，然后又自动回到红球。<b>谁打什么不用人记。</b></div></div>
+    </div>
+
+    <!-- ⑤ 清彩阶段 -->
+    <div class="slot">
+      <div class="ph"><div class="sc">
+        <div class="di"></div>
+        <div class="sb"><span>9:41</span><svg width="70" height="13" viewBox="0 0 70 13"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/><rect x="42.5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="#000" opacity=".4"/><rect x="44" y="2" width="20" height="9" rx="2.5"/></svg></div>
+        <div class="cap2"><span class="d3"><b></b><b></b><b></b></span><i></i><span><span class="rg"><b></b></span></span></div>
+        <div class="nav"><span class="bk">‹</span><div class="tt"><span class="t1">第 3 局</span><span class="t2 num">7 局 4 胜 · 00:58:02</span></div></div>
+        <div class="body">
+          <div class="card mstrip"><span class="pn"><span class="av sm" style="background:#FF5A5F;color:#fff">I</span>Isaac</span><span class="fs"><b class="num">1 : 1</b><span>局分</span></span><span class="pn">Henry<span class="av sm" style="background:#3D7BFF;color:#fff">H</span></span></div>
+          <div class="pls">
+            <div class="pl off"><div class="h">Isaac<span class="st">等待</span></div><div class="s num">68</div><div class="bk" style="color:var(--tx2)">上一杆 22</div></div>
+            <div class="pl on" style="background:#3D7BFF;--g:rgba(61,123,255,.7)"><div class="h">Henry<span class="st" style="color:#3D7BFF">在打</span></div><div class="s num">38</div>
+              <div class="bk">本杆 5<span class="dots"><i style="background:var(--yel)"></i><i style="background:var(--grn)"></i></span></div></div>
+          </div>
+          <div class="card info"><div><b class="num">22</b><span>台面剩余</span></div><div><b class="num" style="color:var(--neg)">−30</b><span>Henry 落后</span></div><div><b class="num" style="color:var(--neg)">2</b><span>还需斗球</span></div></div>
+          <div class="ask"><b>清彩：按顺序打</b><span class="nx"><i style="background:var(--brn)"></i>该打棕球</span></div>
+          <div class="redbtn" style="opacity:.45"><div class="ball" style="--bc:#C9C6BF;width:48px;height:48px"></div><div class="tx"><b>红球已清台</b><span>剩下 6 颗彩球按分值从小到大</span></div></div>
+          <div class="cols">
+            <div class="cb done"><div class="ball y" style="--bc:var(--yel);width:34px;height:34px;font-size:14px">2</div><div class="tx">黄</div></div>
+            <div class="cb done"><div class="ball" style="--bc:var(--grn);width:34px;height:34px;font-size:14px">3</div><div class="tx">绿</div></div>
+            <div class="cb hl"><div class="ball" style="--bc:var(--brn);width:34px;height:34px;font-size:14px">4</div><div class="tx">棕</div><span class="badge">下一颗</span></div>
+            <div class="cb dim"><div class="ball" style="--bc:var(--blu);width:34px;height:34px;font-size:14px">5</div><div class="tx">蓝</div></div>
+            <div class="cb dim"><div class="ball p" style="--bc:var(--pnk);width:34px;height:34px;font-size:14px">6</div><div class="tx">粉</div></div>
+            <div class="cb dim"><div class="ball" style="--bc:var(--blk);width:34px;height:34px;font-size:14px">7</div><div class="tx">黑</div></div>
+          </div>
+          <div class="acts"><div class="foul">犯规</div><div class="swap">没进 · 换人<small>→ Isaac</small></div></div>
+        </div>
+        <div class="tip b" style="left:120px;bottom:400px;width:250px;display:none"></div>
+        <div class="dock"><div class="db"><svg viewBox="0 0 24 24" fill="none" stroke="#16161A" stroke-width="2.2" stroke-linecap="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>撤销</div><div class="db"><svg viewBox="0 0 24 24" fill="none" stroke="#4A4A52" stroke-width="2.2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>记录</div><div class="db"><svg viewBox="0 0 24 24" fill="none" stroke="#4A4A52" stroke-width="2.2"><rect x="5" y="2" width="14" height="20" rx="3"/></svg>横屏</div><div class="db end"><svg viewBox="0 0 24 24" fill="none" stroke="#FF5A5F" stroke-width="2.2" stroke-linecap="round"><path d="M5 21V4h11l-2 4 2 4H5"/></svg>结算</div></div>
+        <div class="hi"></div>
+      </div></div>
+      <div class="cap"><div class="t"><span class="n new">5</span>记分 · 清彩阶段<span class="tag">新</span></div>
+        <div class="d">红球打完后只亮「下一颗」，打过的打勾。落后时自动算<b>还需几个斗球</b>（落后 30、台面只剩 22 → 还需 2 个），一眼知道还有没有机会。</div></div>
+    </div>
+  </div>
+
+  <!-- ================= 第二行：配套界面 ================= -->
+  <div class="sec">配套界面<small>犯规、局结束，以及会联动的战报和战绩</small></div>
+  <div class="row">
+
+    <!-- ⑥ 犯规 -->
+    <div class="slot">
+      <div class="ph"><div class="sc">
+        <div class="di"></div>
+        <div class="sb"><span>9:41</span><svg width="70" height="13" viewBox="0 0 70 13"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/><rect x="42.5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="#000" opacity=".4"/><rect x="44" y="2" width="20" height="9" rx="2.5"/></svg></div>
+        <div class="cap2"><span class="d3"><b></b><b></b><b></b></span><i></i><span><span class="rg"><b></b></span></span></div>
+        <div class="nav"><span class="bk">‹</span><div class="tt"><span class="t1">第 3 局</span><span class="t2 num">7 局 4 胜 · 00:44:05</span></div></div>
+        <div class="body">
+          <div class="card mstrip"><span class="pn"><span class="av sm" style="background:#FF5A5F;color:#fff">I</span>Isaac</span><span class="fs"><b class="num">1 : 1</b><span>局分</span></span><span class="pn">Henry<span class="av sm" style="background:#3D7BFF;color:#fff">H</span></span></div>
+          <div class="pls">
+            <div class="pl off"><div class="h">Isaac<span class="st">等待</span></div><div class="s num">53</div></div>
+            <div class="pl on" style="background:#3D7BFF;--g:rgba(61,123,255,.7)"><div class="h">Henry<span class="st" style="color:#3D7BFF">在打</span></div><div class="s num">27</div></div>
+          </div>
+        </div>
+        <div class="mask"></div>
+        <div class="sheet">
+          <div class="grab"></div>
+          <div class="st">Henry 犯规</div>
+          <div class="ss">罚分给 Isaac · 最低 4 分</div>
+          <div class="lab">罚几分</div>
+          <div class="pens">
+            <div class="pen sel">4<small>默认</small></div>
+            <div class="pen"><span style="display:flex;align-items:center;gap:6px"><span class="ball" style="--bc:var(--blu);width:16px;height:16px"></span>5</span><small>涉及蓝球</small></div>
+            <div class="pen"><span style="display:flex;align-items:center;gap:6px"><span class="ball" style="--bc:var(--pnk);width:16px;height:16px"></span>6</span><small>涉及粉球</small></div>
+            <div class="pen"><span style="display:flex;align-items:center;gap:6px"><span class="ball" style="--bc:var(--blk);width:16px;height:16px"></span>7</span><small>涉及黑球</small></div>
+          </div>
+          <div class="lab">下一杆谁打</div>
+          <div class="opt"><div class="sel">Isaac 接着打<small>默认</small></div><div>让 Henry 再打<small>对手要求复位重打</small></div></div>
+          <div class="sw"><div>自由球<small>被斗住时可指定任意球当目标球</small></div><span class="tg"></span></div>
+          <div class="btn pri" style="margin-top:18px">确定 · Isaac +4</div>
+        </div>
+        <div class="hi"></div>
+      </div></div>
+      <div class="cap"><div class="t"><span class="n new">6</span>犯规面板<span class="tag">新</span></div>
+        <div class="d">默认 <b>罚 4 分、对手接着打</b>，大多数情况直接点确定。罚 5–7 分用球的颜色提示；复位重打、自由球放在下面，用到才点。</div></div>
+    </div>
+
+    <!-- ⑦ 本局结束 -->
+    <div class="slot">
+      <div class="ph"><div class="sc">
+        <div class="di"></div>
+        <div class="sb"><span>9:41</span><svg width="70" height="13" viewBox="0 0 70 13"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/><rect x="42.5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="#000" opacity=".4"/><rect x="44" y="2" width="20" height="9" rx="2.5"/></svg></div>
+        <div class="cap2"><span class="d3"><b></b><b></b><b></b></span><i></i><span><span class="rg"><b></b></span></span></div>
+        <div class="nav"><span class="bk">‹</span><div class="tt"><span class="t1">第 3 局</span><span class="t2 num">7 局 4 胜 · 01:01:44</span></div></div>
+        <div class="body">
+          <div class="pls">
+            <div class="pl on" style="background:#FF5A5F;--g:rgba(255,90,95,.7)"><div class="h">Isaac</div><div class="s num">86</div></div>
+            <div class="pl off"><div class="h">Henry</div><div class="s num">42</div></div>
+          </div>
+        </div>
+        <div class="mask"></div>
+        <div class="sheet" style="padding-bottom:28px">
+          <div class="grab"></div>
+          <div style="display:flex;justify-content:center;margin-top:4px"><div class="ball" style="--bc:var(--blk);width:64px;height:64px;font-size:22px">7</div></div>
+          <div class="st" style="margin-top:12px">第 3 局 · Isaac 拿下</div>
+          <div class="ss">86 : 42 · 单杆最高 Isaac 23 · 用时 22 分</div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:26px;margin:20px 0 6px">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;font-weight:800"><div class="av" style="background:#FF5A5F;color:#fff;width:44px;height:44px">I</div>Isaac</div>
+            <div style="text-align:center"><div class="num" style="font-size:54px;font-weight:900;line-height:1">2 : 1</div><div style="font-size:12px;color:var(--tx2);font-weight:700;margin-top:4px">局分 · 7 局 4 胜</div></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;font-weight:800"><div class="av" style="background:#3D7BFF;color:#fff;width:44px;height:44px">H</div>Henry</div>
+          </div>
+          <div class="btn pri" style="margin-top:18px">开始第 4 局 · Henry 开球</div>
+          <div class="btn soft" style="margin-top:10px;color:var(--tx)">结束比赛</div>
+          <div style="text-align:center;font-size:14px;color:var(--tx2);font-weight:700;margin-top:16px">撤销最后一杆</div>
+        </div>
+        <div class="hi"></div>
+      </div></div>
+      <div class="cap"><div class="t"><span class="n new">7</span>本局结束<span class="tag">新</span></div>
+        <div class="d">最后一颗黑球进了就<b>自动弹出</b>：本局比分、局分、下一局谁开球（自动轮换）。平分时提示「重摆黑球决胜」；打满赛制直接进结算。</div></div>
+    </div>
+
+    <!-- ⑧ 战报 -->
+    <div class="slot">
+      <div class="ph"><div class="sc">
+        <div class="di"></div>
+        <div class="sb"><span>9:41</span><svg width="70" height="13" viewBox="0 0 70 13"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/><rect x="42.5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="#000" opacity=".4"/><rect x="44" y="2" width="20" height="9" rx="2.5"/></svg></div>
+        <div class="cap2"><span class="d3"><b></b><b></b><b></b></span><i></i><span><span class="rg"><b></b></span></span></div>
+        <div class="nav"><span class="bk">‹</span><div class="tt"><span class="t1">战报</span></div></div>
+        <div class="body">
+          <div class="hero card"><div class="ht"><b>斯诺克 · 7 局 4 胜</b><span>10月9日 21:40</span></div>
+            <div class="w"><span style="color:#FF5A5F">Isaac</span> 赢下比赛</div>
+            <div class="vs"><div class="p"><div class="av" style="background:#FF5A5F;color:#fff;width:50px;height:50px;font-size:20px">I</div>Isaac</div><div class="sc2 num">4 : 2</div><div class="p"><div class="av" style="background:#3D7BFF;color:#fff;width:50px;height:50px;font-size:20px">H</div>Henry</div></div></div>
+          <div class="sl">每局比分<small>右边是本局单杆最高</small></div>
+          <div class="card frames">
+            <div class="fr"><span class="no">第 1 局</span><span class="bar"><i style="left:0;width:62%;background:#FF5A5F"></i></span><span class="s num">72:41</span><span class="hb num">38</span></div>
+            <div class="fr"><span class="no">第 2 局</span><span class="bar"><i style="left:0;width:40%;background:#3D7BFF"></i></span><span class="s num">33:68</span><span class="hb num">45</span></div>
+            <div class="fr"><span class="no">第 3 局</span><span class="bar"><i style="left:0;width:67%;background:#FF5A5F"></i></span><span class="s num">86:42</span><span class="hb num">23</span></div>
+            <div class="fr"><span class="no">第 4 局</span><span class="bar"><i style="left:0;width:71%;background:#FF5A5F"></i></span><span class="s num">88:24</span><span class="hb num" style="color:#E5383B;font-weight:900">52</span></div>
+            <div class="fr"><span class="no">第 5 局</span><span class="bar"><i style="left:0;width:45%;background:#3D7BFF"></i></span><span class="s num">51:63</span><span class="hb num">29</span></div>
+            <div class="fr"><span class="no">第 6 局</span><span class="bar"><i style="left:0;width:58%;background:#FF5A5F"></i></span><span class="s num">65:47</span><span class="hb num">31</span></div>
+          </div>
+          <div class="sl">单杆榜</div>
+          <div class="card bks">
+            <div class="bk2"><span class="v num" style="color:#E5383B">52</span><span class="dts"><i style="background:var(--red)"></i><i style="background:var(--blk)"></i><i style="background:var(--red)"></i><i style="background:var(--blk)"></i><i style="background:var(--red)"></i><i style="background:var(--blk)"></i><i style="background:var(--red)"></i><i style="background:var(--pnk)"></i><i style="background:var(--red)"></i><i style="background:var(--blk)"></i><i style="background:var(--red)"></i><i style="background:var(--blu)"></i><i style="background:var(--red)"></i><i style="background:var(--blk)"></i></span><small>Isaac · 第 4 局</small></div>
+            <div class="bk2"><span class="v num">45</span><span class="dts"><i style="background:var(--red)"></i><i style="background:var(--blk)"></i><i style="background:var(--red)"></i><i style="background:var(--pnk)"></i><i style="background:var(--red)"></i><i style="background:var(--blk)"></i><i style="background:var(--red)"></i><i style="background:var(--blk)"></i><i style="background:var(--red)"></i><i style="background:var(--blu)"></i></span><small>Henry · 第 2 局</small></div>
+          </div>
+          <div class="card cmp">
+            <div class="r"><span></span><b style="color:#FF5A5F">Isaac</b><b style="color:#3D7BFF">Henry</b></div>
+            <div class="r"><span>总得分</span><b class="num w">395</b><b class="num">285</b></div>
+            <div class="r"><span>50+ 单杆</span><b class="num w">1</b><b class="num">0</b></div>
+          </div>
+        </div>
+        <div class="hi"></div>
+      </div></div>
+      <div class="cap"><div class="t"><span class="n">8</span>战报<span class="tag re">改</span></div>
+        <div class="d">结构沿用追分：赢家 + 大比分 → <b>每局比分条</b> → <b>单杆榜</b>（用进球颜色画出这一杆）→ 数据对比（总得分、单杆最高、50+ 单杆、犯规罚分）。</div></div>
+    </div>
+
+    <!-- ⑨ 战绩 -->
+    <div class="slot">
+      <div class="ph"><div class="sc">
+        <div class="di"></div>
+        <div class="sb"><span>9:41</span><svg width="70" height="13" viewBox="0 0 70 13"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/><rect x="42.5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="#000" opacity=".4"/><rect x="44" y="2" width="20" height="9" rx="2.5"/></svg></div>
+        <div class="cap2"><span class="d3"><b></b><b></b><b></b></span><i></i><span><span class="rg"><b></b></span></span></div>
+        <div class="body" style="padding-top:44px">
+          <div class="large" style="padding-top:0"><div><div class="g">你的台球履历</div><div class="t">战绩</div></div></div>
+          <div class="gseg"><div>追分</div><div class="on">斯诺克</div></div>
+          <div class="namecard"><div style="display:flex;align-items:center;gap:10px"><div class="av" style="background:#fff;color:#1FA86A;width:44px;height:44px;font-size:18px">I</div><div><div style="font-size:18px;font-weight:900">Isaac</div><div style="font-size:12px;opacity:.85;font-weight:700">斯诺克 · 12 场 · 58 局</div></div></div>
+            <div class="kp"><div><b class="num">58%</b><span>局胜率</span></div><div><b class="num">8-4</b><span>场次胜负</span></div><div><b class="num">52</b><span>单杆最高</span></div><div><b class="num">3</b><span>50+ 单杆</span></div></div></div>
+          <div class="sl">单杆分布</div>
+          <div class="card dist">
+            <div class="bars"><div style="height:92%"><span>41</span></div><div style="height:58%"><span>26</span></div><div style="height:30%"><span>13</span></div><div style="height:9%"><span>3</span></div></div>
+            <div class="xl"><span>10–19</span><span>20–29</span><span>30–49</span><span>50+</span></div>
+          </div>
+          <div class="sl">最近比赛</div>
+          <div class="card">
+            <div class="mrow"><span class="gi" style="background:#1FA86A">斯</span>vs Henry · 7 局 4 胜<span class="r" style="background:#1FC98E1F;color:#0E9F5E">4:2 胜</span></div>
+            <div class="mrow"><span class="gi" style="background:#1FA86A">斯</span>vs Hugo · 5 局 3 胜<span class="r" style="background:#FF5A5F1F;color:#E5383B">1:3 负</span></div>
+          </div>
+        </div>
+        <div class="tab"><div>开火</div><div class="on">战绩</div><div>我的</div></div>
+        <div class="hi"></div>
+      </div></div>
+      <div class="cap"><div class="t"><span class="n">9</span>战绩<span class="tag re">改</span></div>
+        <div class="d">顶部加一层<b>「追分 / 斯诺克」</b>切换，两种玩法的数据分开算。斯诺克看局胜率、单杆最高、50+ 次数和单杆分布；历史日历、首页最近对局也按玩法显示不同的行。</div></div>
+    </div>
+
+    <!-- ⑩ 说明：沿用 + 引擎 -->
+    <div class="slot">
+      <div class="note" style="height:864px;display:flex;flex-direction:column">
+        <h3><i style="background:#3D7BFF"></i>直接沿用</h3>
+        <ul>
+          <li><b>卡片和配色</b>：在打的人整张卡片用他的颜色，和追分一样</li>
+          <li><b>球的质感</b>：首页的台球、黄金九按钮那套光泽</li>
+          <li><b>底栏</b>：撤销 / 记录 / 横屏 / 结算，位置不变</li>
+          <li><b>结算逻辑</b>：保存 / 不保存 / 继续打，不保存要二次确认</li>
+          <li><b>限时比赛、30 分钟自动保存、防连点</b></li>
+          <li><b>引擎</b>：还是只存「发生了什么」（进了哪颗球、换人、犯规几分），比分、剩余分、单杆都由引擎算出来，撤销照样只删最后一条</li>
+        </ul>
+        <h3 style="margin-top:30px"><i style="background:#FF5A5F"></i>自动处理</h3>
+        <ul>
+          <li>红球 ↔ 彩球轮换；红球打完进入清彩，<b>只亮下一颗</b></li>
+          <li>台面剩余分、领先 / 落后、<b>还需几个斗球</b></li>
+          <li>最后一颗黑球进了自动结束本局；<b>平分重摆黑球</b></li>
+          <li>局分、赛制胜负、下一局谁开球</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 说明区 ================= -->
+  <div class="notes">
+    <div class="note">
+      <h3><i style="background:#16161A"></i>一杆一按：怎么记</h3>
+      <ul>
+        <li>进球：点进了的那颗球 <span class="kbd">红 1</span> <span class="kbd">黑 7</span>，分数自动加到在打的人身上</li>
+        <li>这一杆结束（没进 / 安全球）：点 <span class="kbd">没进 · 换人</span></li>
+        <li>犯规：点 <span class="kbd">犯规</span>，默认 4 分直接确定</li>
+        <li>记错：<span class="kbd">撤销</span>，按杆一步步退回</li>
+        <li>一局 147 分最多也就几十次点击，大部分是「点球」和「换人」两个动作</li>
+      </ul>
+    </div>
+    <div class="note">
+      <h3><i style="background:#1FA86A"></i>为什么这样排</h3>
+      <ul>
+        <li><b>红球单独一大块</b>：一局里点得最多的是红球，放最大</li>
+        <li><b>彩球 3×2 网格</b>：按分值从小到大，和台面摆位顺序一致，好记</li>
+        <li><b>换人放在拇指区</b>：右手单手就能点到，黑色最醒目</li>
+        <li><b>不能打的球变暗</b>：避免点错；真要点也能点，会提示一下</li>
+        <li><b>信息条只放三件事</b>：台面剩余、差几分、红球 / 斗球</li>
+      </ul>
+    </div>
+    <div class="note">
+      <h3><i style="background:#FFB020"></i>横屏（建议一起做）</h3>
+      <ul>
+        <li>左右两张大卡片放比分，中间一排 7 颗球横向排开，<b>球更大、更好点</b></li>
+        <li>顶栏沿用现在的「竖屏 | 撤销」+「结算」</li>
+        <li>手机横放在台边，两个人都能看清比分和剩余分</li>
+      </ul>
+    </div>
+    <div class="note q">
+      <h3><i style="background:#FF5A5F"></i>需要你确认</h3>
+      <ul>
+        <li>红球数要不要给 <b>15 / 10 / 6</b> 三档？</li>
+        <li>犯规只做 <b>4 / 5 / 6 / 7</b> 四档，够不够？</li>
+        <li>「复位重打」和「自由球」要不要做，还是先藏起来？</li>
+        <li>先只做 <b>1 v 1</b>，双打以后再说？</li>
+        <li>横屏这一版一起做，还是先只做竖屏？</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</body>
+</html>

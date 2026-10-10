@@ -7,7 +7,7 @@ const { hm } = require('../../utils/util');
 Page({
   onUi(e) { uiDone(this, e.detail.k); },
   onUiClose() { uiDone(this, null); },
-  data: { ro: false, sums: [], rows: [], total: 0 },
+  data: { ro: false, sums: [], rows: [], total: 0, ed: { show: false } },
   onLoad(q) { this.id = q.id || 'live'; },
   onPageScroll(e) { onScroll(this, e); },
   onShow() {
@@ -33,27 +33,29 @@ Page({
       sums: m.players.map((id, i) => ({ ...store.view(id), s: signed(D.scores[i]), cls: D.scores[i] > 0 ? 'pos' : D.scores[i] < 0 ? 'neg' : '' })),
     });
   },
+  /** 点记录 / 左滑「编辑」：打开编辑面板 */
   tapRow(e) {
     if (this.data.ro) return;
-    const i = +e.currentTarget.dataset.i, row = this.data.rows.find(r => r.i === i);
-    ask(this, { title: `第 ${row.round} 局 · ${row.name} ${row.ev}`, desc: '修改或删除后，比分、顺序和之后的记录会自动重算',
-      actions: [{ k: 'edit', t: '修改这条记录', type: 'plain' }, { k: 'del', t: '删除这条记录', type: 'danger' }] })
-      .then(k => { if (k === 'edit') this.edit(i); else if (k === 'del') this.del(i); });
+    const i = +e.currentTarget.dataset.i, m = this.m(), ev = m.events[i], row = this.data.rows.find(r => r.i === i);
+    this.setData({ ed: { show: true, i, round: row.round, p: ev.p, ev: ev.ev,
+      players: m.players.map((id, j) => ({ ...store.view(id), j })),
+      evs: MAIN.map(k => ({ k, name: EV[k].name, c: EV[k].c, v: (k === 'foul' ? '−' : '+') + m.rules[k].v })) } });
   },
-  del(i) {
-    ask(this, { icon: 'warn', title: '删除这条记录？', desc: '删除后比分、顺序和之后的记录会自动重算。', actions: [{ k: 'del', t: '删除', type: 'danger' }] })
-      .then(k => { if (k !== 'del') return; this.m().events.splice(i, 1); store.save(); this.render(); wx.showToast({ title: '已删除', icon: 'success' }); });
+  edP(e) { this.setData({ 'ed.p': +e.currentTarget.dataset.j }); },
+  edE(e) { this.setData({ 'ed.ev': e.currentTarget.dataset.k }); },
+  closeEd() { this.setData({ 'ed.show': false }); },
+  saveEd() {
+    const { i, p, ev } = this.data.ed, e = this.m().events[i];
+    this.setData({ 'ed.show': false });
+    if (e.p === p && e.ev === ev) return;
+    e.p = p; e.ev = ev; store.save(); this.render();
+    wx.showToast({ title: '已修改，已重算', icon: 'none' });
   },
-  edit(i) {
-    const m = this.m(), names = m.players.map(id => store.friend(id).name);
-    ask(this, { title: '这一笔是谁的？', actions: names.map((n, j) => ({ k: 'p' + j, t: n, type: 'plain' })) }).then(a => {
-      if (!a) return;
-      const p = +a.slice(1);
-      ask(this, { title: `${names[p]} 的哪个事件？`, actions: MAIN.map(k => ({ k, t: `${EV[k].name}  ${k === 'foul' ? '−' : '+'}${m.rules[k].v}`, type: k === 'foul' ? 'danger' : 'plain' })) }).then(ev => {
-        if (!ev) return;
-        const e = m.events[i]; e.p = p; e.ev = ev;
-        store.save(); this.render(); wx.showToast({ title: '已修改，已重算', icon: 'success' });
-      });
-    });
+  /** 左滑「删除」：直接删除，不再二次确认 */
+  delRow(e) {
+    if (this.data.ro) return;
+    this.m().events.splice(+e.currentTarget.dataset.i, 1); store.save(); this.render();
+    wx.showToast({ title: '已删除，已重算', icon: 'none' });
   },
+  noop() {},
 });

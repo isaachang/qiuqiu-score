@@ -1,0 +1,103 @@
+<nav-bar title="斯诺克" back scrolled="{{scrolled}}"/>
+<view class="wrap {{ent?'ent':'pre'}}">
+
+  <!-- 对阵：选人 / 开球 / 让分 -->
+  <view class="sec rise" style="--i:0">对阵</view>
+  <view class="card vs rise" style="--i:1;--a:{{P[0].c}};--b:{{P[1].c}}">
+    <view class="vrow">
+      <view wx:for="{{P}}" wx:key="k" class="side" style="order:{{index*2}}">
+        <view wx:if="{{!item.empty}}" class="av big" style="background:{{item.c}};color:{{item.i}};--pc:{{item.c}}" data-i="{{index}}" bindtap="openPick" hover-class="press">{{item.ch}}</view>
+        <view wx:else class="av big vac" data-i="{{index}}" bindtap="openPick" hover-class="press">+</view>
+        <text class="snm">{{item.empty?'选择球员':item.name}}</text>
+        <text class="ssp {{start[index]?'on':''}}">起始 {{start[index]?'+'+start[index]:'0'}}</text>
+      </view>
+      <text class="vsx" style="order:1">VS</text>
+    </view>
+
+    <view class="hcw {{drag?'drag':''}}">
+      <view class="hct2">
+        <text class="hl">让分</text>
+        <text class="hv num" style="{{hv?'color:'+hCol:''}}">{{hLbl}}</text>
+        <view class="cus" bindtap="openCustom" hover-class="press">自定义</view>
+      </view>
+      <view id="trk" class="trk {{drag?'drag':''}}" bindtouchstart="onTs" catchtouchmove="onTm" bindtouchend="onTe" bindtouchcancel="onTc">
+        <view class="mid"></view>
+        <view class="fill" style="{{fill}}"></view>
+        <view class="th" style="{{thumb}}">
+          <text class="num" style="{{hv?'color:'+hCol:''}}">{{hAbs}}</text>
+          <view class="bub" style="background:{{hCol}}"><text class="num">{{hv?'+'+hAbs:'0'}}</text></view>
+        </view>
+      </view>
+      <text class="hint2">拖动选择</text>
+    </view>
+  </view>
+
+  <!-- 赛制 -->
+  <view class="sec rise" style="--i:2">赛制</view>
+  <view class="card segw rise" style="--i:3">
+    <view class="segx">
+      <view wx:for="{{bests}}" wx:key="v" class="sx {{bestOf===item.v?'on':''}}" data-v="{{item.v}}" bindtap="setBest" hover-class="sxp"><text class="sb num">{{item.big}}</text><text class="ssm">{{item.small}}</text></view>
+    </view>
+  </view>
+
+  <!-- 红球与积分：积分规则只展示，不可修改 -->
+  <view class="sec rise" style="--i:4">红球与积分</view>
+  <view class="card rc rise" style="--i:5">
+    <view class="segx">
+      <view wx:for="{{redOpts}}" wx:key="*this" class="sx {{reds===item?'on':''}}" data-v="{{item}}" bindtap="setReds" hover-class="sxp"><text class="sb num">{{item}}</text><text class="ssm">颗</text></view>
+    </view>
+    <view class="rrule">
+      <view class="rh"><text class="rt2">积分规则</text><text class="rtag">标准 · 不可修改</text></view>
+      <view class="rballs">
+        <view wx:for="{{balls}}" wx:key="k" class="rb"><view class="ball b28" style="--bc:{{item.c}}"></view><text class="rbv num">{{item.v}}</text></view>
+      </view>
+      <view class="rfoot">
+        <view class="rf"><text class="rfl">犯规罚分</text><text class="rfv num">4–7</text></view>
+        <view class="rf"><text class="rfl">单杆满分</text><text class="rfv num">{{max}}</text></view>
+        <view class="rf"><text class="rfl">清彩顺序</text><text class="rfv">黄 → 黑</text></view>
+      </view>
+    </view>
+  </view>
+  <view class="pad"></view>
+</view>
+
+<view class="cta"><view class="btn pri {{lack?'dis':''}}" bindtap="start" hover-class="press">{{lack?'选择球员':'开始对局'}}</view></view>
+
+<!-- 选人 -->
+<view class="sheet-mask {{picker.show?'on':''}}" bindtap="closePick" catchtouchmove="noop"></view>
+<view class="sheet {{picker.show?'on':''}}" catchtap="noop">
+  <view class="grab"></view>
+  <view class="add-row">
+    <view class="es-in {{nf?'fo':''}}" style="flex:1"><input class="es-ipt" placeholder="输入球员名字" placeholder-class="es-ph" maxlength="8" value="{{newName}}" bindinput="onName" bindfocus="onFocus" bindblur="onBlur" confirm-type="done" bindconfirm="addNew" cursor-spacing="140"/></view>
+    <view class="btn pri addb" bindtap="addNew">添加</view>
+  </view>
+  <view wx:if="{{picker.list.length}}" class="pick-grid">
+    <view class="pick {{item.sel?'sel':''}}" wx:for="{{picker.list}}" wx:key="id" data-id="{{item.id}}" bindtap="pick" hover-class="press">
+      <view class="av" style="background:{{item.c}};color:{{item.i}};width:88rpx;height:88rpx;font-size:34rpx">{{item.ch}}</view><text>{{item.name}}</text>
+      <view wx:if="{{item.sel}}" class="psel">✓</view>
+    </view>
+  </view>
+  <view wx:if="{{picker.has}}" class="btn soft rmv" bindtap="unpick" hover-class="press">移出对阵</view>
+  <view class="cancel" bindtap="closePick">取消</view>
+</view>
+
+<!-- 自定义让分 -->
+<view class="sheet-mask {{custom.show?'on':''}}" bindtap="closeCustom" catchtouchmove="noop"></view>
+<view class="sheet {{custom.show?'on':''}}" catchtap="noop" catchtouchmove="noop">
+  <view class="grab"></view>
+  <view class="st">自定义让分</view>
+  <view class="cseg">
+    <view wx:for="{{P}}" wx:key="k" class="cs {{custom.who===index?'on':''}}" data-i="{{index}}" bindtap="cWho">
+      <view wx:if="{{!item.empty}}" class="av sm" style="background:{{item.c}};color:{{item.i}}">{{item.ch}}</view><text>{{item.name}} 加分</text>
+    </view>
+  </view>
+  <view class="cval">
+    <view class="cb2" bindtap="cMinus" bindlongpress="repMinus" bindtouchend="stopRep" bindtouchcancel="stopRep" hover-class="press">−</view>
+    <view class="cv"><text class="cvn num" style="color:{{P[custom.who].c}}">+{{custom.pts}}</text><text class="cvl">每局起始分</text></view>
+    <view class="cb2" bindtap="cPlus" bindlongpress="repPlus" bindtouchend="stopRep" bindtouchcancel="stopRep" hover-class="press">+</view>
+  </view>
+  <view class="cq"><view wx:for="{{quick}}" wx:key="*this" class="cqi {{custom.pts===item?'on':''}}" data-v="{{item}}" bindtap="cPick">{{item}}</view></view>
+  <view class="btn pri" bindtap="okCustom" hover-class="press">确定</view>
+  <view class="cancel" bindtap="closeCustom">取消</view>
+</view>
+<ui-sheet show="{{ui.show}}" icon="{{ui.icon}}" title="{{ui.title}}" desc="{{ui.desc}}" actions="{{ui.actions}}" bind:action="onUi" bind:close="onUiClose"/>

@@ -4,18 +4,20 @@ const { EV, CHIPS, derive, signed, played } = require('../utils/engine');
 const { clock } = require('../utils/util');
 const sfx = require('../utils/sfx');
 const idle = require('../utils/idle');
+const nav = require('../utils/nav');
 const limit = require('../utils/limit');
 
 let flySeq = 1;
 
 module.exports = Behavior({
-  data: { risen: false, n: 2, players: [], round: 1, clock: '00:00:00', ccls: '', order: [], flies: [], parts: [], banner: null, chips: [], hintIntro: true },
+  data: { risen: false, n: 2, players: [], round: 1, clock: '00:00:00', ccls: '', order: [], flies: [], parts: [], banner: null, chips: [], hintIntro: true, paused: false },
 
   methods: {
     initScore() {
       idle.check();
       const s = store.get();
       this.m = s.live;
+      if (this.m && this.m.game === 'snooker') { this.m = null; nav.redirect('/pages/snk-score/snk-score'); return false; }
       if (!this.m) {
         this.stopClock(); wx.setKeepScreenOn({ keepScreenOn: false });
         // 刚被自动保存：记分页弹「已自动保存」；其它情况直接返回
@@ -24,6 +26,7 @@ module.exports = Behavior({
       }
       const m = this.m;
       this.setData({
+        paused: !!m.pauseAt,
         lite: !!(getApp().globalData || {}).lite,
         n: m.players.length,
         chips: CHIPS.map(k => ({ k, name: EV[k].name, v: (k === 'foul' ? '−' : '+') + m.rules[k].v, c: EV[k].c, t: EV[k].t })),
@@ -44,7 +47,7 @@ module.exports = Behavior({
       const tick = () => {
         const m = this.m; if (!m) return;
         const now = Date.now();
-        if (now - store.lastAct(m) >= store.IDLE) { this.idleOut(); return; } // 30 分钟没操作 → 自动保存
+        if (!m.pauseAt && now - store.lastAct(m) >= store.IDLE) { this.idleOut(); return; } // 30 分钟没操作 → 自动保存（暂停中不算）
         const { txt, ccls, due } = limit.state(m, now);
         if (due) this.timeUp();
         if (txt !== this.data.clock || ccls !== this.data.ccls) this.setData({ clock: txt, ccls });
@@ -66,14 +69,15 @@ module.exports = Behavior({
     onTuAdd(e) {
       const min = e.detail.m;
       this.setData({ tu: false });
+      if (!this.m) return; // 对局已自动保存
       limit.more(this.m, min); this.startClock();
       wx.showToast({ title: `已加时 ${min} 分钟`, icon: 'none' });
     },
-    onTuEnd() { this.setData({ tu: false }); this.endFromTimeUp && this.endFromTimeUp(); },
+    onTuEnd() { this.setData({ tu: false }); if (this.m && this.endFromTimeUp) this.endFromTimeUp(); },
     /** 长时间没操作：自动保存，然后交给页面提示 */
     idleOut() {
       this.stopClock(); sfx.stop();
-      this.setData({ 'fin.show': false, 'ui.show': false, tup: false, banner: null });
+      this.setData({ 'fin.show': false, 'ui.show': false, tu: false, banner: null }); // 「时间到」面板也要关掉，否则盖在「已自动保存」上面
       idle.check();
       this.initScore();
     },
@@ -137,7 +141,7 @@ module.exports = Behavior({
       if (!e) { wx.showToast({ title: '没有可撤销的记录', icon: 'none' }); return; }
       store.touchLive(); store.save();
       const before = derive({ ...m, events: [...m.events, e] }), step = before.steps[before.steps.length - 1];
-      if (e.ev === 'dj' || e.ev === 'xj') sfx.stop(); // 撤销金球时音乐也一起停
+      if (e.ev === 'dj' || e.ev === 'xj' || e.ev === 'h9') sfx.stop(); // 撤销金球时音乐也一起停
       if (this.data.banner) this.closeBanner(true);
       this.refresh(null);
       step.d.forEach((x, j) => { if (x) this.fly(j, '↺ ' + signed(-x), 'dim'); });
@@ -184,14 +188,14 @@ module.exports = Behavior({
       if (E.gold || s.ev === 'foul') { // 大金 / 小金 / 黄金九 / 犯规：同一套奖章样式的弹窗
         const who = s.ev === 'foul' ? `${names[s.to]} +${v}` : s.payers.length > 1 ? '两家各付 ' + v : names[s.payers[0]] + ' 付 ' + v;
         this.clearBannerTimers();
-        // 大金、小金有音乐：庆祝一直显示到音乐结束；点屏幕任意处 = 音乐和庆祝一起关掉
-        const music = (s.ev === 'dj' || s.ev === 'xj') && sfx.playGold(() => this.closeBanner(false));
+        // 大金、小金、黄金九有音乐：庆祝一直显示到音乐结束；点屏幕任意处 = 音乐和庆祝一起关掉
+        const music = (s.ev === 'dj' || s.ev === 'xj' || s.ev === 'h9') && sfx.playGold(() => this.closeBanner(false));
         this.setData({ banner: { k: s.ev, t: E.name, c: E.c, tc: E.t, live: !!music, out: false, sub: s.ev === 'foul' ? `${names[s.p]} −${v} · ${who}` : `${names[s.p]} ${signed(s.d[s.p])} · ${who}` } });
         if (music) {
           this._bn = setTimeout(() => this.closeBanner(false), 8000); // 兜底：万一收不到音乐结束事件
           this._bb = [1600, 3200, 4800].map(t => setTimeout(() => this.data.banner && this.burst(s.p, E.c, 16), t)); // 音乐期间再撒几次彩纸
         } else {
-          this._bn = setTimeout(() => this.closeBanner(false), 1700); // 黄金九 / 犯规 / 关了音效：短暂显示后自动消失
+          this._bn = setTimeout(() => this.closeBanner(false), 1700); // 犯规 / 关了音效：短暂显示后自动消失
         }
       }
     },
@@ -208,9 +212,23 @@ module.exports = Behavior({
 
     /** 引导进行中时，点任何地方都只是「下一步」，不会误记分 */
     guard() { if (this.data.coach) { this.nextCoach && this.nextCoach(); return true; } return false; },
-    onCard(e) { if (this.guard()) return; this.setData({ hintIntro: false }); this.score(+e.currentTarget.dataset.i, 'pu'); },
-    onChip(e) { if (this.guard()) return; const { i, k } = e.currentTarget.dataset; this.score(+i, k); },
-    onUndo() { if (this.guard()) return; this.undo(); },
+    onCard(e) { if (this.guard() || this.data.paused) return; this.setData({ hintIntro: false }); this.score(+e.currentTarget.dataset.i, 'pu'); },
+    onChip(e) { if (this.guard() || this.data.paused) return; const { i, k } = e.currentTarget.dataset; this.score(+i, k); },
+    onUndo() { if (this.guard() || this.data.paused) return; this.undo(); },
+    /* ---------- 暂停：计时、限时倒计时、自动保存都停住；暂停时不能记分 ---------- */
+    onPause() {
+      if (this.guard() || this.data.paused) return;
+      this.closeBanner(true); // 正在庆祝：庆祝和音乐一起收掉
+      store.pauseLive();
+      if (store.get().settings.vib) wx.vibrateShort({ type: 'medium' });
+      this.setData({ paused: true });
+    },
+    onUnpause() {
+      store.unpauseLive();
+      if (store.get().settings.vib) wx.vibrateShort({ type: 'light' });
+      this.setData({ paused: false });
+      this.startClock();
+    },
     noop() {},
   },
 });

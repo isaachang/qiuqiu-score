@@ -1,0 +1,93 @@
+@import "/styles/snooker.wxss";
+/* 斯诺克 · 新对局 */
+.pad{height:220rpx}
+
+/* ---------- 对阵卡 ---------- */
+.vs{position:relative;overflow:hidden;padding:40rpx 24rpx 28rpx}
+.vs::before,.vs::after{content:"";position:absolute;top:0;bottom:0;width:50%;opacity:.1;pointer-events:none}
+.vs::before{left:0;background:linear-gradient(90deg,var(--a),transparent)}
+.vs::after{right:0;background:linear-gradient(270deg,var(--b),transparent)}
+.vrow{position:relative;z-index:1;display:flex;align-items:flex-start}
+.side{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center}
+.av.big{width:132rpx;height:132rpx;font-size:52rpx;box-shadow:0 0 0 8rpx #fff,0 24rpx 52rpx -20rpx var(--pc)}
+.av.big.vac{background:#F0EEE9;color:var(--tx3);font-size:60rpx;font-weight:500;line-height:1;padding:0;box-shadow:inset 0 0 0 4rpx #E2DFD8}
+.snm{font-size:32rpx;font-weight:900;margin-top:20rpx;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ssp{font-size:23rpx;font-weight:800;color:var(--tx3);margin-top:6rpx;transition:color .2s}
+.ssp.on{color:var(--pos)}
+.brk2{margin-top:16rpx;font-size:23rpx;font-weight:900;padding:10rpx 28rpx;border-radius:99rpx;background:#F0EEE9;color:var(--tx2);transition:background .25s,color .25s}
+.brk2.on{background:var(--ink);color:#fff}
+/* VS：只有字，用两位选手的颜色做渐变 */
+.vsx{flex:none;margin-top:36rpx;padding:0 6rpx;font-size:52rpx;font-weight:900;font-style:italic;letter-spacing:-2rpx;line-height:1.2;
+  background:linear-gradient(135deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* ---------- 让分：拔河式滑杆，往谁那边拖谁加分 ---------- */
+.hcw{position:relative;z-index:1;margin-top:34rpx;padding-top:28rpx;border-top:2rpx solid var(--line)}
+.hct2{display:flex;align-items:center;gap:16rpx;padding:0 8rpx}
+.hl{font-size:28rpx;font-weight:900}
+.hv{flex:1;text-align:right;font-size:28rpx;font-weight:900;color:var(--tx2);transition:color .2s,opacity .15s}
+.hcw.drag .hv{opacity:0} /* 拖动时数字在气泡里，上面这行先隐藏 */
+.cus{font-size:23rpx;font-weight:800;padding:8rpx 20rpx;border-radius:99rpx;background:#F0EEE9;color:var(--tx)}
+.trk{position:relative;height:88rpx;margin-top:26rpx;border-radius:44rpx;background:#F3F1EC;box-shadow:inset 0 2rpx 6rpx rgba(0,0,0,.06);overflow:visible}
+.trk::before,.trk::after{content:"";position:absolute;top:0;bottom:0;width:50%;opacity:.16;pointer-events:none}
+.trk::before{left:0;border-radius:44rpx 0 0 44rpx;background:linear-gradient(90deg,var(--a),transparent)}
+.trk::after{right:0;border-radius:0 44rpx 44rpx 0;background:linear-gradient(270deg,var(--b),transparent)}
+.mid{position:absolute;left:50%;top:22rpx;bottom:22rpx;width:4rpx;margin-left:-2rpx;border-radius:2rpx;background:rgba(20,20,30,.2);z-index:1}
+.fill{position:absolute;top:10rpx;bottom:10rpx;border-radius:34rpx;z-index:1;transition:opacity .2s}
+.th{position:absolute;top:50%;width:92rpx;height:92rpx;margin:-46rpx 0 0 -46rpx;border-radius:50%;background:#fff;z-index:3;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 0 6rpx var(--tc),0 16rpx 32rpx -10rpx rgba(0,0,0,.35);transition:box-shadow .2s,transform .2s cubic-bezier(.3,1.4,.5,1)}
+.th .num{font-size:34rpx;font-weight:900;color:var(--tx2)}
+.trk.drag .th{transform:scale(1.08)}
+/* 按住拖动时：滑块上方浮出放大的数字 */
+.bub{position:absolute;left:50%;bottom:118rpx;min-width:96rpx;height:72rpx;padding:0 22rpx;margin-left:-48rpx;box-sizing:border-box;border-radius:36rpx;display:flex;align-items:center;justify-content:center;
+  color:#fff;opacity:0;transform:translateY(16rpx) scale(.6);transition:opacity .15s,transform .2s cubic-bezier(.3,1.4,.5,1);pointer-events:none;box-shadow:0 16rpx 30rpx -12rpx rgba(0,0,0,.4)}
+.bub::after{content:"";position:absolute;left:50%;bottom:-10rpx;width:20rpx;height:20rpx;margin-left:-10rpx;background:inherit;transform:rotate(45deg);border-radius:4rpx}
+.bub .num{font-size:38rpx;font-weight:900;color:#fff}
+.trk.drag .bub{opacity:1;transform:none}
+.hint2{display:block;text-align:center;font-size:22rpx;font-weight:700;color:var(--tx3);margin-top:20rpx}
+
+/* ---------- 通栏分段：赛制 / 红球 ---------- */
+.segw{padding:12rpx}
+.segx{display:flex;gap:12rpx}
+.sx{flex:1;height:112rpx;border-radius:30rpx;display:flex;align-items:baseline;justify-content:center;gap:4rpx;padding-top:30rpx;box-sizing:border-box;transition:background .25s,color .25s,transform .25s cubic-bezier(.3,1.4,.5,1)}
+.sb{font-size:48rpx;font-weight:900;line-height:1}
+.ssm{font-size:21rpx;font-weight:800;color:var(--tx2);white-space:nowrap}
+.sx.on{background:var(--ink);color:#fff;box-shadow:0 20rpx 40rpx -20rpx rgba(0,0,0,.5)}
+.sx.on .ssm{color:rgba(255,255,255,.7)}
+.sxp{transform:scale(.95)}
+.rc{padding:12rpx}
+.rrule{margin-top:12rpx;border-radius:32rpx;background:#FAF8F4;padding:24rpx 24rpx 20rpx;box-shadow:inset 0 0 0 2rpx rgba(20,20,30,.05)}
+.rh{display:flex;align-items:center;justify-content:space-between}
+.rt2{font-size:26rpx;font-weight:900}
+.rtag{font-size:19rpx;font-weight:800;color:var(--tx3);padding:4rpx 14rpx;border-radius:99rpx;background:var(--card2)}
+.rballs{display:flex;justify-content:space-between;margin-top:22rpx;padding:0 8rpx}
+.rb{display:flex;flex-direction:column;align-items:center;gap:8rpx}
+.rbv{font-size:30rpx;font-weight:900;line-height:1}
+.rfoot{display:flex;margin-top:22rpx;padding-top:18rpx;border-top:2rpx solid var(--line)}
+.rf{flex:1;display:flex;flex-direction:column;align-items:center}
+.rf+.rf{border-left:2rpx solid var(--line)}
+.rfl{font-size:19rpx;color:var(--tx2);font-weight:700}
+.rfv{font-size:28rpx;font-weight:900;margin-top:4rpx}
+
+/* ---------- 选人 ---------- */
+.add-row{display:flex;gap:16rpx;margin-top:8rpx}
+.addb{height:108rpx;border-radius:34rpx;padding:0 40rpx;font-size:30rpx}
+.pick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20rpx;margin-top:28rpx;max-height:520rpx;overflow-y:auto}
+.pick{display:flex;flex-direction:column;align-items:center;gap:12rpx;padding:24rpx 8rpx;border-radius:36rpx;background:var(--card2);font-size:26rpx;font-weight:700}
+.pick{position:relative}
+.pick.sel{box-shadow:inset 0 0 0 4rpx var(--ink)}
+.psel{position:absolute;top:10rpx;right:10rpx;width:36rpx;height:36rpx;border-radius:50%;background:var(--ink);color:#fff;font-size:20rpx;font-weight:900;display:flex;align-items:center;justify-content:center}
+.rmv{margin-top:28rpx;background:#F0EEE9;color:#E5383B}
+
+/* ---------- 自定义让分 ---------- */
+.cseg{display:flex;gap:12rpx;padding:8rpx;border-radius:32rpx;background:#F0EEE9;margin-top:28rpx}
+.cs{flex:1;height:84rpx;border-radius:26rpx;display:flex;align-items:center;justify-content:center;gap:12rpx;font-size:27rpx;font-weight:800;color:var(--tx2);transition:background .2s,color .2s}
+.cs .av.sm{width:44rpx;height:44rpx;font-size:20rpx}
+.cs.on{background:#fff;color:var(--tx);box-shadow:0 4rpx 16rpx rgba(0,0,0,.08)}
+.cval{display:flex;align-items:center;justify-content:space-between;margin:36rpx 8rpx 8rpx}
+.cb2{width:116rpx;height:116rpx;border-radius:38rpx;background:#F0EEE9;font-size:56rpx;font-weight:600;display:flex;align-items:center;justify-content:center}
+.cv{display:flex;flex-direction:column;align-items:center}
+.cvn{font-size:104rpx;font-weight:900;line-height:1}
+.cvl{font-size:22rpx;color:var(--tx2);font-weight:700;margin-top:8rpx}
+.cq{display:flex;gap:12rpx;margin:28rpx 0 32rpx}
+.cqi{flex:1;height:72rpx;border-radius:24rpx;background:#F0EEE9;display:flex;align-items:center;justify-content:center;font-size:27rpx;font-weight:800;color:var(--tx2)}
+.cqi.on{background:var(--ink);color:#fff}

@@ -3,6 +3,7 @@
 const store = require('./store');
 const nav = require('./nav');
 const { ask } = require('./ui');
+const { liveUrl, resultUrl } = require('./game');
 
 const g = () => (getApp() && getApp().globalData) || {};
 
@@ -23,9 +24,9 @@ function notice(page, { onResume, onClose, redirect } = {}) {
   ask(page, { icon: 'ok', title: '已自动保存', desc: '30 分钟没有记分，这局已存进战绩。',
     actions: [{ k: 'view', t: '查看战报', type: 'pri' }, { k: 'resume', t: '继续这局', type: 'plain' }] })
     .then(k => {
-      if (k === 'view') (redirect ? nav.redirect : nav.to)('/pages/result/result?id=' + id);
+      if (k === 'view') (redirect ? nav.redirect : nav.to)(resultUrl(store.match(id) || { id }));
       else if (k === 'resume') {
-        if (store.resume(id)) onResume ? onResume() : nav.to('/pages/score/score');
+        if (store.resume(id)) onResume ? onResume() : nav.to(liveUrl(store.get().live));
         else wx.showToast({ title: '已有进行中的对局', icon: 'none' });
       } else onClose && onClose();
     });

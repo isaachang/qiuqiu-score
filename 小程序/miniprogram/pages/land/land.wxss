@@ -55,3 +55,16 @@
 .lbtn.glass.lite{background:rgba(255,255,255,.96);-webkit-backdrop-filter:none;backdrop-filter:none}
 .medal .mx{font-size:48px}
 
+
+/* 名字牌（横屏用 px）：双人局最大，三人局小一号 */
+.lc .nmp{font-size:28px;padding:4px 16px;max-width:260px;box-shadow:0 6px 14px -8px rgba(0,0,0,.4)}
+.n3 .lc .nmp{font-size:20px;padding:3px 12px;max-width:180px}
+.lc .ph{gap:8px}
+/* 暂停浮层（横屏用 px） */
+.pzbx{width:300px;border-radius:30px;padding:24px 22px 18px}
+.pzic{width:56px;height:56px;gap:8px}
+.pzb{width:8px;height:24px;border-radius:4px}
+.pzt{font-size:24px;margin-top:12px}
+.pzc{font-size:20px;margin-top:2px}
+.pzs{font-size:12px;margin-top:4px}
+.pzbtn{height:44px;border-radius:22px;font-size:16px;margin-top:16px}

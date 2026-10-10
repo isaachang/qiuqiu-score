@@ -1,0 +1,39 @@
+<nav-bar title="战报" back scrolled="{{scrolled}}"/>
+<view wx:if="{{!ok}}" class="empty">未找到这场对局</view>
+<view wx:else class="wrap rp {{ent?'ent':'pre'}}" style="padding-bottom:240rpx">
+
+  <!-- 赢家 + 局分 -->
+  <view class="hero rise" style="--i:0">
+    <view class="ht"><text class="htag">斯诺克 · {{best}}</text><text class="hw">{{when}}</text></view>
+    <view class="hh"><text wx:if="{{w>=0}}" class="hname" style="color:{{P[w].c}}">{{P[w].name}}</text>{{head}}</view>
+    <view class="hvs">
+      <view class="hp"><image wx:if="{{w===0}}" class="hcr" src="/images/crown.svg"/><view class="av" style="background:{{P[0].c}};color:{{P[0].i}}">{{P[0].ch}}</view><text>{{P[0].name}}</text></view>
+      <text class="hsc num">{{fw[0]}} : {{fw[1]}}</text>
+      <view class="hp"><image wx:if="{{w===1}}" class="hcr" src="/images/crown.svg"/><view class="av" style="background:{{P[1].c}};color:{{P[1].i}}">{{P[1].ch}}</view><text>{{P[1].name}}</text></view>
+    </view>
+  </view>
+
+  <!-- 每局比分：每局一张对局卡片 -->
+  <view class="sec rise" style="--i:1">每局比分<text class="s">{{frames.length}} 局</text></view>
+  <view class="mcs rise" style="--i:2">
+    <view wx:for="{{frames}}" wx:key="no" class="mcw"><match-card c="{{item.card}}"/></view>
+    <view wx:if="{{!frames.length}}" class="card emp2">还没有打完的局</view>
+  </view>
+
+  <!-- 数据对比 -->
+  <view class="sec rise" style="--i:5">数据对比</view>
+  <view class="card cmp rise" style="--i:6">
+    <view class="cr hd"><text></text><text class="cn" style="background:{{P[0].c}};color:{{P[0].i}}">{{P[0].name}}</text><text class="cn" style="background:{{P[1].c}};color:{{P[1].i}}">{{P[1].name}}</text></view>
+    <view wx:for="{{cmp}}" wx:key="l" class="cr">
+      <text class="cl">{{item.l}}</text>
+      <text class="cv2 num {{item.win===0?'hi':''}}" style="{{item.win===0?'background:'+P[0].c+'26;color:'+P[0].c:''}}">{{item.v[0]}}</text>
+      <text class="cv2 num {{item.win===1?'hi':''}}" style="{{item.win===1?'background:'+P[1].c+'26;color:'+P[1].c:''}}">{{item.v[1]}}</text>
+    </view>
+  </view>
+
+  <view class="brand rise" style="--i:9"><image class="blogo" src="/images/logo.png"/><text class="bn">球球记分</text></view>
+</view>
+<view wx:if="{{ok}}" class="cta">
+  <button class="btn sec2" open-type="share">分享给球友</button>
+  <view class="btn pri" bindtap="again" hover-class="press">再来一局</view>
+</view>

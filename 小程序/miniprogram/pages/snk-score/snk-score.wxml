@@ -1,0 +1,170 @@
+<!-- 斯诺克 · 竖屏记分：一杆一按 -->
+<view class="screen snk {{ent?'ent':'pre'}}">
+  <view class="nav" style="padding-top:{{nav.top}}px;height:{{nav.top+nav.h}}px">
+    <view class="bk" bindtap="back"><image src="/images/back.svg"/></view>
+    <view class="tt" style="top:{{nav.top}}px"><text class="t1">第 {{vm.no}} 局</text><text class="t2 num">{{vm.best}} · {{clock}}</text></view>
+  </view>
+
+  <view wx:if="{{vm}}" class="body">
+    <!-- 局分 -->
+    <view class="mstrip rise" style="--i:0">
+      <view class="mp"><view class="av sm" style="background:{{vm.players[0].c}};color:{{vm.players[0].i}}">{{vm.players[0].ch}}</view><text class="mn">{{vm.players[0].name}}</text></view>
+      <view class="fs"><text class="fv num">{{vm.fw[0]}} : {{vm.fw[1]}}</text><text class="fl">局分</text></view>
+      <view class="mp r"><text class="mn">{{vm.players[1].name}}</text><view class="av sm" style="background:{{vm.players[1].c}};color:{{vm.players[1].i}}">{{vm.players[1].ch}}</view></view>
+    </view>
+
+    <!-- 两位选手：在打的人整张卡片亮起来 -->
+    <view class="pls rise" style="--i:1">
+      <view wx:for="{{vm.players}}" wx:key="id" class="pl {{item.on?'on':'off'}} {{item.sup?'sup':''}}"
+            style="{{item.on?'background:'+item.c+';color:'+item.i+';box-shadow:0 32rpx 60rpx -30rpx '+item.c:''}}">
+        <view class="ph2">
+          <text class="pn">{{item.name}}</text>
+          <text wx:if="{{item.sup}}" class="supt">超分</text>
+          <text wx:elif="{{item.hc}}" class="hct">让 +{{item.hc}}</text>
+          <text wx:if="{{item.on}}" class="st2" style="color:{{item.c}}">在打</text>
+        </view>
+        <view class="sw2"><text class="s num {{item.bump}}">{{item.sc}}</text></view>
+        <view class="bk2">
+          <block wx:if="{{item.on&&item.brk}}"><text class="bkl">本杆 {{item.brk}}</text><view class="dots"><text wx:if="{{item.more}}" class="dmore num">+{{item.more}}</text><view wx:for="{{item.dots}}" wx:for-item="d" wx:key="k" class="dt" style="background:{{d.c}}"></view></view></block>
+          <block wx:elif="{{!item.on&&item.last!==null}}">上一杆 {{item.last}}</block>
+        </view>
+        <view wx:if="{{item.sup}}" class="sweep"></view>
+        <view wx:for="{{flies}}" wx:for-item="f" wx:key="id" wx:if="{{f.pi===item.idx}}" class="fly2 num">{{f.text}}</view>
+      </view>
+    </view>
+
+    <!-- 台面剩余 · 领先 / 超分 · 红球（彩球）剩余 -->
+    <view class="info rise" style="--i:2">
+      <view class="ic"><text class="iv num">{{vm.info.rem}}</text><text class="il">台面剩余</text></view>
+      <view class="ic">
+        <block wx:if="{{vm.info.lead}}"><text class="iv num {{vm.info.sup?'neg':'pos'}}">+{{vm.info.lead}}</text><text class="il {{vm.info.sup?'supl':''}}">{{vm.info.who}} {{vm.info.sup?'超分':'领先'}}</text></block>
+        <block wx:else><text class="iv num">0</text><text class="il">平分</text></block>
+      </view>
+      <view class="ic"><text class="iv num">{{vm.info.thirdV}}</text><text class="il">{{vm.info.thirdL}}</text></view>
+    </view>
+
+    <!-- 进球区 -->
+    <view class="ask rise" style="--i:3">
+      <text class="at">{{vm.title}}</text>
+      <view class="nx"><view class="nxd {{vm.chip.g?'g':''}}" style="{{vm.chip.c?'background:'+vm.chip.c:''}}"></view>{{vm.chip.t}}</view>
+    </view>
+    <view class="redbtn {{vm.red.st}} rise" style="--i:4" data-k="red" bindtap="onBall" hover-class="{{vm.red.st==='on'?'tp':''}}" hover-stay-time="60">
+      <view class="ball b40" style="--bc:{{vm.red.st==='gone'?'#C9C6BF':'#E5383B'}}"><text wx:if="{{vm.red.st!=='gone'}}">1</text></view>
+      <view class="rt"><text class="rn">{{vm.red.st==='gone'?'红球已清台':'红'}}</text><text wx:if="{{vm.red.st!=='gone'}}" class="rv num">+1</text></view>
+      <view wx:if="{{vm.red.st!=='gone'}}" class="left"><view wx:for="{{vm.red.left}}" wx:key="k" class="rd {{item.on?'':'gone'}}"></view></view>
+    </view>
+    <view class="cols {{vm.combo?'combo':''}} rise" style="--i:5">
+      <view wx:for="{{vm.tiles}}" wx:key="k" class="ctile {{item.st}}" data-k="{{item.k}}" bindtap="onBall" hover-class="tp" hover-stay-time="60">
+        <view wx:if="{{vm.combo}}" class="duo"><view class="ball b24" style="--bc:#E5383B"></view><view class="ball b34" style="--bc:{{item.c}}"></view></view>
+        <view wx:else class="ball b34" style="--bc:{{item.c}}"></view>
+        <view class="tx"><text class="tn">{{item.name}}</text><text class="tv num">+{{item.val}}</text></view>
+        <text wx:if="{{item.st==='next'}}" class="badge">下一颗</text>
+      </view>
+    </view>
+    <view class="acts rise" style="--i:6">
+      <view class="foul" bindtap="onFoul" hover-class="tp">犯规</view>
+      <view class="swap" bindtap="onMiss" hover-class="tp">没进 · 换人</view>
+    </view>
+  </view>
+
+  <view class="dock dockin glass {{lite?'lite':''}}">
+    <view class="db hl" bindtap="onUndo" hover-class="dbp"><image src="/images/undo.svg"/>撤销</view>
+    <view class="db" bindtap="openLog" hover-class="dbp"><image src="/images/list.svg"/>记录</view>
+    <view class="db end" bindtap="openFin" hover-class="dbp"><image src="/images/flag.svg"/>结算</view>
+  </view>
+
+  <!-- 超分 -->
+  <view wx:if="{{sup}}" class="supov" catchtap="hideSup" catchtouchmove="noop">
+    <view class="supbx">
+      <view class="rings"><view class="rg"></view><view class="rg r2"></view><view class="rg r3"></view></view>
+      <view class="sparks"><view wx:for="{{sup.sparks}}" wx:key="*this" class="spk" style="--a:{{item*36}}deg;background:{{item%3===0?'#FFB020':item%3===1?'#FF5A5F':sup.c}}"></view></view>
+      <view class="supbadge">超分</view>
+      <view class="supname"><view class="av sm" style="background:{{sup.c}};color:{{sup.i}}">{{sup.ch}}</view>{{sup.name}}</view>
+      <text class="supsub num">领先 {{sup.lead}} · 台面剩余 {{sup.rem}}</text>
+    </view>
+  </view>
+  <!-- 单杆庆祝 -->
+  <view wx:if="{{banner}}" class="sbn" catchtap="closeBanner" catchtouchmove="noop">
+    <view class="sbx">
+      <view class="ball b120" style="--bc:{{banner.c}}"><text>{{banner.v}}</text></view>
+      <text class="sbt">{{banner.t}}</text><text class="sbs">{{banner.sub}}</text><text class="sbtap">轻点任意处继续</text>
+    </view>
+  </view>
+
+  <!-- 犯规 -->
+  <view class="sheet-mask {{foul.show?'on':''}}" bindtap="closeFoul" catchtouchmove="noop"></view>
+  <view class="sheet sk {{foul.show?'on':''}}" catchtap="noop" catchtouchmove="noop">
+    <view class="grab"></view>
+    <view class="st">犯规 · {{foul.off}}</view>
+    <view class="ss">罚分给 {{foul.opp}} · 由 {{foul.opp}} 接着打</view>
+    <view class="lab">罚分</view>
+    <view class="pens">
+      <view wx:for="{{foul.opts}}" wx:key="v" class="pen {{foul.pts===item.v?'sel':''}}" data-v="{{item.v}}" bindtap="pickPen">
+        <view class="pv"><view wx:if="{{item.c}}" class="ball b16" style="--bc:{{item.c}}"></view><text class="num">{{item.v}}</text></view>
+        <text class="pt2">{{item.t}}</text>
+      </view>
+    </view>
+    <view wx:if="{{foul.maxReds>0}}" class="frd">
+      <view class="frl"><view class="frt"><view class="ball b16" style="--bc:#E5383B"></view><text>同时进了红球</text></view><text class="frsub">进袋的红球不再摆回，台面红球会减少</text></view>
+      <view class="frst">
+        <view class="frb {{foul.reds>0?'':'off'}}" bindtap="redMinus" hover-class="frbp">−</view>
+        <text class="frn num">{{foul.reds}}</text>
+        <view class="frb {{foul.reds<foul.maxReds?'':'off'}}" bindtap="redPlus" hover-class="frbp">+</view>
+      </view>
+    </view>
+    <view class="btn pri sb2" bindtap="confirmFoul" hover-class="press">确定 · {{foul.opp}} +{{foul.pts}}{{foul.reds?' · 红球 −'+foul.reds:''}}</view>
+    <view class="cancel" bindtap="closeFoul">取消</view>
+  </view>
+
+  <!-- 单杆记录 -->
+  <view class="sheet-mask {{logs.show?'on':''}}" bindtap="closeLog" catchtouchmove="noop"></view>
+  <view class="sheet sk {{logs.show?'on':''}}" catchtap="noop">
+    <view class="grab"></view>
+    <view class="st">单杆记录 · 第 {{logs.no}} 局</view>
+    <view class="ss">{{logs.fouls}}</view>
+    <scroll-view scroll-y class="logl">
+      <view wx:for="{{logs.rows}}" wx:key="k" class="lr">
+        <text class="lv num" style="color:{{item.c}}">{{item.v}}</text>
+        <view class="dots"><view wx:for="{{item.dots}}" wx:for-item="d" wx:key="k" class="dt" style="background:{{d.c}}"></view></view>
+        <text class="ln2">{{item.name}}</text>
+      </view>
+      <view wx:if="{{!logs.rows.length}}" class="lemp">这一局还没有得分</view>
+    </scroll-view>
+    <view class="cancel" bindtap="closeLog">关闭</view>
+  </view>
+
+  <!-- 结算：结束本局 > 结束比赛 > 取消 -->
+  <view class="sheet-mask {{fin.show?'on':''}}" bindtap="closeFin" catchtouchmove="noop"></view>
+  <view class="sheet sk {{fin.show?'on':''}}" catchtap="noop" catchtouchmove="noop">
+    <view class="grab"></view>
+    <view class="st">结算</view>
+    <view class="ss num">局分 {{fin.fw[0]}} : {{fin.fw[1]}} · 第 {{fin.no}} 局 {{fin.sc[0]}} : {{fin.sc[1]}}</view>
+    <block wx:if="{{fin.started}}">
+      <view class="btn pri sb2" bindtap="concede" hover-class="press">结束本局</view>
+      <text class="fnote">判 {{fin.judge}} 赢下第 {{fin.no}} 局</text>
+    </block>
+    <view class="btn soft sb3 {{fin.started?'':'first'}}" bindtap="endMatch" hover-class="press">结束比赛</view>
+    <view class="cancel" bindtap="closeFin">取消</view>
+  </view>
+
+  <!-- 一局结束 / 整场结束 -->
+  <view class="sheet-mask {{frame.show?'on':''}}" catchtouchmove="noop"></view>
+  <view class="sheet sk {{frame.show?'on':''}}" catchtap="noop" catchtouchmove="noop">
+    <view class="grab"></view>
+    <view class="st">{{frame.over?frame.winner+' 赢下比赛':'第 '+frame.no+' 局 · '+frame.win+' 胜'}}</view>
+    <view class="ss num">{{frame.sc[0]}} : {{frame.sc[1]}}{{frame.hb?' · '+frame.hb:''}}</view>
+    <view class="big2">
+      <view class="bp"><view class="av" style="background:{{vm.players[0].c}};color:{{vm.players[0].i}}">{{vm.players[0].ch}}</view><text>{{vm.players[0].name}}</text></view>
+      <view class="bc"><text class="bcv num">{{frame.fw[0]}} : {{frame.fw[1]}}</text><text class="bcl">局分 · {{frame.best}}</text></view>
+      <view class="bp"><view class="av" style="background:{{vm.players[1].c}};color:{{vm.players[1].i}}">{{vm.players[1].ch}}</view><text>{{vm.players[1].name}}</text></view>
+    </view>
+    <view wx:if="{{frame.over}}" class="btn pri sb2" bindtap="saveMatch" hover-class="press">保存战绩，查看战报</view>
+    <block wx:else>
+      <view class="btn pri sb2" bindtap="nextFrame" hover-class="press">开始第 {{frame.no+1}} 局</view>
+      <text class="fnote">{{frame.next}} 开球</text>
+      <view class="btn soft sb3" bindtap="endMatch" hover-class="press">结束比赛</view>
+    </block>
+    <view class="cancel" bindtap="onUndo">取消</view>
+  </view>
+</view>
+<ui-sheet show="{{ui.show}}" icon="{{ui.icon}}" title="{{ui.title}}" desc="{{ui.desc}}" actions="{{ui.actions}}" bind:action="onUi" bind:close="onUiClose"/>

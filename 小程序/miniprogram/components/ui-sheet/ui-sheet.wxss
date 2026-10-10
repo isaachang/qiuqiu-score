@@ -13,5 +13,6 @@
 .ub.pri{background:#16161A;color:#fff}
 .ub.danger{background:#F0444D;color:#fff}
 .ub.plain{background:#F0EEE9;color:#16161A}
+.ub.soft-danger{background:#F0EEE9;color:#E5383B}
 .ubp{transform:scale(.96)!important;opacity:.9!important}
 .ucancel{text-align:center;color:#6B6B73;font-size:30rpx;font-weight:600;padding:28rpx 0 4rpx}

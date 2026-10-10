@@ -1,0 +1,47 @@
+@import "/styles/snooker.wxss";
+.empty{padding:200rpx 0;text-align:center;color:var(--tx2)}
+.hero{border-radius:52rpx;padding:32rpx 32rpx 40rpx;background:linear-gradient(180deg,#fff,#FFF6EC);box-shadow:0 20rpx 56rpx -28rpx rgba(60,40,20,.28)}
+.ht{display:flex;justify-content:space-between;align-items:center}
+.htag{font-size:23rpx;font-weight:800;color:#fff;background:var(--ink);padding:8rpx 20rpx;border-radius:99rpx}
+.hw{font-size:23rpx;color:var(--tx2);font-weight:700}
+.hh{text-align:center;font-size:44rpx;font-weight:900;margin-top:32rpx}
+.hname{margin-right:14rpx}
+.hvs{display:flex;align-items:flex-end;justify-content:center;gap:48rpx;margin-top:32rpx}
+.hp{display:flex;flex-direction:column;align-items:center;gap:12rpx;font-size:26rpx;font-weight:800;position:relative}
+.hp .av{width:104rpx;height:104rpx;font-size:40rpx}
+.hcr{position:absolute;top:-34rpx;width:52rpx;height:52rpx}
+.hsc{font-size:120rpx;font-weight:900;line-height:1;letter-spacing:-.02em;margin-bottom:40rpx}
+.frs{padding:8rpx 28rpx}
+.fr2{display:flex;align-items:center;gap:20rpx;height:84rpx}
+.fr2+.fr2{border-top:2rpx solid var(--line)}
+.fno2{width:96rpx;font-size:24rpx;color:var(--tx2);font-weight:700;flex:none}
+.fbar{flex:1;height:16rpx;border-radius:8rpx;background:var(--card2);overflow:hidden}
+.fbi{height:100%;border-radius:8rpx}
+.fsc2{width:130rpx;text-align:right;font-size:30rpx;font-weight:900;flex:none}
+.fhb{width:60rpx;text-align:right;font-size:22rpx;color:var(--tx2);font-weight:700;flex:none}
+.emp2{text-align:center;color:var(--tx2);font-size:26rpx;padding:36rpx 0}
+.bks{padding:12rpx 28rpx}
+.bkr{display:flex;align-items:center;gap:20rpx;padding:20rpx 0}
+.bkr+.bkr{border-top:2rpx solid var(--line)}
+.bkv{width:84rpx;font-size:44rpx;font-weight:900;flex:none}
+.bkr .dots{flex:1}
+.bkr .dt{width:16rpx;height:16rpx}
+.bkn{font-size:22rpx;color:var(--tx2);font-weight:700;flex:none}
+.cmp{padding:8rpx 28rpx}
+.cr{display:grid;grid-template-columns:1.4fr 1fr 1fr;align-items:center;height:80rpx}
+.cr+.cr{border-top:2rpx solid var(--line)}
+.cr.hd{height:88rpx}
+.cn{justify-self:center;font-size:22rpx;font-weight:800;padding:6rpx 18rpx;border-radius:99rpx;max-width:180rpx;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cl{font-size:26rpx;color:var(--tx2)}
+.cv2{justify-self:center;font-size:28rpx;font-weight:800;padding:4rpx 16rpx;border-radius:99rpx}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);padding:28rpx 12rpx}
+.gi{display:flex;flex-direction:column;align-items:center;gap:8rpx}
+.gv{font-size:36rpx;font-weight:900}
+.gl{font-size:22rpx;color:var(--tx2)}
+.brand{display:flex;align-items:center;justify-content:center;gap:16rpx;margin:56rpx 0 8rpx}
+.blogo{width:52rpx;height:52rpx;border-radius:14rpx}
+.bn{font-size:30rpx;font-weight:900;letter-spacing:2rpx}
+
+/* 每局比分：对局卡片 */
+.mcs{display:flex;flex-direction:column;gap:20rpx}
+.mcw{border-radius:44rpx;box-shadow:0 20rpx 56rpx -28rpx rgba(60,40,20,.28)}

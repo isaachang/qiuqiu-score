@@ -172,6 +172,7 @@ function finishLive(auto) {
   const s = get(), L = s.live;
   if (!L) return null;
   s.live = null;
+  if (L.pauseAt) { L.idle = (L.idle || 0) + Math.max(0, Date.now() - L.pauseAt); delete L.pauseAt; } // 暂停中结束：暂停时间不算
   if (!L.events.length) { save(); return null; }
   L.status = 'done'; L.end = auto ? lastAct(L) : Date.now(); L.id = 'm' + Date.now();
   if (auto) L.auto = true;
@@ -189,8 +190,14 @@ function touchLive() { const L = get().live; if (L) L.touch = Date.now(); }
 /** 进行中的对局超过 30 分钟没操作：自动保存进战绩（结束时间记为最后一次操作），返回保存的对局 */
 function autoSave() {
   const L = get().live;
-  if (!L || Date.now() - lastAct(L) < IDLE) return null;
+  if (!L || L.pauseAt || Date.now() - lastAct(L) < IDLE) return null; // 暂停中不自动保存
   return finishLive(true);
+}
+/* ---------- 暂停：计时、限时倒计时、自动保存都停住 ---------- */
+function pauseLive() { const L = get().live; if (L && !L.pauseAt) { L.pauseAt = Date.now(); save(); } }
+function unpauseLive() {
+  const L = get().live; if (!L || !L.pauseAt) return;
+  L.idle = (L.idle || 0) + Math.max(0, Date.now() - L.pauseAt); delete L.pauseAt; L.touch = Date.now(); save();
 }
 /** 自动保存的对局「继续这局」：放回进行中，中间空着的时间不算对局时长 */
 function resume(id) {
@@ -204,6 +211,22 @@ function resume(id) {
   s.live = m;
   save();
   return true;
+}
+/* ---------- 斯诺克 ---------- */
+/** 斯诺克新对局的设置（记住上一次的对手和赛制） */
+function snkDraft() {
+  const s = get(), me = s.friends.find(f => f.me);
+  if (!s.snkDraft) s.snkDraft = { players: [me.id, null], cfg: { first: 0, bestOf: 1, reds: 15, hc: { p: -1, pts: 0 } } }; // 默认 1 局定胜负
+  const d = s.snkDraft;
+  d.players = d.players.map(id => (id && s.friends.some(f => f.id === id && !f.deleted) ? id : null)); // 删掉的球友不再出现
+  return d;
+}
+function startSnk() {
+  const s = get(), d = snkDraft();
+  if (s.live && !s.live.events.length) s.live = null;
+  s.live = { id: 'live', game: 'snooker', mode: 2, players: d.players.slice(), cfg: JSON.parse(JSON.stringify(d.cfg)), events: [], start: Date.now(), status: 'live', limit: 0 };
+  save();
+  return s.live;
 }
 /** 球友列表（不含已删除的） */
 function activeFriends() { return get().friends.filter(f => !f.deleted); }
@@ -225,4 +248,4 @@ function deleteMatch(id) { const s = get(); markHist(s.history.find(m => m.id ==
 function discardLive() { get().live = null; save(); }
 function match(id) { const s = get(); return id === 'live' ? s.live : s.history.find(m => m.id === id); }
 
-module.exports = { get, save, rev, friend, color, view, addFriend, activeFriends, updateFriend, removeFriend, deleteMatch, loadDemo, clearDemo, newDraft, startLive, finishLive, discardLive, match, COLORS, derive, IDLE, lastAct, touchLive, autoSave, resume };
+module.exports = { get, save, rev, friend, color, view, addFriend, activeFriends, updateFriend, removeFriend, deleteMatch, loadDemo, clearDemo, newDraft, startLive, finishLive, discardLive, match, COLORS, derive, IDLE, lastAct, touchLive, autoSave, resume, snkDraft, startSnk, pauseLive, unpauseLive };

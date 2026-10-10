@@ -50,7 +50,7 @@ Page({
   toLand() { if (this.guard()) return; nav.to('/pages/land/land'); },
   /* ---------- 结算面板 ---------- */
   finish() {
-    this._saving = false; if (this.guard()) return;
+    this._saving = false; if (this.guard() || !this.m) return;
     const m = this.m, D = derive(m), sec = played(m) / 1000, draw = isDraw(D.scores);
     const rank = m.players.map((id, i) => ({ ...store.view(id), s: D.scores[i] })).sort((a, b) => b.s - a.s)
       .map((r, k) => ({ ...r, no: 1 + D.scores.filter(x => x > r.s).length, txt: signed(r.s), cls: r.s > 0 ? 'pos' : r.s < 0 ? 'neg' : '', top: k === 0 && !draw })); // 同分同名次

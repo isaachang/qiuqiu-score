@@ -12,3 +12,6 @@ node_modules/
 小程序/project.private.config.json
 小程序/65a2d2baf26bef874cfb2d765d6cbe11/
 .DS_Store
+
+# 本地预览配置
+.claude/

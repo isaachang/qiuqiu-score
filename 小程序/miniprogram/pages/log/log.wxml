@@ -3,10 +3,11 @@
   <view style="--i:0" class="sums rise">
     <view class="sum" wx:for="{{sums}}" wx:key="id"><view class="av sm" style="background:{{item.c}};color:{{item.i}}">{{item.ch}}</view><text class="sn">{{item.name}}</text><text class="sv num {{item.cls}}">{{item.s}}</text></view>
   </view>
-  <view class="sec rise" style="--i:1;margin-top:12rpx">共 {{total}} 条<text class="s">{{ro?'已结束 · 只读':'点击记录可修改或删除'}}</text></view>
-  <view style="--i:2" class="card rise">
+  <view class="sec rise" style="--i:1;margin-top:12rpx">共 {{total}} 条<text class="s">{{ro?'已结束 · 只读':'左滑编辑或删除'}}</text></view>
+  <view style="--i:2" class="card rise lgc">
     <view wx:if="{{!rows.length}}" class="empty">还没有记录</view>
-    <view class="lr" wx:for="{{rows}}" wx:key="i" data-i="{{item.i}}" bindtap="tapRow" hover-class="{{ro?'':'rowp'}}">
+    <swipe-row wx:for="{{rows}}" wx:key="i" edit disabled="{{ro}}" data-i="{{item.i}}" bind:tapbody="tapRow" bind:edit="tapRow" bind:delete="delRow">
+    <view class="lr {{index>0?'sep':''}}">
       <view class="rd"><text class="rn num">{{item.round}}</text><text class="rl">局</text></view>
       <view class="tile" style="background:{{item.c}}29;color:{{item.t}}"><text wx:if="{{item.k==='h9'}}" class="b9" style="width:34rpx;height:34rpx"></text><text wx:else>{{item.ev[0]}}</text></view>
       <view class="lm">
@@ -16,6 +17,29 @@
       </view>
       <view class="ld num"><text wx:for="{{item.ds}}" wx:for-item="d" wx:key="j" class="{{d.cls}}">{{d.txt}}</text></view>
     </view>
+    </swipe-row>
   </view>
+</view>
+
+<!-- 编辑一条记录：上面选人，下面选结果，一次确定 -->
+<view class="sheet-mask {{ed.show?'on':''}}" bindtap="closeEd" catchtouchmove="noop"></view>
+<view class="sheet {{ed.show?'on':''}}" catchtap="noop" catchtouchmove="noop">
+  <view class="grab"></view>
+  <view class="st">编辑 · 第 {{ed.round}} 局</view>
+  <view class="ss">改完后，比分、顺序和之后的记录会自动重算</view>
+  <view class="elab">谁</view>
+  <view class="eseg">
+    <view wx:for="{{ed.players}}" wx:key="j" class="es2 {{ed.p===item.j?'on':''}}" data-j="{{item.j}}" bindtap="edP">
+      <view class="av sm" style="background:{{item.c}};color:{{item.i}}">{{item.ch}}</view><text>{{item.name}}</text>
+    </view>
+  </view>
+  <view class="elab">结果</view>
+  <view class="eevs">
+    <view wx:for="{{ed.evs}}" wx:key="k" class="eev {{ed.ev===item.k?'on':''}}" data-k="{{item.k}}" bindtap="edE" style="{{ed.ev===item.k?'background:'+item.c+';color:#fff':''}}">
+      <text class="een">{{item.name}}</text><text class="eev2 num">{{item.v}}</text>
+    </view>
+  </view>
+  <view class="btn pri ebtn" bindtap="saveEd" hover-class="press">确定</view>
+  <view class="ecancel" bindtap="closeEd">取消</view>
 </view>
 <ui-sheet show="{{ui.show}}" icon="{{ui.icon}}" title="{{ui.title}}" desc="{{ui.desc}}" actions="{{ui.actions}}" bind:action="onUi" bind:close="onUiClose"/>

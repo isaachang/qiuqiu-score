@@ -1,6 +1,8 @@
 const store = require('../../utils/store');
 const nav = require('../../utils/nav');
 const idle = require('../../utils/idle');
+const SN = require('../../utils/snooker');
+const { liveUrl } = require('../../utils/game');
 const { isDev } = require('../../utils/env');
 const { derive, signed, played } = require('../../utils/engine');
 const { clock } = require('../../utils/util');
@@ -139,7 +141,14 @@ Page({
   /* ---------- 旧局未结算：自定义面板（替代微信自带的选项框） ---------- */
   openOld() {
     this._oldDone = false;
-    const L = store.get().live, D = derive(L);
+    const L = store.get().live;
+    if (L.game === 'snooker') { // 旧局是斯诺克：显示局分和本局比分
+      const S = SN.derive(L);
+      const players = L.players.map((id, i) => ({ ...store.view(id), s: `${S.fw[i]} 局 · ${S.F.sc[i]}`, cls: '' }));
+      this.setData({ old: { show: true, confirm: false, empty: !L.events.length, mode: '斯诺克', rounds: S.frames.length, logs: L.events.length, dur: clock(played(L) / 1000), players } });
+      return;
+    }
+    const D = derive(L);
     const players = L.players.map((id, i) => ({ ...store.view(id), s: signed(D.scores[i]), cls: D.scores[i] > 0 ? 'pos' : D.scores[i] < 0 ? 'neg' : '' }));
     this.setData({ old: { show: true, confirm: false, empty: !L.events.length, mode: L.mode === 2 ? '双人' : '三人', rounds: D.round - 1, logs: L.events.length, dur: clock(played(L) / 1000), players } });
   },
@@ -148,5 +157,5 @@ Page({
   askDiscard() { wx.vibrateShort({ type: 'light' }); this.setData({ 'old.confirm': true }); },
   backFromDiscard() { this.setData({ 'old.confirm': false }); },
   discardOld() { if (this._oldDone) return; this._oldDone = true; store.discardLive(); this.setData({ 'old.show': false }); this.go(); },
-  continueOld() { if (this._oldDone) return; this._oldDone = true; this.setData({ 'old.show': false }); nav.redirect('/pages/score/score'); },
+  continueOld() { if (this._oldDone) return; this._oldDone = true; this.setData({ 'old.show': false }); nav.redirect(liveUrl(store.get().live)); },
 });

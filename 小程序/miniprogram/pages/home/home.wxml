@@ -24,7 +24,7 @@
   </view>
 
   <view wx:if="{{live}}" class="card live rise" style="--i:3" hover-class="press" bindtap="resume">
-    <view class="lh"><view class="dot"><view class="ring"></view></view><text class="lt2">{{live.mode}}追分 · 第 {{live.round}} 局 · <text class="lclk {{live.ccls}}">{{live.ccls==='cd'||live.ccls==='warn'?'剩 ':''}}{{live.clock}}</text></text><view class="go2">继续 ›</view></view>
+    <view class="lh"><view class="dot"><view class="ring"></view></view><text class="lt2">{{live.title}}<text class="lclk {{live.ccls}}">{{live.ccls==='cd'||live.ccls==='warn'?'剩 ':''}}{{live.clock}}</text></text><view class="go2">继续 ›</view></view>
     <view class="lg" style="grid-template-columns:repeat({{live.cols}},1fr)">
       <view class="lp" wx:for="{{live.players}}" wx:key="id">
         <view class="av pop" style="--i:{{index+3}};background:{{item.c}};color:{{item.i}};width:80rpx;height:80rpx;font-size:32rpx">{{item.ch}}</view>
@@ -36,24 +36,21 @@
 
   <view class="sec rise" style="--i:4">更多玩法<text class="s">持续上新</text></view>
   <view class="more rise" style="--i:5">
-    <view class="mm" style="background:#FFF3D6" bindtap="soon" hover-class="press"><view class="mi" style="background:#FFC53D"><text>8</text></view><text class="mmt">中式八球</text><text class="mtag" style="color:#9A6A00">即将上线</text></view>
-    <view class="mm" style="background:#DDF6EC" bindtap="soon" hover-class="press"><view class="mi" style="background:#1FC98E"><text>S</text></view><text class="mmt">斯诺克</text><text class="mtag" style="color:#0E7A55">即将上线</text></view>
-    <view class="mm" style="background:#EEE7FF" bindtap="soon" hover-class="press"><view class="mi" style="background:#9B6BFF"><text>9</text></view><text class="mmt">九球抢局</text><text class="mtag" style="color:#5B3BC4">即将上线</text></view>
+    <view class="mm m-snk" bindtap="newSnk" hover-class="mpress2"><view class="mmo"></view><view class="mi3 b-red"></view><text class="mmt">斯诺克</text><text class="mtag go">开始记分 ›</text></view>
+    <view class="mm m-8" bindtap="soon" hover-class="mpress2"><view class="mmo"></view><view class="mi3 b-8"><text>8</text></view><text class="mmt">中式八球</text><text class="mtag">即将上线</text></view>
+    <view class="mm m-9" bindtap="soon" hover-class="mpress2"><view class="mmo"></view><view class="mi3 b-9"><text>9</text></view><text class="mmt">九球抢局</text><text class="mtag">即将上线</text></view>
   </view>
 
-  <view class="sec rise" style="--i:6">最近对局<text class="s" bindtap="toStats">左滑可删除 · 全部 ›</text></view>
-  <view class="card clip rise" style="--i:7">
-    <view wx:if="{{!recent.length}}" class="emp">
+  <view class="sec rise" style="--i:6">最近对局<text class="s">左滑可删除</text></view>
+  <view wx:if="{{!recent.length}}" class="card clip rise" style="--i:7">
+    <view class="emp">
       <view class="ill"><view class="ball" style="width:96rpx;height:96rpx;left:20rpx;top:40rpx;background:#FF5A5F"></view><view class="ball" style="width:110rpx;height:110rpx;left:70rpx;top:10rpx;background:#FFC53D;animation-delay:-1.2s"></view><view class="ball" style="width:88rpx;height:88rpx;left:140rpx;top:50rpx;background:#3D7BFF;animation-delay:-2.4s"></view></view>
-      <text class="et">还没有对局</text><text class="es">点上面的双人 / 三人追分，开第一局吧</text>
+      <text class="et">还没有对局</text><text class="es">点上面的玩法，开第一局吧</text>
     </view>
-    <swipe-row wx:for="{{recent}}" wx:key="id" data-id="{{item.id}}" bind:tapbody="openMatch" bind:delete="askDelete">
-      <view class="row {{index>0?'sep':''}}">
-        <view class="stack"><view class="av sm" wx:for="{{item.avs}}" wx:for-item="a" wx:key="id" style="background:{{a.c}};color:{{a.i}}">{{a.ch}}</view></view>
-        <view class="rm"><text class="rn">{{item.names}}</text><text class="rs">{{item.mode}} · {{item.rounds}} 局 · {{item.when}}</text></view>
-        <view class="wl"><text class="num {{item.cls}}">{{item.s}}</text><text class="wr">{{item.res}}</text></view>
-      </view>
-    </swipe-row>
+  </view>
+  <view wx:else class="mcs rise" style="--i:7">
+    <swipe-row wx:for="{{recent}}" wx:key="id" round data-id="{{item.id}}" bind:tapbody="openMatch" bind:delete="askDelete"><match-card c="{{item.card}}"/></swipe-row>
+    <view class="more-btn" bindtap="toAll" hover-class="press">查看全部对局 ›</view>
   </view>
   <view class="tabpad"></view>
 </view>
