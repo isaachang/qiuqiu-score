@@ -12,7 +12,7 @@
     <view class="row" bindtap="toFriends" hover-class="rowp"><text class="rl">球友管理</text><text class="rv">{{count}} 位</text><text class="chev">›</text></view>
     <view class="row"><text class="rl">记分时屏幕常亮</text><switch checked="{{keep}}" color="#22C993" data-k="keep" bindchange="toggle"/></view>
     <view class="row"><text class="rl">计分震动反馈</text><switch checked="{{vib}}" color="#22C993" data-k="vib" bindchange="toggle"/></view>
-    <view class="row"><view class="dm"><text class="rl">金球音效</text><text class="dsub">打出大金、小金时播放；手机静音时不响</text></view><switch checked="{{sfx}}" color="#22C993" data-k="sfx" bindchange="toggle"/></view>
+    <view class="row"><view class="dm"><text class="rl">金球音效</text><text class="dsub">打出大金、小金、黄金九时播放；静音模式下也会响，可在这里关闭</text></view><switch checked="{{sfx}}" color="#22C993" data-k="sfx" bindchange="toggle"/></view>
   </view>
   <view wx:if="{{dev}}" class="sec rise" style="--i:4">演示数据</view>
   <view wx:if="{{dev}}" class="card rise" style="--i:4">

@@ -1,4 +1,4 @@
-// 金球音效：打出大金、小金时播放（黄金九不播）。手机开静音时不响；可在「我的」里关闭。
+// 金球音效：打出大金、小金、黄金九时播放。不跟随 iPhone 静音键：只要媒体音量开着就响；可在「我的」里关闭。
 // 注意：iOS 上「stop() 后立刻 play()」会静默失败（连续两个金球时第二个没声音），
 // 所以正在播放时只跳回开头，不先 stop。
 const store = require('./store');
@@ -7,7 +7,8 @@ const fireEnd = () => { playing = false; const f = endCb; endCb = null; f && f()
 
 function audio() {
   if (!ctx) {
-    try { wx.setInnerAudioOption({ obeyMuteSwitch: true, mixWithOther: true }); } catch (e) {}
+    // 静音模式下也播；不打断手机上正在放的歌
+    try { wx.setInnerAudioOption({ obeyMuteSwitch: false, mixWithOther: true }); } catch (e) {}
     ctx = wx.createInnerAudioContext();
     ctx.src = '/audio/gold.mp3';
     ctx.onPlay(() => { playing = true; });

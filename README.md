@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.4.0-FF5A5F?style=flat-square" alt="版本 0.4.0">
+  <img src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.4.1-FF5A5F?style=flat-square" alt="版本 0.4.1">
   <img src="https://img.shields.io/badge/%E5%B9%B3%E5%8F%B0-%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F-07C160?style=flat-square&logo=wechat&logoColor=white" alt="微信小程序">
   <img src="https://img.shields.io/badge/%E6%8A%80%E6%9C%AF-%E5%8E%9F%E7%94%9F%20WXML%20%2F%20WXSS%20%2F%20JS-3D7BFF?style=flat-square" alt="原生">
   <img src="https://img.shields.io/badge/%E7%8A%B6%E6%80%81-%E5%86%85%E6%B5%8B%E4%B8%AD-FFB020?style=flat-square" alt="内测中">
@@ -132,7 +132,7 @@ npm install
 npm run smoke      # 冒烟测试
 npm run preview    # 生成预览二维码（开发版）
 npm run shots      # 重新生成 README 截图（需要本机装有 Chrome）
-npm run upload -- 0.4.0 "更新说明"   # 上传新版本，到小程序后台设为体验版
+npm run upload -- 0.4.1 "更新说明"   # 上传新版本，到小程序后台设为体验版
 ```
 
 > 上传需要小程序后台的代码上传密钥和 IP 白名单；密钥只在本机使用，不在仓库里。
@@ -143,7 +143,8 @@ npm run upload -- 0.4.0 "更新说明"   # 上传新版本，到小程序后台�
 
 | 版本 | 主要内容 |
 | :-- | :-- |
-| **0.4.0** | 斯诺克、暂停、名字牌、战绩改版、记录左滑编辑 / 删除 |
+| **0.4.1** | 金球音乐静音模式下也播放（跟随媒体音量） |
+| 0.4.0 | 斯诺克、暂停、名字牌、战绩改版、记录左滑编辑 / 删除 |
 | 0.3.0 | 平局、限时比赛、30 分钟自动保存、横屏结算、新手引导、体验版不含演示数据 |
 | 0.2.2 | 液态玻璃 Tab「开火 / 战绩 / 我的」、金球 BGM、历史日历 |
 | 0.2.1 | 演示数据（Isaac / Henry / Hugo） |
